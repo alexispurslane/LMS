@@ -1,0 +1,55 @@
+import tdl, math
+import player, races, utils, colors
+def display_stat(name, obj):
+    a = getattr(obj, 'max_'+consts.ABBREV[name])
+    b = getattr(obj, consts.ABBREV[name])
+    return '%s: %d(%d)' % (name, b, a)
+
+def draw_hud(GS):
+    for i in range(0, consts.HEIGHT):
+        GS['console'].drawChar(math.ceil(consts.WIDTH/2), i, '|')
+
+    player = GS['player']
+    rows = [
+        'LL: '+str(player.level)+'('+str(player.race.levels)+') '+player.race.name,
+        display_stat('HT', player)+' '+display_stat('ST', player)+' '+display_stat('SP', player),
+        display_stat('AT', player)
+    ]
+    GS['console'].drawStr(math.ceil(consts.WIDTH/2)+2, consts.HEIGHT-1, rows[0])
+    GS['console'].drawStr(math.ceil(consts.WIDTH/2)+2, consts.HEIGHT-2, rows[1])
+    GS['console'].drawStr(math.ceil(consts.WIDTH/2)+2, consts.HEIGHT-3, rows[2])
+
+    for (i, m) in enumerate(GS['messages']):
+        c = int(255/(i+1))
+        if c < 0: c = 0 # cap
+        if GS['turns'] == 0: c = 255
+
+        GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
+
+    if len(GS['messages']) > 17:
+        return []
+    else:
+        return GS['messages']
+
+def draw_screen(GS):
+    console = GS['console']
+    console.clear()
+
+    if GS['screen'] == 'GAME':
+        GS['messages'] = draw_hud(GS)
+        GS['terrain_map'].draw_map(GS['console'], GS['player'])
+        for m in GS['proweling_monsters']:
+            if GS['terrain_map'].terrain_map.fov[m.x, m.y]:
+                GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=colors.brown)
+        console.drawChar(GS['player'].x, GS['player'].y, '@', bg=colors.brown)
+    elif GS['screen'] == 'INTRO':
+        console.drawStr(int(consts.WIDTH/2)-12, 2, 'Welcome to Alchemy Sphere')
+        console.drawStr(int(consts.WIDTH/2)-13, 3, '*press any key to continue*')
+    elif GS['screen'] == 'DEATH':
+        console.drawStr(int(consts.WIDTH/2)-2, 2, 'R.I.P', fg=(255, 0, 0))
+        p = GS['player']
+        console.drawStr(int(consts.WIDTH/2)-4, 3, 'Score: ' + str(p.attack/2+p.strength))
+        console.drawStr(int(consts.WIDTH/2)-10, 3, '*press R to restart*')
+
+    tdl.flush()
+

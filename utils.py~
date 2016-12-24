@@ -1,0 +1,49 @@
+import math
+
+class Item:
+    def __init__(self, name='Unknown item', weight=1):
+        self.name = name
+        self.weight = weight
+
+class Weapon(Item):
+    def __init__(self, name='Unknown weapon', weight=2, attack=5):
+        super().__init__(name=name, weight=weight)
+        self.attack = attack
+        
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Player:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.speed = 4
+        self.health = 100
+        self.inventory = [
+            Weapon(name='Fencing sword', attack=13, weight=1)
+        ]
+        self.strength = 1
+
+    def learn(self, monster):
+        self.strength += math.floor(monster.health/4)
+        self.attack += math.floor(monster.attack/4)
+        self.strength += math.floor(monster.attack/4)
+
+    def attack(self, monster):
+        if monster.speed < self.speed:
+            player.health -= monster.attack
+            monster.health -= player.attack
+        
+    def add_inventory_item(self, item):
+        self.inventory.append(item)
+        self.inventory.sort(key = lambda x: x.weight)
+        self.speed = 4 + self.inventory[0].weight/self.strength
+        if isinstance(item, Weapon):
+            self.attack = item.attack
+
+def dist(p1, p2):
+    return math.ceil(math.sqrt(math.pow(p2.x - p1.x, 2) +
+                                math.pow(p2.y - p1.y, 2)))
+

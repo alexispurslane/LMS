@@ -1,0 +1,93 @@
+import tdl
+import random, math
+import monsters, colors, consts, utils
+
+class TerrainMap:
+    def __init__(self, w, h):
+        self.terrain_map = tdl.map.Map(w, h)
+        self.dungeon_level = 0
+        self.width = w
+        self.height = h
+        self.fov = True
+        self.proweling_monsters = []
+        self.monsterN = 0
+        self.dungeon_monsters = [
+            [monsters.Goblin() for n in range(0,4)] + [monsters.Giant(), monsters.Giant()],
+            [monsters.Witch() for n in range(0,4)] + [monsters.Wyvern(), monsters.Wyvern()],
+            [monsters.Fury() for n in range(0,4)] + [monsters.FlyingDragon(), monsters.FlyingDragon()],
+            [monsters.BabyDragon() for n in range(0,4)] + [monsters.Dragon(), monsters.Dragon()],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)],
+            [random.choice(monsters.all_monsters)() for n in range(0, 7)]
+        ]
+        
+    def on_map(self, x, y):
+        return x >= 0 and x < self.width and y >= 0 and y < self.height
+
+    def monster_at(self, x, y):
+        for m in self.proweling_monsters:
+            if m.x == x and m.y == y:
+                return m
+        return None
+            
+    def is_walkable(self, x, y, player=utils.Point(-1, -1)):
+        return self.on_map(x,y) and not self.monster_at(x, y)\
+               and not x == player.x and not y == player.y\
+               and self.terrain_map.walkable[x, y]
+
+    def more_dungeons(self):
+        return self.dungeon_level < len(self.dungeon_monsters)
+    
+    def generate_new_map(self):
+        self.proweling_monsters = []
+        self.monsterN = 0
+        playerX, playerY = None, None
+        noise = tdl.noise.Noise(mode='FBM', octaves=2, dimensions=2, hurst=0.6, lacunarity=0.1)
+        def get_type(x,y):
+            l = noise.get_point(x, y)
+            if l > consts.FLOOR_LEVEL and l < consts.LARGE_TREE_LEVEL:
+                return 'TREE'
+            elif l >= consts.LARGE_TREE_LEVEL:
+                return 'LARGE_TREE'
+            else:
+                return 'FLOOR'
+
+        for x, y in self.terrain_map:
+            self.terrain_map.transparent[x, y] = get_type(x,y) == 'FLOOR'
+            self.terrain_map.walkable[x, y] = get_type(x,y) == 'FLOOR' or get_type(x,y) == 'TREE'
+            if self.terrain_map.transparent[x, y] and not playerX and not playerY:
+                playerX = x
+                playerY = y
+            elif self.terrain_map.transparent[x, y]:
+                r = random.randint(1, 100)
+                if r <= 30 and self.more_dungeons() and self.monsterN < 6:
+                    monster = self.dungeon_monsters[self.dungeon_level][self.monsterN]
+                    monster.x = x
+                    monster.y = y
+                    self.monsterN += 1
+                    self.proweling_monsters.append(monster)
+
+        self.dungeon_level += 1
+        return (self.proweling_monsters, playerX, playerY)
+
+    def draw_map(self, console, player):
+        if self.fov:
+            m = self.terrain_map.compute_fov(player.x, player.y, cumulative=True)
+        else:
+            m = self.terrain_map
+        for x, y in m:
+            if not self.on_map(x+1,y):
+                console.drawChar(x, y, '>', bg=colors.brown, fg=colors.grey)
+            elif self.terrain_map.transparent[x, y]:
+                console.drawChar(x, y, '.', bg=colors.brown)
+            elif not self.terrain_map.walkable[x, y]:
+                console.drawChar(x, y, 'T', fg=colors.dark_green, bg=colors.brown)
+            elif not self.terrain_map.transparent[x, y]:
+                console.drawChar(x, y, 't', fg=colors.green, bg=colors.brown)
+
