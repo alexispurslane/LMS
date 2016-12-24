@@ -58,9 +58,23 @@ class TerrainMap:
                    (max(x+1, 0), y) in self.water or\
                    (x, max(y+1, 0)) in self.water or\
                    (x, max(y-1, 0)) in self.water
-
+        
+        def all_around_floor(x, y):
+            return get_type(max(x-1, 0), y) == 'FLOOR' and\
+                   get_type(max(x-2, 0), y) == 'FLOOR' and\
+                   get_type(max(x-3, 0), y) == 'FLOOR' and\
+                   get_type(max(x+1, 0), y) == 'FLOOR' and\
+                   get_type(max(x+2, 0), y) == 'FLOOR' and\
+                   get_type(max(x+3, 0), y) == 'FLOOR' and\
+                   get_type(x, max(y+1, 0)) == 'FLOOR' and\
+                   get_type(x, max(y+2, 0)) == 'FLOOR' and\
+                   get_type(x, max(y+3, 0)) == 'FLOOR' and\
+                   get_type(x, max(y-1, 0)) == 'FLOOR' and\
+                   get_type(x, max(y-2, 0)) == 'FLOOR' and\
+                   get_type(x, max(y-3, 0)) == 'FLOOR'
+        
         choices = monsters.select_by_difficulty(self.forest_level)
-        ms = [random.choice(choices)() for i in range(random.randint(7, 14))]
+        ms = [random.choice(choices)() for i in range(random.randint(20, 40))]
         
         if self.forest_level == consts.FOREST_LEVELS:
             ms.append(monsters.FlyingDragon())
@@ -71,6 +85,15 @@ class TerrainMap:
             self.terrain_map.walkable[x, y] = get_type(x, y) == 'WATER' or\
                                               get_type(x,y) == 'FLOOR' or\
                                               get_type(x,y) == 'TREE'
+
+            if random.randint(1, 40) > 20:
+                if get_type(x,y) == 'FLOOR' and\
+                   all_around_floor(x, y):
+                    n = random.randint(1, 1000)
+                    for item in sorted(items.ITEMS, key=lambda i: i.probability):
+                        if n < item.probability:
+                            self.spawned_items[x, y] = item
+
             if random.randint(1, 100) < 99 and\
                (len(self.water) < 4 or adjacent_water(x, y)) and\
                get_type(x, y) == 'FLOOR':
@@ -82,7 +105,8 @@ class TerrainMap:
                 self.water[x, y] = True
             elif self.terrain_map.transparent[x, y]:
                 r = random.randint(1, 100)
-                if r <= 50 and self.monsterN < len(ms) and not get_type(x, y) == 'WATER':
+                if r <= 50 and self.monsterN < len(ms) and not get_type(x, y) == 'WATER' and\
+                   utils.dist(utils.Point(x, y), utils.Point(playerX, playerY)) >= 10:
                     monster = ms[self.monsterN]
                     monster.x = x
                     monster.y = y
@@ -93,12 +117,6 @@ class TerrainMap:
                         self.proweling_monsters.append(partner)
                     self.monsterN += 1
                     self.proweling_monsters.append(monster)
-            else:
-                if get_type(x,y) == 'FLOOR':
-                    n = random.randint(1, 100)
-                    for item in sorted(items.ITEMS, key=lambda i: i.weight):
-                        if n < item.probability:
-                            self.spawned_items[x, y] = item
 
         self.forest_level += 1
         return (playerX, playerY)

@@ -18,10 +18,13 @@ def run_game(GS):
             'Get ye to the last forest, from thence to the',
             'caves. You\'re pereformance will be evaluated.'
         ],
+        'side_screen': 'HUD',
         'turns': 0
     }
         
     while True:
+        if GS['player'].health <= 0:
+            GS['screen'] = 'DEATH'
         draw.draw_screen(GS)
 
         for event in tdl.event.get():
@@ -35,12 +38,17 @@ def run_game(GS):
                 (GS['player'].x,
                  GS['player'].y) = GS['terrain_map'].generate_new_map()
             elif event.type == 'KEYDOWN' and GS['screen'] == 'GAME':
-                if event.keychar.upper() in consts.GAME_KEYS['M']:
+                if event.keychar.upper() in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':
                     GS['player'].move(event, GS)
-                if event.keychar.upper() in consts.GAME_KEYS['A']:
+                elif event.keychar.upper() in consts.GAME_KEYS['A']:
                     consts.GAME_KEYS['A'][event.keychar.upper()](GS, GS['player'])
-                for m in GS['terrain_map'].proweling_monsters:
-                    m.move(GS)
-                GS['turns'] += 1
+                elif event.keychar == '?' and GS['side_screen'] == 'HUD':
+                    GS['side_screen'] = 'MAN'
+                elif event.keychar == '?' and GS['side_screen'] == 'MAN':
+                    GS['side_screen'] = 'HUD'
+
+                if GS['side_screen'] == 'HUD':
+                    utils.monster_turn(GS)
+                    GS['turns'] += 1
 
 run_game(None)

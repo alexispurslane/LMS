@@ -24,7 +24,7 @@ class Weapon(Item):
         player.attack = self.attack
 
 ITEMS = [
-    Weapon('Broad sword', weight=10, attack=20, probability=10, char='|'),
-    Weapon('Fencing foil', weight=1, attack=15, probability=8, char=')'),
-    Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=15)
+    Weapon('Broad sword', weight=10, attack=20, probability=2, char='|'),
+    Weapon('Fencing foil', weight=1, attack=15, probability=5, char=')'),
+    Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=8)
 ]

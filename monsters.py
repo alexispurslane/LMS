@@ -17,21 +17,16 @@ class Monster:
         sight = int(self.speed/6.25)
         if sight < 4: sight = 4
 
-        small = True
-        if self.health < GS['player'].health:
-            small = utils.dist(self, GS['player']) >= 1 and self.speed > GS['player'].speed
-            # Smaller, slower monsters will run away
-            
         if utils.Point(GS['player'].x, GS['player'].y) in adj:
             GS['messages'].insert(0, 'The '+type(self).__name__+' attacks you suddenly!')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
-                GS['messages'].insert(0, 'You destory the sneaky '+type(self).__name__)
-        elif utils.dist(self, GS['player']) <= sight and small:
+                GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
+        elif utils.dist(self, GS['player']) <= sight:
             valid = list(filter(lambda p:
-                                GS['terrain_map'].is_walkable(p.x, p.y, GS['player']),
+                                GS['terrain_map'].is_walkable(p.x, p.y),
                                 adj))
-            if random.randint(0, 10) <= sight:
+            if random.randint(0, 20) <= sight:
                 if len(valid) > 0:
                     like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
                     choices = []
@@ -102,7 +97,7 @@ create_monster('Dragon', 'D', colors.dark_red,
 create_monster('Goblin', 'g', colors.green,
                speed = 3,
                health = 10,
-               attack = 12,
+               attack = 8,
                sound = 'pattering')
 
 create_monster('Giant', 'G', colors.dark_green,
@@ -111,10 +106,10 @@ create_monster('Giant', 'G', colors.dark_green,
                attack = 25,
                sound = 'thumping')
 
-create_monster('Wizard', 'i', colors.blue,
+create_monster('Wizard', 'i', colors.light_blue,
                health = 10,
                speed = 2,
-               attack = 8,
+               attack = 4,
                sound = 'grumbling')
 
 create_monster('Witch', 'w', colors.grey,

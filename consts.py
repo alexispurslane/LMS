@@ -1,3 +1,5 @@
+import utils
+
 FONT_SIZE        = 8
 FLOOR_LEVEL      = 0.4
 WATER_LEVEL      = 0.0000049
@@ -15,14 +17,22 @@ GAME_MOVEMENT_KEYS = {
     'J':     [0, 1],
 }
 def pickup(GS, p):
-    item = GS['terrain_map'].spawned_items[p.x, p.y]
-    GS['messages'].insert(0, 'You pick up a '+item.name)
-    GS['terrain_map'].spawned_items.remove(item)
-    p.add_inventory_item(item)
-    
+    if (p.x, p.y) in GS['terrain_map'].spawned_items:
+        item = GS['terrain_map'].spawned_items[p.x, p.y]
+        GS['messages'].insert(0, 'You pick up a '+item.name)
+        del GS['terrain_map'].spawned_items[p.x, p.y]
+        p.add_inventory_item(item)
+
+def auto_rest(GS, p):
+    while p.health < p.max_health:
+        p.rest()
+        utils.monster_turn(GS)
+        GS['turn'] += 1
+
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),
-    ',': pickup
+    ',': pickup,
+    ':': auto_rest
 }
 GAME_KEYS = {
     'M': GAME_MOVEMENT_KEYS,

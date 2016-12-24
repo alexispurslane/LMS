@@ -1,5 +1,4 @@
 import math
-import consts
 
 class Point:
     def __init__(self, x, y):
@@ -22,3 +21,7 @@ def f7(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
+
+def monster_turn(GS):
+    for m in GS['terrain_map'].proweling_monsters:
+        m.move(GS)

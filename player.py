@@ -4,7 +4,7 @@ class Player:
     def __init__(self, race):
         self.x = 0
         self.y = 0
-        self.level = 1
+        self.level = 0
         self.exp = 0
 
         # Setup character's race.
@@ -17,7 +17,7 @@ class Player:
         self.defence = 0
 
     def learn(self, GS, monster):
-        self.exp = math.floor(monster.attack/2)
+        self.exp += math.floor(monster.attack/2)
         self.level_up(GS)
 
     def rest(self):
@@ -25,13 +25,13 @@ class Player:
             self.health += 1
             
     def level_up(self, GS):
-        s = math.floor(self.strength/20)
+        s = math.floor(self.exp/(20+self.level*4))
         prevlev = self.level
-        if s >= 1 and s <= self.races.levels:
+        if s >= 1 and s <= self.race.levels:
             self.level = s
             if self.level > prevlev:
-                GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+self.level)
-            self.max_health = self.level*self.race.level_up_bonus
+                GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+str(self.level))
+            self.max_health = (self.level+1)*self.race.level_up_bonus
 
     def attack_monster(self, GS, monster):
         if monster.speed < self.speed:
@@ -53,7 +53,7 @@ class Player:
         self.inventory.append(item)
         self.inventory.sort(key = lambda x: x.weight)
         self.speed = 4 + max(0, self.inventory[0].weight-self.strength)
-        item.equip(self)
+        item.equip(self) # Autoequip for now.
 
     def move(self, event, GS):
         if self.health < 12:
@@ -61,7 +61,7 @@ class Player:
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
         nY = self.y + dY
-        if nX >= consts.WIDTH and GS['terrain_map'].more_dungeons():
+        if nX >= consts.WIDTH and GS['terrain_map'].more_forests():
             GS['messages'].insert(0, "You move on through the forest")
             (self.x, self.y) = terrain_map.generate_new_map() 
         if GS['terrain_map'].is_walkable(nX, nY):
