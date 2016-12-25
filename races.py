@@ -3,8 +3,13 @@ import utils, items
 defaults = {
     'max_health': 25,
     'strength': 1,
+    'skills': {
+        'weapon': 1,
+        'spell': 0.8,
+        'range': 0.8
+    },
     'inventory': [
-        items.Weapon('Short sword', attack=12, weight=2)
+        items.SHORT_SWORD
     ]
 }
 default_settings = {
@@ -25,11 +30,37 @@ class Race:
 HUMAN      = Race() # Its raceist!
 HALF_GIANT = Race({
     'max_health': 100,
-    'strength': 5,
-    'inventory': []
+    'strength': 10,
+    'inventory': [],
+    'skills': {
+        'weapon': 0.9,
+        'spell': 0.5,
+        'range': 0
+    }
 }, {
     'name': 'Half-Giant',
     'bonus': 2,
     'speed': 10,
     'levels': 3
 })
+ELF = Race({
+    'max_health': 18,
+    'strength': 2,
+    'inventory': [
+        items.FENCING_FOIL,
+        items.LIGHT_BOW,
+        items.ELVEN_HELM
+    ]+[items.WOODEN_ARROW]*7+[items.REGULAR_ARROW]*20,
+    'skills': {
+        'weapon': 0.98,
+        'spell': 1,
+        'range': 1.2
+    }
+}, {
+    'name': 'Elf',
+    'bonus': 30,
+    'speed': 2,
+    'levels': 13
+})
+
+RACES = [HUMAN, HALF_GIANT, ELF]

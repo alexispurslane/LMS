@@ -14,8 +14,8 @@ class Monster:
             utils.Point(self.x, self.y+1),
             utils.Point(self.x, self.y-1)
         ]
-        sight = int(self.speed/6.25)
-        if sight < 4: sight = 4
+        sight = int(self.speed/2)
+        if sight < 8: sight = 8
 
         if utils.Point(GS['player'].x, GS['player'].y) in adj:
             GS['messages'].insert(0, 'The '+type(self).__name__+' attacks you suddenly!')
@@ -26,22 +26,22 @@ class Monster:
             valid = list(filter(lambda p:
                                 GS['terrain_map'].is_walkable(p.x, p.y),
                                 adj))
-            if random.randint(0, 20) <= sight:
-                if len(valid) > 0:
-                    like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
-                    choices = []
+            #if random.randint(0, 20) <= sight:
+            if len(valid) > 0:
+                like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
+                choices = []
+                
+                if len(like) > 0:
+                    choices = like
+                else:
+                    choices = valid
                     
-                    if len(like) > 0:
-                        choices = like
-                    else:
-                        choices = valid
-                    
-                    chosen = min(choices, key=lambda p: utils.dist(p, GS['player']))
-                    self.x, self.y = chosen.x, chosen.y
-            else:
-                if len(valid) > 0:
-                    chosen = random.choice(valid)
-                    self.x, self.y = chosen.x, chosen.y
+                chosen = min(choices, key=lambda p: utils.dist(p, GS['player']))
+                self.x, self.y = chosen.x, chosen.y
+            #else:
+            #    if len(valid) > 0:
+            #        chosen = random.choice(valid)
+            #        self.x, self.y = chosen.x, chosen.y
         adj = 'distant'
         dist = utils.dist(self, GS['player'])
         if dist <= 20:
@@ -52,7 +52,7 @@ class Monster:
             adj = 'close'
         elif dist <= 4:
             adj = 'dangerously nearby'
-        if not GS['terrain_map'].terrain_map.fov[self.x, self.y] and random.randint(1, 100) <= 20:
+        if not GS['terrain_map'].terrain_map.fov[self.x, self.y] and random.randint(1, 100) <= 15:
             GS['messages'].insert(0, 'You hear a '+adj+' '+self.sound+' sound')
 
 # g - goblin
@@ -84,7 +84,7 @@ create_monster('Fury', 'f', colors.yellow,
 
 create_monster('BabyDragon', 'd', colors.red,
                speed=4,
-               health=12,
+               health=30,
                attack=15,
                sound='scratching')
 
@@ -96,7 +96,7 @@ create_monster('Dragon', 'D', colors.dark_red,
 
 create_monster('Goblin', 'g', colors.green,
                speed = 3,
-               health = 10,
+               health = 20,
                attack = 8,
                sound = 'pattering')
 
@@ -107,13 +107,13 @@ create_monster('Giant', 'G', colors.dark_green,
                sound = 'thumping')
 
 create_monster('Wizard', 'i', colors.light_blue,
-               health = 10,
+               health = 11,
                speed = 2,
                attack = 4,
                sound = 'grumbling')
 
 create_monster('Witch', 'w', colors.grey,
-               health = 7,
+               health = 11,
                speed = 3,
                attack = 2,
                sound = 'tapping')

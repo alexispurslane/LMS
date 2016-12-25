@@ -11,10 +11,17 @@ class Player:
         self.race = race
         self.max_health = self.health = self.race.first_level['max_health']
         self.max_strength = self.strength = self.race.first_level['strength']
-        self.attack = self.max_attack = self.race.first_level['inventory'][0].attack
+        self.attack = self.race.first_level['strength']
+        self.max_attack = self.attack
         self.inventory = self.race.first_level['inventory']
         self.speed = self.max_speed = self.race.speed
         self.defence = 0
+        self.killed_monsters = 0
+        self.ranged_weapon = None
+        self.missles = []
+
+        for item in self.inventory:
+            item.equip(self)
 
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
@@ -25,13 +32,14 @@ class Player:
             self.health += 1
             
     def level_up(self, GS):
-        s = math.floor(self.exp/(20+self.level*4))
+        s = math.floor(self.exp/(60+self.level*4))
         prevlev = self.level
         if s >= 1 and s <= self.race.levels:
             self.level = s
             if self.level > prevlev:
                 GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+str(self.level))
             self.max_health = (self.level+1)*self.race.level_up_bonus
+            self.strength += math.floor(self.race.level_up_bonus/10)
 
     def attack_monster(self, GS, monster):
         if monster.speed < self.speed:
@@ -45,8 +53,10 @@ class Player:
                 self.health -= monster.attack
                 self.health += self.defence
                 
-        if self.health > 0:
+        if self.health > 0 and monster.health <= 0:
             self.learn(GS, monster)
+        if monster.health <= 0:
+            self.killed_monsters += 1
         return (self.health <= 0, monster.health <= 0)
         
     def add_inventory_item(self, item):
@@ -61,7 +71,7 @@ class Player:
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
         nY = self.y + dY
-        if nX >= consts.WIDTH and GS['terrain_map'].more_forests():
+        if nX >= consts.WIDTH-1 and GS['terrain_map'].more_forests():
             GS['messages'].insert(0, "You move on through the forest")
             (self.x, self.y) = terrain_map.generate_new_map() 
         if GS['terrain_map'].is_walkable(nX, nY):

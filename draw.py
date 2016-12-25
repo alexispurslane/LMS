@@ -4,87 +4,130 @@ import maps, monsters, consts, colors, utils, races, player
 def display_stat(name, obj):
     a = getattr(obj, 'max_'+consts.ABBREV[name])
     b = getattr(obj, consts.ABBREV[name])
-    return '%s: %d(%d)' % (name, b, a)
+    return '%s:%d/%d' % (name, b, a)
 
-def draw_hud(GS):
-    edge_pos = math.ceil(consts.WIDTH/2)+2
-    for i in range(0, consts.HEIGHT):
-        GS['console'].drawChar(edge_pos-2, i, '|')
-    if GS['side_screen'] == 'HUD':
-        player = GS['player']
-        rows = [
-            'LL: '+str(player.level)+'('+str(player.race.levels)+') '+player.race.name,
-            display_stat('HT', player)+' '+display_stat('ST', player)+' '+display_stat('SP', player),
-            display_stat('AT', player)+' EX: '+str(player.exp)
-        ]
-        for i in range(len(rows)):
-            GS['console'].drawStr(edge_pos, consts.HEIGHT-(i+1), rows[i])
-
-        occurences = {}
-        for (i, m) in enumerate(GS['messages']):
-            c = int(300/(i+1))
-            # caps
-            if c < 0:
-                c = 0
-            elif c > 255:
-                c = 255
-            if GS['turns'] == 0: c = 255
-
-            nm = re.sub(r" \(x.*\)", "", m)
-            if nm in occurences:
-                occurences[nm] = occurences[nm] + 1
+def draw_hud_screen(GS, edge_pos):
+    player = GS['player']
+    rows = [
+        'LL: '+str(player.level)+'('+str(player.race.levels)+') | '+player.race.name+' | '+ display_stat('HT', player),
+        display_stat('ST', player)+' | '+display_stat('SP', player)+' | '+ display_stat('AT', player)+' | EX:'+str(player.exp),
+        'GAME INFO: T:'+str(GS['turns'])+
+        ' | FL: '+str(GS['terrain_map'].forest_level)+'('+str(consts.FOREST_LEVELS)+')'+
+        ' | DL: '+str(GS['terrain_map'].dungeon_level)+'('+str(consts.DUNGEON_LEVELS)+')'+
+        ' | MC: '+str(len(GS['terrain_map'].proweling_monsters))+
+        ' | ('+str(player.x)+','+str(player.y)+')'
+    ]
+    for i in range(len(rows)):
+        color = colors.medium_blue
+        if i <= 1:
+            if GS['player'].health > GS['player'].max_health/2:
+                color = colors.dark_green
             else:
-                occurences[nm] = 1
+                color = colors.red
+        GS['console'].drawStr(edge_pos, (consts.HEIGHT-len(rows))+i,
+                                rows[i].ljust(math.floor(consts.WIDTH/2)-2),
+                                bg=color)
 
-            GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
+    if len(GS['messages']) > consts.MESSAGE_NUMBER:
+        GS['messages'] = [GS['messages'][0]]
+    occurences = {}
+    for (i, m) in enumerate(GS['messages']):
+        c = int(300/(i+1))
+        # caps
+        if c < 0: c = 0
+        elif c > 255: c = 255
+        if GS['turns'] == 0: c = 255
 
-        GS['messages'] = utils.f7(GS['messages'])
-        for (i, m) in enumerate(GS['messages']):
-            m = re.sub(r" \(x.*\)", "", m)
-            if occurences[m] > 1:
-                GS['messages'][i] = m+' (x'+str(occurences[m])+')'
-
-        if len(GS['messages']) > consts.MESSAGE_NUMBER:
-            return [GS['messages'][0]]
+        nm = re.sub(r" \(x.*\)", "", m)
+        if nm in occurences:
+            occurences[nm] = occurences[nm] + 1
         else:
-            return GS['messages']
-    elif GS['side_screen'] == 'MAN': 
-        with open('manual.txt', 'r') as myfile:
-                manual = myfile.read().split("\n")
+            occurences[nm] = 1
+
+        if len(m) > 59: m = m[:59]
+        GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
+
+    GS['messages'] = utils.f7(GS['messages'])
+    for (i, m) in enumerate(GS['messages']):
+        m = re.sub(r" \(x.*\)", "", m)
+        if occurences[m] > 1:
+            GS['messages'][i] = m+' (x'+str(occurences[m])+')'
+
+    return GS['messages']
+
+def draw_inventory_screen(GS, edge_pos):
+    console = GS['console']
+    for (i, item) in enumerate(GS['player'].inventory):
+        item_display = ""
+        if isinstance(item, items.Armor):
+            item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
+        elif isinstance(item, items.Weapon):
+            item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
+        elif isinstance(item, items.RangedWeapon):
+            item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
+        elif isinstance(item, items.Missle):
+            item_display = '(%s) -> H:%d' % (item.char, item.hit)
+        console.drawStr(edge_pos+1, i+1, '('+chr(97+i)+') '+item.name+' -> '+item_display+' (Oc'+str(item.probability)+'%)')
+
+def draw_man_screen(GS, edge_pos):
+    with open('manual.txt', 'r') as myfile:
+        manual = myfile.read().split("\n")
         
         for (i, line) in enumerate(manual):
             if line != '' and line[0] == '*':
                 GS['console'].drawStr(edge_pos-1, i, line, fg=colors.red)
             else:
                 GS['console'].drawStr(edge_pos, i, line)
-        return GS['messages']
+    return GS['messages']
+        
+def draw_hud(GS):
+    edge_pos = math.ceil(consts.WIDTH/2)+2
+    for i in range(0, consts.HEIGHT):
+        GS['console'].drawChar(edge_pos-2, i, '|')
+        
+    return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS, edge_pos)
 
 def draw_screen(GS):
     console = GS['console']
     console.clear()
 
-    if GS['screen'] == 'GAME':
-        GS['messages'] = draw_hud(GS)
-        GS['terrain_map'].draw_map(GS['console'], GS['player'])
-        for m in GS['terrain_map'].proweling_monsters:
-            if GS['terrain_map'].terrain_map.fov[m.x, m.y] or not consts.FOV:
-                color = colors.brown
-                if (m.x, m.y) in GS['terrain_map'].water:
-                    color = colors.blue
-                GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=color)
-
-        color = colors.brown
-        if (GS['player'].x, GS['player'].y) in GS['terrain_map'].water:
-            color = colors.blue
-        console.drawChar(GS['player'].x, GS['player'].y, '@', bg=color)
-    elif GS['screen'] == 'INTRO':
-        console.drawStr(int(consts.WIDTH/2)-12, 2, 'Welcome to Alchemy Sphere')
-        console.drawStr(int(consts.WIDTH/2)-13, 3, '*press any key to continue*')
-    elif GS['screen'] == 'DEATH':
-        console.drawStr(int(consts.WIDTH/2)-2, 2, 'R.I.P', fg=(255, 0, 0))
-        p = GS['player']
-        console.drawStr(int(consts.WIDTH/2)-4, 3, 'Score: ' + str(p.attack/2+p.strength))
-        console.drawStr(int(consts.WIDTH/2)-10, 4, '*press R to restart*')
+    globals()['draw_'+GS['screen'].lower()+'_screen'](GS)
 
     tdl.flush()
 
+def draw_charsel_screen(GS):
+    console = GS['console']
+    for (i, race) in enumerate(races.RACES):
+        race_display = 'LuB:%d, Sp:%d, MxL:%d; ST:%d, HT: %d' %\
+                       (race.level_up_bonus, race.speed, race.levels,
+                        race.first_level['strength'], race.first_level['max_health'])
+        console.drawStr(4, i+1, '('+chr(97+i)+') '+race.name+' -> '+race_display)
+
+def draw_intro_screen(GS):
+    console = GS['console']
+    console.drawStr(int(consts.WIDTH/2)-12, 2, 'Welcome to Alchemy Sphere')
+    console.drawStr(int(consts.WIDTH/2)-13, 3, '*press any key to continue*')
+
+def draw_death_screen(GS):
+    console = GS['console']
+    console.drawStr(int(consts.WIDTH/2)-2, 2, 'R.I.P', fg=(255, 0, 0))
+    p = GS['player']
+    console.drawStr(int(consts.WIDTH/2)-4, 3, 'Final Level: ' + str(p.level))
+    console.drawStr(int(consts.WIDTH/2)-4, 4, 'Final Score: ' + str(p.level+p.killed_monsters))
+    console.drawStr(int(consts.WIDTH/2)-10, 5, '*press R to restart*')
+
+def draw_game_screen(GS):
+    console = GS['console']
+    GS['messages'] = draw_hud(GS)
+    GS['terrain_map'].draw_map(GS['console'], GS['player'])
+    for m in GS['terrain_map'].proweling_monsters:
+        if GS['terrain_map'].terrain_map.fov[m.x, m.y] or not consts.FOV:
+            color = colors.brown
+            if (m.x, m.y) in GS['terrain_map'].water:
+                color = colors.blue
+            GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=color)
+
+    color = colors.brown
+    if (GS['player'].x, GS['player'].y) in GS['terrain_map'].water:
+        color = colors.blue
+    console.drawChar(GS['player'].x, GS['player'].y, '@', bg=color)

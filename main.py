@@ -4,6 +4,7 @@ import maps, monsters, consts, colors, utils, races, player, draw
 
 # I'm truely sorry.
 def run_game(GS):
+    tdl.setFont('font/consolas12x12_gs_tc.png', greyscale=True, altLayout=True)
     GS = GS or {
         'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Alchemy Sphere'),
         'screen': 'INTRO',
@@ -34,9 +35,15 @@ def run_game(GS):
                 if event.keychar.upper() == 'R':
                     run_game(None)
             elif event.type == 'KEYDOWN' and GS['screen'] == 'INTRO':
-                GS['screen'] = 'GAME'
-                (GS['player'].x,
-                 GS['player'].y) = GS['terrain_map'].generate_new_map()
+                GS['screen'] = 'CHARSEL'
+            elif event.type == 'KEYDOWN' and GS['screen'] == 'CHARSEL':
+                if event.keychar.isalpha():
+                    selected_race = races.RACES[ord(event.keychar.lower())-97]
+                    GS['player'] = player.Player(selected_race)
+                    (GS['player'].x, GS['player'].y) = GS['terrain_map'].generate_new_map()
+                    GS['terrain_map'].proweling_monsters = sorted(
+                        GS['terrain_map'].proweling_monsters, key=lambda m: m.speed)
+                    GS['screen'] = 'GAME'
             elif event.type == 'KEYDOWN' and GS['screen'] == 'GAME':
                 if event.keychar.upper() in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':
                     GS['player'].move(event, GS)
@@ -50,5 +57,7 @@ def run_game(GS):
                 if GS['side_screen'] == 'HUD':
                     utils.monster_turn(GS)
                     GS['turns'] += 1
+            elif event.type == 'KEYDOWN' and GS['side_screen'] == 'INVENTORY':
+                GS['side_screen'] == 'HUD'
 
 run_game(None)

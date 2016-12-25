@@ -1,15 +1,16 @@
 ****ALCHEMY SPEHRE IN-GAME REFERENCE
 ***KEY COMMANDS
 The hjkl keys govern movement, like so:
-    k    
-    h.l   
-    j    
+    u k i   
+   h  .  l   
+    n j m   
 While the . key means "stay in place".
 ***CHARACTER ACTIONS
 , - pick up an item
 . - rest
-: - auto-rest
+; - auto-rest (rest until recovered. Useful after level-ups)
 i - inventory
 q - quaff
 e - eat
 w - equip/weild/wear
+f - fire at the closes monster
