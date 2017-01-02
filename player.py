@@ -32,13 +32,13 @@ class Player:
             self.health += 1
             
     def level_up(self, GS):
-        s = math.floor(self.exp/(60+self.level*4))
+        s = math.floor(self.exp/(20+self.level*4))
         prevlev = self.level
         if s >= 1 and s <= self.race.levels:
             self.level = s
             if self.level > prevlev:
                 GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+str(self.level))
-            self.max_health = (self.level+1)*self.race.level_up_bonus
+            self.max_health += (self.level+1)*self.race.level_up_bonus
             self.strength += math.floor(self.race.level_up_bonus/10)
 
     def attack_monster(self, GS, monster):
@@ -71,9 +71,12 @@ class Player:
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
         nY = self.y + dY
-        if nX >= consts.WIDTH-1 and GS['terrain_map'].more_forests():
-            GS['messages'].insert(0, "You move on through the forest")
-            (self.x, self.y) = terrain_map.generate_new_map() 
+        if nX >= GS['terrain_map'].width-1 and GS['terrain_map'].more_forests():
+            GS['messages'].insert(0, "You move on through the forest.")
+            (self.x, self.y) = GS['terrain_map'].generate_new_map()
+        if (nX, nY) == GS['terrain_map'].downstairs and GS['terrain_map'].more_dungeons():
+            GS['messages'].insert(0, "You decend.")
+            (self.x, self.y) = GS['terrain_map'].generate_new_map()
         if GS['terrain_map'].is_walkable(nX, nY):
             self.x = nX
             self.y = nY

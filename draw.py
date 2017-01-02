@@ -122,12 +122,12 @@ def draw_game_screen(GS):
     GS['terrain_map'].draw_map(GS['console'], GS['player'])
     for m in GS['terrain_map'].proweling_monsters:
         if GS['terrain_map'].terrain_map.fov[m.x, m.y] or not consts.FOV:
-            color = colors.brown
+            color = (0,0,0)
             if (m.x, m.y) in GS['terrain_map'].water:
                 color = colors.blue
             GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=color)
 
-    color = colors.brown
+    color = (0,0,0)
     if (GS['player'].x, GS['player'].y) in GS['terrain_map'].water:
         color = colors.blue
     console.drawChar(GS['player'].x, GS['player'].y, '@', bg=color)

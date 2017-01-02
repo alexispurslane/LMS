@@ -14,6 +14,8 @@ class TerrainMap:
         self.water = {}
         self.spawned_items = {}
         self.noise = None
+        self.downstairs = None
+        self.dungeon_decor = {}
         
     def adjacent_water(self, x, y):
         return (max(x-1, 0), y) in self.water or\
@@ -36,15 +38,21 @@ class TerrainMap:
             self.get_type(x, max(y-3, 0)) == 'FLOOR'
     
     def get_type(self, x, y):
-        l = self.noise.get_point(x, y)
-        if l > consts.FLOOR_LEVEL and l < consts.STONE_LEVEL:
-            return 'TREE'
-        elif l >= consts.STONE_LEVEL:
-            return 'STONE'
-        elif l <= consts.FLOOR_LEVEL and l > consts.WATER_LEVEL:
-            return 'FLOOR'
-        elif l <= consts.WATER_LEVEL:
-            return 'WATER'
+        if self.more_forests():
+            l = self.noise.get_point(x, y)
+            if l > consts.FLOOR_LEVEL and l < consts.STONE_LEVEL:
+                return 'TREE'
+            elif l >= consts.STONE_LEVEL:
+                return 'STONE'
+            elif l <= consts.FLOOR_LEVEL and l > consts.WATER_LEVEL:
+                return 'FLOOR'
+            elif l <= consts.WATER_LEVEL:
+                return 'WATER'
+        elif self.more_dungeons():
+            if self.terrain_map.transparent[x, y]:
+                return 'FLOOR'
+            else:
+                return 'STONE'
         
     def on_map(self, x, y):
         return x >= 0 and x < self.width and y >= 0 and y < self.height
@@ -115,8 +123,6 @@ class TerrainMap:
     def spawn_monsters(self, location, player_x, player_y):
         if location == 'FOREST':
             self.spawn_forest_monsters(player_x, player_y)
-        else:
-            self.spawn_dungeon_monsters(player_x, player_y)
             
     def spawn_forest_monsters(self, player_x, player_y):
         # Spawn monsters
@@ -140,16 +146,84 @@ class TerrainMap:
                 ms.remove(m)
                 self.proweling_monsters.append(m)
 
-    def spawn_dungeon_monsters(self, player_x, player_y):
-        pass
+    def draw_h_corridor(self, x1, x2, y):
+        for x in range(min(x1, x2), max(x1, x2)):
+            self.terrain_map.transparent[x, y] = True
+            self.terrain_map.walkable[x, y] = True
+
+    def draw_v_corridor(self, y1, y2, x):
+        for y in range(min(y1, y2), max(y1, y2)):
+            self.terrain_map.transparent[x, y] = True
+            self.terrain_map.walkable[x, y] = True
     
     def generate_new_dungeon_map(self):
-        return None
+        self.noise = tdl.noise.Noise(
+            mode='FBM',
+            octaves=consts.MAP['OCTAVES'],
+            dimensions=consts.MAP['DIMS'],
+            hurst=consts.MAP['HURST'],
+            lacunarity=consts.MAP['LA'])  # For water this time
+        rooms = []
+        self.proweling_monsters = []
+
+        for r in range(0, consts.MAX_ROOMS):
+            w = random.randint(consts.MIN_ROOM_SIZE, consts.MAX_ROOM_SIZE)
+            h = random.randint(consts.MIN_ROOM_SIZE, consts.MAX_ROOM_SIZE)
+            x = random.randint(1, self.width - w - 1)
+            y = random.randint(1, self.height - h - 1)
+            room = utils.Room(x, y, w, h)
+
+            failed = False
+            for r in rooms:
+                if room.intersects(r):
+                    failed = True
+
+            if not failed:
+                for i in range(0, consts.ITEMS_PER_ROOM):
+                    if random.randint(1, 2) == 1:
+                        n = random.randint(1, 100)
+                        for item in items.ITEMS:
+                            if n < item.probability:
+                                if random.randint(1, 2) == 1:
+                                    pos = random.randint(i, room.w-1)
+                                    self.spawned_items[room.center.x+pos, room.center.y] = item
+                                else:
+                                    pos = random.randint(i, room.h-1)
+                                    self.spawned_items[room.center.x, room.center.y+pos] = item
+                                
+                if len(rooms) > 0:
+                    r1 = room
+                    r2 = rooms[len(rooms) - 1]
+                    if random.randint(1, 2) == 1:
+                        self.draw_h_corridor(r2.center.x, r1.center.x, r1.center.y)
+                        self.draw_v_corridor(r1.center.y, r2.center.y, r1.center.x)
+                    else:
+                        self.draw_v_corridor(r1.center.y, r2.center.y, r1.center.x)
+                        self.draw_h_corridor(r2.center.x, r1.center.x, r1.center.y)
+                    
+                rooms.append(room)
+                
+                for i in range(0, max(self.dungeon_level*2, 1)):
+                    ms = monsters.select_by_difficulty(self.dungeon_level, in_forest=True)
+                    m = random.choice(ms)()
+                    m.x = room.center.x
+                    m.y = room.center.y
+                    if random.randint(1, 2)==1:
+                        m.x += 1
+                    else:
+                        m.y += 1
+                    self.proweling_monsters.append(m)
+                    
+                room.draw_into_map(self)
+
+        self.downstairs = (rooms[-1].center.x, rooms[-1].center.y)
+        return (rooms[0].center.x, rooms[0].center.y)
     
     def generate_final_level(self):
         return None
 
     def generate_new_map(self):
+        self.terrain_map = tdl.map.Map(self.width, self.height)
         if self.more_forests():
             return self.generate_new_forest_map()
         elif self.more_dungeons():
@@ -159,26 +233,59 @@ class TerrainMap:
 
     def draw_map(self, console, player):
         if consts.FOV:
-            fov = self.terrain_map.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV)
+            fov = self.terrain_map.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=20)
         else:
             fov = self.terrain_map
-        for x, y in fov:
-            if not self.on_map(x+1,y):
-                console.drawChar(x, y, '>', bg=colors.brown, fg=colors.grey)
-            elif (x, y) in self.water and self.water[x, y]:
-                l = self.noise.get_point(x, y)
-                color = colors.blue
-                if l > 0.17:
-                    color = colors.light_blue
-                elif l > 0.04:
-                    color = colors.medium_blue
-                console.drawChar(x, y, '~', bg=color)
-            elif (x, y) in self.spawned_items:
-                console.drawChar(x, y, self.spawned_items[x, y].char, bg=colors.brown)
-            elif self.get_type(x, y) == 'FLOOR':
-                console.drawChar(x, y, '.', bg=colors.brown)
-            elif self.get_type(x, y) == 'STONE':
-                console.drawChar(x, y, '#', bg=colors.grey, fg=colors.dark_grey)
-            elif self.get_type(x, y) == 'TREE':
-                console.drawChar(x, y, 'T', fg=colors.green, bg=colors.brown)
 
+        for x, y in fov:
+            if self.more_forests():
+                self.draw_forest_tile(console, (x, y), (0, 0, 0))
+            elif self.more_dungeons():
+                self.draw_dungeon_tile(console, (x, y), (0, 0, 0))
+
+    def draw_dungeon_tile(self, console, pos, tint):
+        (x, y) = pos
+        if pos == self.downstairs:
+            console.drawChar(x, y, '>', fg=colors.grey)
+        elif (x, y) in self.water and self.water[x, y]:
+            l = self.noise.get_point(x, y)
+            color = colors.blue
+            if l > 0.17:
+                color = colors.light_blue
+            elif l > 0.04:
+                color = colors.medium_blue
+            console.drawChar(x, y, '~', bg=color)
+        elif (x, y) in self.spawned_items:
+            console.drawChar(x, y, self.spawned_items[x, y].char,
+                             fg=colors.tint(self.spawned_items[x, y].fg, tint))
+        elif self.get_type(x, y) == 'FLOOR':
+            console.drawChar(x, y, '.')
+        elif self.get_type(x, y) == 'STONE':
+            console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.lighten(colors.grey))
+        elif pos in self.dungeon_decor:
+            if self.dungeon_decor[pos] == 'FM':
+                console.drawChar(x, y, '"', fg=(21, 244, 238), bg=colors.black)
+            elif self.dungeon_decor[pos] == 'RB':
+                console.drawChar(x, y, '`', fg=colors.dark_grey, bg=colors.black)
+    
+    def draw_forest_tile(self, console, pos, tint):
+        (x, y) = pos
+        if not self.on_map(x+1,y):
+            console.drawChar(x, y, '>', fg=colors.grey)
+        elif (x, y) in self.water and self.water[x, y]:
+            l = self.noise.get_point(x, y)
+            color = colors.blue
+            if l > 0.17:
+                color = colors.light_blue
+            elif l > 0.04:
+                color = colors.medium_blue
+            console.drawChar(x, y, '~', bg=color)
+        elif (x, y) in self.spawned_items:
+            console.drawChar(x, y, self.spawned_items[x, y].char,
+                             fg=colors.tint(self.spawned_items[x, y].fg, tint))
+        elif self.get_type(x, y) == 'FLOOR':
+            console.drawChar(x, y, '.')
+        elif self.get_type(x, y) == 'STONE':
+            console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.grey)
+        elif self.get_type(x, y) == 'TREE':
+            console.drawChar(x, y, 'T', fg=colors.tint(colors.green, tint))

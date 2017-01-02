@@ -1,9 +1,12 @@
+import colors
+
 class Item:
     def __init__(self, name='Unknown item', weight=1, probability=50, char='*'):
         self.name = name
         self.weight = weight
         self.probability = probability
         self.char = char
+        self.fg = colors.grey
 
     def equip(self, player):
         pass

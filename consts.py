@@ -4,12 +4,17 @@ FONT_SIZE        = 8
 FLOOR_LEVEL      = 0.43
 WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
-WIDTH, HEIGHT    = int(1280/FONT_SIZE)-30, int(480/FONT_SIZE)
+WIDTH, HEIGHT    = int(1380/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
-CUMULATE_FOV     = False
+CUMULATE_FOV     = True
 MESSAGE_NUMBER   = 31
-FOREST_LEVELS    = 7
-DUNGEON_LEVELS   = 10
+FOREST_LEVELS    = 3
+MAX_ROOMS        = 70
+ITEMS_PER_ROOM   = 2
+DUNGEON_LEVELS   = 21
+
+MIN_ROOM_SIZE = 6
+MAX_ROOM_SIZE = 20
 
 MAP = {
     'OCTAVES': 2, # Controls the amount of detail in the noise.

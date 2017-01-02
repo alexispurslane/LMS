@@ -1,4 +1,5 @@
 brown = (43, 21, 0)
+black = (0,0,0)
 
 grey = (148,148,148)
 dark_grey = (108,108,108)
@@ -29,3 +30,6 @@ def darken(c):
 def extreme_darken(c):
     (r,g,b) = c
     return (r-60, g-60, b-60)
+
+def tint(a, b):
+    return a[0]+b[0], a[1]+b[1], a[2]+b[2]
