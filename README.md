@@ -27,21 +27,24 @@ houses) of magic are:
 * Blue: Magic that has to do with defence.
 * Yellow: Magic that has to do with skill-levels and experence points.
 
-A player accrues experenece points in each house of magic as he casts
-spells in them, which increases the liklihood of the spells
+A player accrues experience points in each house of magic as he casts
+spells in them. Each color of experience points (XP) increase the
+likelihood of the spells of the corresponding color of magic
 succeeding. When spells fail, they can either have a random effect or
-just do nothing. When spells succeed, they do exactly what the stated
-effect was in the spellbook from which you learned it. You are always
+just do nothing. When spells succeed, they do exactly what the
+spellbook (or scroll) from which you learned it said. You are always
 told wether a spell succeeded or failed.
 
-With each spell, there is an amount of experenece points necissary to
-cast it, as well as an amount of "color power" it uses. Each magic
-generator only produces a set amount of "color power", which can be
-used to cast a spell. To fully regenerate its color power takes four
-turns, but color power can be used partially. For example: You have a
-ring that produces 5 purple color power. You can cast one purple 5
-spell, or a purple 3 and a purple 2 spell. After this, it takes four
-game turns to cool down the ring and restore its full power.
+With each spell, there is an amount of experience points (XP) necissary to
+cast it, as well as the amount of "color power" it uses. Each magic
+generator only produces a specific amount of "color power", which can
+be used to cast a spell. To fully regenerate its color power takes
+four turns, but color power can be used partially.
+
+> **Example**: You have a ring that produces 5 purple color power (5P
+> CP). You can cast one 5P spell, or a 3P spell and a 2P spell. After
+> this, it takes four game turns to cool down the ring and restore its
+> full power.
 
 
 ### Magic Channelers
@@ -57,9 +60,11 @@ The player can learn an unlimited number of spells, but it takes one
 or more turns to learn a spell. Once a spell is learnt, however, it
 may be cast at any time, provided the right color magic generator is
 present to power it. If you have less than the required experence
-points required to cast it, you have a 100 perecent chance minus the
-difference. For example, for a spell that requires 20XP, and you have
-18XP, you have a 98% chance of success.
+points required to cast it, you have a 100 percent chance minus the
+difference.
+
+> **Example**: for a spell that requires 20XP, and you have 18XP, you
+> have a 98% chance of success.
 
 It takes the same number of turns as the difference between the
 required XP and your XP (or one at the least) to learn a spell.
