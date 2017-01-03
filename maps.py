@@ -1,10 +1,11 @@
 import tdl
 import random, math
-import monsters, colors, consts, utils, items, dungeons, forests
+import monsters, colors, consts, utils, items, dungeons, forests, draw
 
 class TerrainMap:
     def __init__(self, w, h):
         self.terrain_map = tdl.map.Map(w, h)
+        self.alt_terrain_map = tdl.map.Map(w, h)
         self.forest_level = 0
         self.dungeon_level = 0
         self.rooms = []
@@ -73,17 +74,11 @@ class TerrainMap:
             and self.terrain_map.walkable[x, y]
 
     def in_forests(self):
-        return self.forest_level <= consts.FOREST_LEVELS
-
-    def in_dungeons(self):
-        return self.dungeon_level <= consts.DUNGEON_LEVELS
-
-    def more_forests(self):
         return self.forest_level < consts.FOREST_LEVELS
 
-    def more_dungeons(self):
+    def in_dungeons(self):
         return self.dungeon_level < consts.DUNGEON_LEVELS
-    
+
     def generate_new_forest_map(self):
         return forests.generate_new_forest_map(self)
 
@@ -105,25 +100,45 @@ class TerrainMap:
 
     def generate_new_map(self):
         self.terrain_map = tdl.map.Map(self.width, self.height)
-        if self.more_forests():
+        self.alt_terrain_map = tdl.map.Map(self.width, self.height)
+        
+        if self.in_forests():
+            if consts.DEBUG: print('LEVEL: FOREST')
             return self.generate_new_forest_map()
-        elif self.more_dungeons():
+        elif self.in_dungeons():
+            if consts.DEBUG: print('LEVEL: DUNGEON')
             return self.generate_new_dungeon_map()
         else:
+            if consts.DEBUG: print('LEVEL: FINAL')
             return self.generate_final_level()
 
     def draw_map(self, console, player):
         if consts.FOV:
-            rad = 4
+            rad = math.ceil(player.light_source_radius/2)
             for room in self.rooms:
                 if room.intersects(utils.Room(player.x, player.y, 1, 1)):
-                    rad = 12
-            fov = self.terrain_map.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=rad)
+                    rad = player.light_source_radius
+                    
+            fov = self.terrain_map.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=rad, sphere=True)
+            fov2 = self.alt_terrain_map.compute_fov(player.x, player.y, radius=rad, sphere=True)
         else:
             fov = self.terrain_map
 
         for x, y in fov:
-            if self.more_forests():
-                draw.draw_forest_tile(self, console, (x, y), (0, 0, 0))
-            elif self.more_dungeons():
-                draw.draw_dungeon_tile(self, console, (x, y), (0, 0, 0)) 
+            tint = (-100, -80, -80)
+                
+            if self.in_forests():
+                draw.draw_forest_tile(self, console, (x, y), tint)
+            elif self.in_dungeons():
+                draw.draw_dungeon_tile(self, console, (x, y), tint)
+
+        for x, y in fov2:
+            if player.light_source_radius == 10:
+                tint = (0, 0, -80)
+            else:
+                tint = (0, 0, 0)
+
+            if self.in_forests():
+                draw.draw_forest_tile(self, console, (x, y), tint)
+            elif self.in_dungeons():
+                draw.draw_dungeon_tile(self, console, (x, y), tint)

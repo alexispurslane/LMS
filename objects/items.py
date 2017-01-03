@@ -34,6 +34,20 @@ class Weapon(Item):
     def dequip(self, player):
         player.max_attack = player.attack = 0
 
+class Light(Item):
+    def __init__(self, name='Torch', weight=1, radius=10, lasts=200, probability=55, char='\\'):
+        super().__init__(name=name, weight=weight, probability=probability, char=char)
+        self.radius = radius
+        self.lasts = lasts
+
+    def equip(self, p):
+        if self.lasts > 0:
+            p.light_source_radius = self.radius
+            p.remember_to_dequip(self)
+
+    def dequip(self, p):
+        p.light_source_radius = 1
+
 class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2, probability=20, char=')',
                  missle_type='Arrow', range=8):
@@ -69,7 +83,8 @@ ITEMS = [
     Armor('Elven Helm', weight=1, probability=45, char='*'),
     RangedWeapon('Light Bow', weight=1, probability=25, range=10),
     Missle('Mahogeny Arrow', hit=30, char='_'),
-    Missle()
+    Missle(),
+    Light()
 ]
 
 for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i

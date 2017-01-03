@@ -44,7 +44,7 @@ def generate_new_forest_map(self):
             player_x = x
             player_y = y
 
-    spawn_monsters(self, 'FOREST', player_x, player_y)
+    spawn_monsters(self, player_x, player_y)
     self.forest_level += 1
     return (player_x, player_y)
 

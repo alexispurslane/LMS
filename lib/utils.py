@@ -24,8 +24,10 @@ def f7(seq):
 
 def monster_turn(GS):
     for m in GS['terrain_map'].proweling_monsters:
-        speed = math.ceil(m/10)
-        if GS['turns'] % speed == 0:
+        speed = math.ceil(m.speed/10)
+        if speed == 1:
+            m.move(GS)
+        elif speed > 1 and GS['turns'] % speed == 0:
             m.move(GS)
 
 class Room:
@@ -62,4 +64,20 @@ class Room:
                 pos = x+self.x1, y+self.y1
                 tmap.terrain_map.transparent[pos] = True
                 tmap.terrain_map.walkable[pos] = True
+                
+                tmap.alt_terrain_map.transparent[pos] = True
+                tmap.alt_terrain_map.walkable[pos] = True
+                
                 tmap.dungeon_decor[pos] = random.choice(['FM', None, None, None, None])
+
+def dir_of(pos1, pos2):
+    if pos1[0] < pos2[0]:
+        return 'LEFT'
+    elif pos1[0] > pos2[0]:
+        return 'RIGHT'
+    elif pos1[1] > pos2[1]:
+        return 'DOWN'
+    elif pos1[1] < pos2[1]:
+        return 'UP'
+    else:
+        return 'SAME'

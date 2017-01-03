@@ -1,9 +1,12 @@
+import tdl
 import utils, consts, math, items
 
 class Player:
     def __init__(self, race):
         self.x = 0
         self.y = 0
+        self.light_source_radius = 1
+        self.path = []
         self.level = 0
         self.exp = 0
 
@@ -19,9 +22,13 @@ class Player:
         self.killed_monsters = 0
         self.ranged_weapon = None
         self.missles = []
+        self.dequips = []
 
         for item in self.inventory:
             item.equip(self)
+
+    def remember_to_dequip(self, item):
+        self.dequips.append(item)
 
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
@@ -32,7 +39,7 @@ class Player:
             self.health += 1
             
     def level_up(self, GS):
-        s = math.floor(self.exp/(20+self.level*4))
+        s = math.floor(self.exp/(30+self.level*5))
         prevlev = self.level
         if s >= 1 and s <= self.race.levels:
             self.level = s
@@ -95,13 +102,36 @@ class Player:
     def attributes(self):
         attrs = [self.light(), self.fast()]
         return ', '.join(attrs)+' '+self.race.name
+
+    def move_to(self, pos, GS):
+        if utils.dir_of(pos, (self.x, self.y)) == 'LEFT':
+            return tdl.event.KeyDown('l', 'l', False, False, False, False, False)
+        elif utils.dir_of(pos, (self.x, self.y)) == 'DOWN':
+            return tdl.event.KeyDown('j', 'j', False, False, False, False, False)
+        elif utils.dir_of(pos, (self.x, self.y)) == 'RIGHT':
+            return tdl.event.KeyDown('h', 'h', False, False, False, False, False)
+        elif utils.dir_of(pos, (self.x, self.y)) == 'UP':
+            return tdl.event.KeyDown('k', 'k', False, False, False, False, False)
+
+    def execute(self, path, GS):
+        self.path = path
     
     def move(self, event, GS):
+        for item in self.dequips:
+            item.lasts -= 1
+            if item.lasts <= 0:
+                item.dequip(self)
+                GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
+        
         if self.health < 12:
             GS['messages'].insert(0, 'Your health is low. You should rest <r>.')
             
-        if self.health < self.max_health and GS['turns']%2 == 0:
+        if self.health < self.max_health and GS['turns'] % 4 == 0:
             self.health += 1
+
+        if len(self.path) > 0:
+            event = self.move_to(self.path[0], GS)
+            del self.path[0]
             
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
