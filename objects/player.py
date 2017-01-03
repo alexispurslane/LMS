@@ -56,14 +56,14 @@ class Player:
 
     def attack_monster(self, GS, monster):
         if monster.speed < self.speed:
-            self.health -= monster.attack
+            monster.attack_player(self, GS)
             self.health += self.defence
             if self.health > 0:
                 monster.health -= self.attack
         elif monster.speed >= self.speed:
             monster.health -= self.attack
             if monster.health > 0:
-                self.health -= monster.attack
+                monster.attack_player(self, GS)
                 self.health += self.defence
                 
         if self.health > 0 and monster.health <= 0:

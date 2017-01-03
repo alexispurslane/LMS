@@ -55,7 +55,7 @@ def run_game(GS):
                     GS['player'].inventory[GS['selection']].dequip(GS['player'])
                 elif event.keychar.upper() == 'I':
                     GS['side_screen'] = 'HUD'
-                GS['selection'] %= len(GS['player'].inventory)
+                GS['selection'] %= len(GS['player'].inventory)-1
 
             elif event.type == 'KEYDOWN' and GS['screen'] == 'DEATH':
                 if event.keychar.upper() == 'R':

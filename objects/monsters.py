@@ -6,6 +6,10 @@ class Monster:
         self.x = 0
         self.y = 0
         self.fg = fg
+
+    def attack_player(self, player, GS):
+        player.health -= self.attack
+        self.special_action(GS, player)
         
     def move(self, GS):
         adj = [
@@ -53,7 +57,7 @@ class Monster:
 # f - fury
 # F - flying dragon
 
-def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling'):
+def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
     def __init__(self):
         Monster.__init__(self, char, color)
         
@@ -63,6 +67,7 @@ def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffl
         'health': health,
         'attack': attack,
         'sound': sound,
+        'special_action': special_action
     })
 
 create_monster('Fury', 'f', colors.yellow,
@@ -95,11 +100,19 @@ create_monster('Giant', 'G', colors.dark_green,
                attack = 25,
                sound = 'thumping')
 
+def filtch(self, GS, player):
+    item = random.choice(player.inventory)
+    player.inventory.remove(item)
+    GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
+    p = player
+    GS['terrain_map'].spawned_items[p.x+2, p.y+2] = item
+    
 create_monster('Wizard', 'i', colors.light_blue,
                health = 11,
                speed = 2,
                attack = 4,
-               sound = 'grumbling')
+               sound = 'grumbling',
+               special_action=filtch)
 
 create_monster('Witch', 'w', colors.grey,
                health = 11,
