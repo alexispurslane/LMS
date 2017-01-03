@@ -15,7 +15,7 @@ class Player:
         self.max_attack = self.attack
         self.inventory = self.race.first_level['inventory']
         self.speed = self.max_speed = self.race.speed
-        self.defence = 0
+        self.max_defence = self.defence = 0
         self.killed_monsters = 0
         self.ranged_weapon = None
         self.missles = []
@@ -38,8 +38,11 @@ class Player:
             self.level = s
             if self.level > prevlev:
                 GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+str(self.level))
-            self.max_health += (self.level+1)*self.race.level_up_bonus
-            self.strength += math.floor(self.race.level_up_bonus/10)
+            ratio = self.health/self.max_health
+            self.max_health = (self.level+1)*self.race.level_up_bonus
+            self.health = self.max_health*ratio
+            self.max_strength += math.floor(self.race.level_up_bonus/10)
+            self.strength = self.max_strength
 
     def attack_monster(self, GS, monster):
         if monster.speed < self.speed:
@@ -63,11 +66,43 @@ class Player:
         self.inventory.append(item)
         self.inventory.sort(key = lambda x: x.weight)
         self.speed = 4 + max(0, self.inventory[0].weight-self.strength)
-        item.equip(self) # Autoequip for now.
+        # item.equip(self) Autoequip
 
+    def remove_inventory_item(self, i):
+        item = self.inventory[i]
+        item.dequip(self)
+        del self.inventory[i]
+
+    def total_weight(self):
+        total = 0
+        for i in self.inventory:
+            total += i.weight
+            
+        return total
+
+    def light(self):
+        if self.total_weight() <= 3:
+            return 'light'
+        else:
+            return ''
+
+    def fast(self):
+        if self.speed <= 5:
+            return 'fast'
+        else:
+            return ''
+
+    def attributes(self):
+        attrs = [self.light(), self.fast()]
+        return ', '.join(attrs)+' '+self.race.name
+    
     def move(self, event, GS):
         if self.health < 12:
             GS['messages'].insert(0, 'Your health is low. You should rest <r>.')
+            
+        if self.health < self.max_health and GS['turns']%2 == 0:
+            self.health += 1
+            
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
         nY = self.y + dY
@@ -77,6 +112,11 @@ class Player:
         if (nX, nY) == GS['terrain_map'].downstairs and GS['terrain_map'].more_dungeons():
             GS['messages'].insert(0, "You decend.")
             (self.x, self.y) = GS['terrain_map'].generate_new_map()
+        if (nX, nY) in GS['terrain_map'].doors:
+            GS['terrain_map'].doors[nX, nY] = False
+            GS['terrain_map'].terrain_map.walkable[nX, nY] = True
+            GS['terrain_map'].terrain_map.transparent[nX, nY] = True
+            #nX, nY = self.x, self.y
         if GS['terrain_map'].is_walkable(nX, nY):
             self.x = nX
             self.y = nY

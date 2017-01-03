@@ -8,13 +8,14 @@ WIDTH, HEIGHT    = int(1380/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
 CUMULATE_FOV     = True
 MESSAGE_NUMBER   = 31
-FOREST_LEVELS    = 3
+FOREST_LEVELS    = 0
 MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
 DUNGEON_LEVELS   = 21
 
-MIN_ROOM_SIZE = 6
-MAX_ROOM_SIZE = 20
+MIN_ROOM_WIDTH = 8
+MIN_ROOM_HEIGHT = 4
+MAX_ROOM_SIZE = 12
 
 MAP = {
     'OCTAVES': 2, # Controls the amount of detail in the noise.
@@ -47,20 +48,19 @@ def auto_rest(GS, p):
     while p.health < p.max_health:
         p.rest()
         utils.monster_turn(GS)
-        draw.draw_game_screen(GS)
         GS['turns'] += 1
 
 def fire(GS, p):
-    print('FIRED')
-    targets = filter(
+    targets = list(filter(
         lambda m:
         GS['terrain_map'].terrain_map.compute_path(p.x, p.y, m.x, m.y,
                                                    diagonal_cost=0) != [] and\
-        dist(m, p) < p.ranged_weapon.range,
-        GS['terrain_map'].proweling_monsters)
-    if p.ranged_weapon:
+        utils.dist(m, p) < p.ranged_weapon.range,
+        GS['terrain_map'].proweling_monsters))
+    if p.ranged_weapon and len(targets) > 0:
         target = min(targets, key=lambda m: utils.dist(m, p))
         missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
+        print(missle.hit)
         target.health -= missle.hit
         p.missles.remove(missle)
         adj = [
@@ -76,8 +76,10 @@ def fire(GS, p):
                 GS['terrain_map'].spawned_items[x, y] = missle
 
 def inventory(GS, p):
-    print('INVENTORY')
-    GS['side_screen'] = 'INVENTORY'
+    if GS['side_screen'] == 'INVENTORY':
+        GS['side_screen'] == 'HUD'
+    else:
+        GS['side_screen'] = 'INVENTORY'
 
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),
@@ -96,5 +98,6 @@ ABBREV = {
     'HT': 'health',
     'ST': 'strength',
     'AT': 'attack',
-    'SP': 'speed'
+    'SP': 'speed',
+    'DF': 'defence'
 }

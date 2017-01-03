@@ -50,7 +50,7 @@ ELF = Race({
         items.FENCING_FOIL,
         items.LIGHT_BOW,
         items.ELVEN_HELM
-    ]+[items.WOODEN_ARROW]*7+[items.REGULAR_ARROW]*20,
+    ]+[items.MAHOGENY_ARROW]*7+[items.REGULAR_ARROW]*20,
     'skills': {
         'weapon': 0.98,
         'spell': 1,

@@ -1,5 +1,6 @@
 import tdl, math, re
-import maps, monsters, consts, colors, utils, races, player
+import maps, monsters, consts, colors, utils, races, player, items
+from itertools import groupby
 
 def display_stat(name, obj):
     a = getattr(obj, 'max_'+consts.ABBREV[name])
@@ -7,9 +8,12 @@ def display_stat(name, obj):
     return '%s:%d/%d' % (name, b, a)
 
 def draw_hud_screen(GS, edge_pos):
+    if not GS['messages']:
+        GS['messages'] = []
     player = GS['player']
+    
     rows = [
-        'LL: '+str(player.level)+'('+str(player.race.levels)+') | '+player.race.name+' | '+ display_stat('HT', player),
+        'LL: '+str(player.level)+'('+str(player.race.levels)+') | '+player.attributes()+' | '+ display_stat('HT', player)+' | '+display_stat('DF', player),
         display_stat('ST', player)+' | '+display_stat('SP', player)+' | '+ display_stat('AT', player)+' | EX:'+str(player.exp),
         'GAME INFO: T:'+str(GS['turns'])+
         ' | FL: '+str(GS['terrain_map'].forest_level)+'('+str(consts.FOREST_LEVELS)+')'+
@@ -57,7 +61,9 @@ def draw_hud_screen(GS, edge_pos):
 
 def draw_inventory_screen(GS, edge_pos):
     console = GS['console']
-    for (i, item) in enumerate(GS['player'].inventory):
+    lst = groupby(GS['player'].inventory)
+    for (i, grp) in enumerate(lst):
+        item, number = grp
         item_display = ""
         if isinstance(item, items.Armor):
             item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
@@ -67,7 +73,11 @@ def draw_inventory_screen(GS, edge_pos):
             item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
         elif isinstance(item, items.Missle):
             item_display = '(%s) -> H:%d' % (item.char, item.hit)
-        console.drawStr(edge_pos+1, i+1, '('+chr(97+i)+') '+item.name+' -> '+item_display+' (Oc'+str(item.probability)+'%)')
+        color = colors.black
+        if i == GS['selection']:
+            color = colors.grey
+        console.drawStr(edge_pos+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
+                        bg=color)
 
 def draw_man_screen(GS, edge_pos):
     with open('manual.txt', 'r') as myfile:
@@ -125,9 +135,57 @@ def draw_game_screen(GS):
             color = (0,0,0)
             if (m.x, m.y) in GS['terrain_map'].water:
                 color = colors.blue
+            elif GS['terrain_map'].dungeon_decor[m.x, m.y] == 'FM':
+                color = (21, 244, 238)
+                
             GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=color)
 
     color = (0,0,0)
     if (GS['player'].x, GS['player'].y) in GS['terrain_map'].water:
         color = colors.blue
+    elif GS['terrain_map'].dungeon_decor[GS['player'].x, GS['player'].y] == 'FM':
+        color = (21, 244, 238)
     console.drawChar(GS['player'].x, GS['player'].y, '@', bg=color)
+
+
+def draw_dungeon_tile(terrain_map, console, pos, tint):
+    (x, y) = pos
+    if pos == terrain_map.downstairs:
+        console.drawChar(x, y, '>', fg=colors.grey)
+    elif (x, y) in terrain_map.spawned_items:
+        console.drawChar(x, y, terrain_map.spawned_items[x, y].char,
+                            fg=colors.tint(terrain_map.spawned_items[x, y].fg, tint))
+    elif terrain_map.get_type(x, y) == 'FLOOR':
+        console.drawChar(x, y, '.', fg=colors.dark_grey)
+    elif terrain_map.get_type(x, y) == 'DOOR':
+        if terrain_map.doors[x, y]:
+            console.drawChar(x, y, '+', fg=colors.brown, bg=colors.brown)
+        else:
+            console.drawChar(x, y, '-', fg=colors.brown, bg=colors.black)
+    elif terrain_map.get_type(x, y) == 'STONE':
+        console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.lighten(colors.grey))
+    if pos in terrain_map.dungeon_decor:
+        if terrain_map.dungeon_decor[pos] == 'FM':
+            console.drawChar(x, y, '"', fg=(1, 224, 218), bg=(21, 244, 238))
+
+def draw_forest_tile(terrain_map, console, pos, tint):
+    (x, y) = pos
+    if not terrain_map.on_map(x+1,y):
+        console.drawChar(x, y, '>', fg=colors.grey)
+    elif (x, y) in terrain_map.water and terrain_map.water[x, y]:
+        l = terrain_map.noise.get_point(x, y)
+        color = colors.blue
+        if l > 0.17:
+            color = colors.light_blue
+        elif l > 0.04:
+            color = colors.medium_blue
+        console.drawChar(x, y, '~', bg=color)
+    elif (x, y) in terrain_map.spawned_items:
+        console.drawChar(x, y, terrain_map.spawned_items[x, y].char,
+                            fg=colors.tint(terrain_map.spawned_items[x, y].fg, tint))
+    elif terrain_map.get_type(x, y) == 'FLOOR':
+        console.drawChar(x, y, '.')
+    elif terrain_map.get_type(x, y) == 'STONE':
+        console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.grey)
+    elif terrain_map.get_type(x, y) == 'TREE':
+        console.drawChar(x, y, 'T', fg=colors.tint(colors.green, tint))

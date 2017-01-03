@@ -16,6 +16,7 @@ class Monster:
         ]
         sight = int(self.speed/2)
         if sight < 8: sight = 8
+        if GS['player'].light(): sight = 1
 
         if utils.Point(GS['player'].x, GS['player'].y) in adj:
             GS['messages'].insert(0, 'The '+type(self).__name__+' attacks you suddenly!')
@@ -26,34 +27,22 @@ class Monster:
             valid = list(filter(lambda p:
                                 GS['terrain_map'].is_walkable(p.x, p.y),
                                 adj))
-            #if random.randint(0, 20) <= sight:
-            if len(valid) > 0:
-                like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
-                choices = []
-                
-                if len(like) > 0:
-                    choices = like
-                else:
-                    choices = valid
-                    
-                chosen = min(choices, key=lambda p: utils.dist(p, GS['player']))
-                self.x, self.y = chosen.x, chosen.y
-            #else:
-            #    if len(valid) > 0:
-            #        chosen = random.choice(valid)
-            #        self.x, self.y = chosen.x, chosen.y
-        adj = 'distant'
-        dist = utils.dist(self, GS['player'])
-        if dist <= 20:
-            adj = 'faint'
-        elif dist <= 10:
-            adj = ''
-        elif dist <= 8:
-            adj = 'close'
-        elif dist <= 4:
-            adj = 'dangerously nearby'
-        if not GS['terrain_map'].terrain_map.fov[self.x, self.y] and random.randint(1, 100) <= 15:
-            GS['messages'].insert(0, 'You hear a '+adj+' '+self.sound+' sound')
+            if random.randint(0, 20) <= 5:
+                if len(valid) > 0:
+                    like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
+                    choices = []
+
+                    if len(like) > 0:
+                        choices = like
+                    else:
+                        choices = valid
+
+                    chosen = min(choices, key=lambda p: utils.dist(p, GS['player']))
+                    self.x, self.y = chosen.x, chosen.y
+            else:
+                if len(valid) > 0:
+                    chosen = random.choice(valid)
+                    self.x, self.y = chosen.x, chosen.y
 
 # g - goblin
 # G - giant
@@ -90,7 +79,7 @@ create_monster('BabyDragon', 'd', colors.red,
 
 create_monster('Dragon', 'D', colors.dark_red,
                health = 300,
-               speed = 10,
+               speed = 15,
                attack = 80,
                sound = 'scraping')
 
@@ -102,7 +91,7 @@ create_monster('Goblin', 'g', colors.green,
 
 create_monster('Giant', 'G', colors.dark_green,
                health = 50,
-               speed = 15,
+               speed = 20,
                attack = 25,
                sound = 'thumping')
 
@@ -130,10 +119,10 @@ create_monster('FlyingDragon', 'F', colors.dark_yellow,
                attack = 70,
                sound = 'crashing')
 
-regular_monsters = [Fury, Wyvern, Witch, Giant, Goblin, BabyDragon]
+regular_monsters = [Fury, Wyvern, Witch, Wizard, Giant, Goblin, BabyDragon]
 
 def select_by_difficulty(d, in_forest=True):
     if in_forest:
-        return list(filter(lambda m: m().health <= 28.5*(d+1), regular_monsters))
+        return list(filter(lambda m: m().health <= 12*(d+1), regular_monsters))
     else:
-        return list(filter(lambda m: m().health <= 42.8*(d+1), regular_monsters))
+        return list(filter(lambda m: m().health <= 15*(d+1), regular_monsters))

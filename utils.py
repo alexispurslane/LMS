@@ -24,7 +24,9 @@ def f7(seq):
 
 def monster_turn(GS):
     for m in GS['terrain_map'].proweling_monsters:
-        m.move(GS)
+        speed = math.ceil(m/10)
+        if GS['turns'] % speed == 0:
+            m.move(GS)
 
 class Room:
     def __init__(self, x, y, w, h):
@@ -41,6 +43,18 @@ class Room:
         return self.x1 <= room.x2 and self.x2 >= room.x1 and\
                self.y1 <= room.y2 and self.y2 >= room.y1
 
+    def edge_points(self):
+        pnts = [(0,0)]
+        for x in range(1, self.x2):
+            pnts.append((x, self.y1))
+            pnts.append((x, self.y2-1))
+
+        for y in range(1, self.y2):
+            pnts.append((self.x1, y))
+            pnts.append((self.x2-1, y))
+
+        return pnts
+
     def draw_into_map(self, tmap):
         waters = 0
         for x in range(0, self.w):
@@ -48,10 +62,4 @@ class Room:
                 pos = x+self.x1, y+self.y1
                 tmap.terrain_map.transparent[pos] = True
                 tmap.terrain_map.walkable[pos] = True
-                tmap.dungeon_decor[pos] = random.choice(['FM', 'RB', None, None, None])
-                
-                if random.randint(0, 100) > 90 and waters < 1:
-                    tmap.water[pos] = True
-                    waters += 1
-                if tmap.adjacent_water(x, y):
-                    tmap.water[pos] = True
+                tmap.dungeon_decor[pos] = random.choice(['FM', None, None, None, None])

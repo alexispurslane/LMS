@@ -19,6 +19,7 @@ def run_game(GS):
             'Get ye to the last forest, from thence to the',
             'caves. You\'re pereformance will be evaluated.'
         ],
+        'selection': 0,
         'side_screen': 'HUD',
         'turns': 0
     }
@@ -31,6 +32,21 @@ def run_game(GS):
         for event in tdl.event.get():
             if event.type == 'QUIT':
                 raise SystemExit('The window has been closed.')
+            elif event.type == 'KEYDOWN' and GS['side_screen'] == 'INVENTORY':
+                if event.keychar.upper() == 'UP':
+                    GS['selection'] += 1
+                elif event.keychar.upper() == 'DOWN':
+                    GS['selection'] -= 1
+                elif event.keychar.upper() == 'D':
+                    GS['player'].remove_inventory_item(GS['selection'])
+                elif event.keychar.upper() == 'W':
+                    GS['player'].inventory[GS['selection']].equip(GS['player'])
+                elif event.keychar.upper() == 'T':
+                    GS['player'].inventory[GS['selection']].dequip(GS['player'])
+                elif event.keychar.upper() == 'I':
+                    GS['side_screen'] = 'HUD'
+                GS['selection'] %= len(GS['player'].inventory)
+                
             elif event.type == 'KEYDOWN' and GS['screen'] == 'DEATH':
                 if event.keychar.upper() == 'R':
                     run_game(None)
@@ -38,12 +54,14 @@ def run_game(GS):
                 GS['screen'] = 'CHARSEL'
             elif event.type == 'KEYDOWN' and GS['screen'] == 'CHARSEL':
                 if event.keychar.isalpha():
-                    selected_race = races.RACES[ord(event.keychar.lower())-97]
-                    GS['player'] = player.Player(selected_race)
-                    (GS['player'].x, GS['player'].y) = GS['terrain_map'].generate_new_map()
-                    GS['terrain_map'].proweling_monsters = sorted(
-                        GS['terrain_map'].proweling_monsters, key=lambda m: m.speed)
-                    GS['screen'] = 'GAME'
+                    racen = ord(event.keychar.lower())-97
+                    if racen < 3:
+                        selected_race = races.RACES[racen]
+                        GS['player'] = player.Player(selected_race)
+                        (GS['player'].x, GS['player'].y) = GS['terrain_map'].generate_new_map()
+                        GS['terrain_map'].proweling_monsters = sorted(
+                            GS['terrain_map'].proweling_monsters, key=lambda m: m.speed)
+                        GS['screen'] = 'GAME'
             elif event.type == 'KEYDOWN' and GS['screen'] == 'GAME':
                 if event.keychar.upper() in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':
                     GS['player'].move(event, GS)
@@ -57,7 +75,5 @@ def run_game(GS):
                 if GS['side_screen'] == 'HUD':
                     utils.monster_turn(GS)
                     GS['turns'] += 1
-            elif event.type == 'KEYDOWN' and GS['side_screen'] == 'INVENTORY':
-                GS['side_screen'] == 'HUD'
 
 run_game(None)

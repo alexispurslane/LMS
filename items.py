@@ -16,7 +16,12 @@ class Armor(Item):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
 
     def equip(self, player):
-        player.defence = self.weight
+        player.defence += self.weight
+        player.max_defence = player.defence
+
+    def dequip(self, player):
+        player.defence -= self.weight
+        player.max_defence = player.defence
     
 class Weapon(Item):
     def __init__(self, name='Unknown weapon', weight=2, attack=5, probability=20, char='|'):
@@ -25,6 +30,9 @@ class Weapon(Item):
         
     def equip(self, player):
         player.max_attack = player.attack = self.attack
+        
+    def dequip(self, player):
+        player.max_attack = player.attack = 0
 
 class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2, probability=20, char=')',
@@ -36,6 +44,9 @@ class RangedWeapon(Item):
     def equip(self, player):
         player.ranged_weapon = self
 
+    def dequip(self, player):
+        player.ranged_weapon = None
+
 class Missle(Item):
     def __init__(self, name='Regular Arrow', weight=0, probability=45, char='-', hit=1):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
@@ -44,6 +55,9 @@ class Missle(Item):
 
     def equip(self, player):
         player.missles.append(self)
+
+    def dequip(self, player):
+        player.missles.remove(self)
 
 ITEMS = [
     Weapon('Broad sword', weight=10, attack=20, probability=12, char='|'),
@@ -54,7 +68,7 @@ ITEMS = [
     Armor('Sheild', weight=2),
     Armor('Elven Helm', weight=1, probability=45, char='*'),
     RangedWeapon('Light Bow', weight=1, probability=25, range=10),
-    Missle('Wooden Arrow', hit=30, char='_'),
+    Missle('Mahogeny Arrow', hit=30, char='_'),
     Missle()
 ]
 
