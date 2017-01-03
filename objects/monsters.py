@@ -113,6 +113,7 @@ def filtch(self, GS, player):
     ]
     valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
     if len(valid) > 0:
+        pos = random.choice(valid)
         item = random.choice(player.inventory)
         player.inventory.remove(item)
         GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')

@@ -62,24 +62,58 @@ def draw_hud_screen(GS, edge_pos):
 def draw_inventory_screen(GS, edge_pos):
     console = GS['console']
     lst = groupby(GS['player'].inventory)
-    for (i, grp) in enumerate(lst):
-        item, number = grp
-        item_display = ""
+    nlst = {
+        'Light Sources': [],
+        'Armor': [],
+        'Weapons': [],
+        'Missles': [],
+        'Food': []
+    }
+    for grp in lst:
+        item, n = grp
         if isinstance(item, items.Armor):
-            item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
+            nlst['Armor'].append(grp)
         elif isinstance(item, items.Weapon):
-            item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
+            nlst['Weapons'].append(grp)
         elif isinstance(item, items.RangedWeapon):
-            item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
+            nlst['Weapons'].append(grp)
         elif isinstance(item, items.Missle):
-            item_display = '(%s) -> H:%d' % (item.char, item.hit)
+            nlst['Missles'].append(grp)
         elif isinstance(item, items.Light):
-            item_display = '(%s) -> R:%d, L:%d' % (item.char, item.radius, item.lasts)
-        color = colors.black
-        if i == GS['selection']:
-            color = colors.grey
-        console.drawStr(edge_pos+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
-                        bg=color)
+            nlst['Light Sources'].append(grp)
+        elif isinstance(item, items.Food):
+            nlst['Food'].append(grp)
+
+    place = 1
+    selection = 0
+    for k, v in nlst.items():
+        console.drawStr(edge_pos+1, place, k, bg=colors.red)
+        place += 1
+        
+        i = 0
+        for item, number in v:
+            item_display = ""
+            if isinstance(item, items.Armor):
+                item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
+            elif isinstance(item, items.Weapon):
+                item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
+            elif isinstance(item, items.RangedWeapon):
+                item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
+            elif isinstance(item, items.Missle):
+                item_display = '(%s) -> H:%d' % (item.char, item.hit)
+            elif isinstance(item, items.Light):
+                item_display = '(%s) -> R:%d, L:%d' % (item.char, item.radius, item.lasts)
+            elif isinstance(item, items.Food):
+                item_display = '(%s) -> N:%d' % (item.char, item.nutrition)
+                
+            color = colors.black
+            if selection == GS['selection']: color = colors.grey
+                
+            console.drawStr(edge_pos+1, place, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
+                            bg=color)
+            place += 1
+            selection += 1
+            i += 1
 
 def draw_man_screen(GS, edge_pos):
     with open('manual.txt', 'r') as myfile:

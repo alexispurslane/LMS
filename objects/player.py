@@ -39,7 +39,6 @@ class Player:
     def rest(self):
         if self.health < self.max_health:
             self.health += 1
-            self.hunger += 1
             
     def level_up(self, GS):
         s = math.floor(self.exp/(40+self.level*5))
@@ -91,7 +90,7 @@ class Player:
         return total
 
     def light(self):
-        if self.total_weight() <= 3:
+        if self.total_weight() <= 5:
             return 'light'
         else:
             return ''
@@ -120,6 +119,10 @@ class Player:
         if self.health < self.max_health and GS['turns'] % 4 == 0:
             self.health += 1
             self.hunger += 1
+
+        if self.hunger > 20:
+            GS['messages'].insert(0, 'You feel hungry. Your stomach gurgles. You feel weak.')
+            self.health -= 1
 
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
