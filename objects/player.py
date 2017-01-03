@@ -1,4 +1,4 @@
-import tdl
+import tdl, copy
 import utils, consts, math, items
 
 class Player:
@@ -73,7 +73,7 @@ class Player:
         return (self.health <= 0, monster.health <= 0)
         
     def add_inventory_item(self, item):
-        self.inventory.append(item)
+        self.inventory.append(copy.copy(item))
         self.inventory.sort(key = lambda x: x.weight)
         self.speed = 4 + max(0, self.inventory[0].weight-self.strength)
         # item.equip(self) Autoequip

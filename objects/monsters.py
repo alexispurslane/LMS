@@ -111,7 +111,7 @@ def filtch(self, GS, player):
         (self.x, self.y-1),
         (self.x, self.y-2),
     ]
-    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1])))
+    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
     if len(valid) > 0:
         item = random.choice(player.inventory)
         player.inventory.remove(item)
