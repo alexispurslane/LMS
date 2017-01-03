@@ -6,7 +6,7 @@ class Player:
         self.x = 0
         self.y = 0
         self.light_source_radius = 1
-        self.path = []
+        self.hunger = 0
         self.level = 0
         self.exp = 0
 
@@ -24,6 +24,8 @@ class Player:
         self.missles = []
         self.dequips = []
 
+        self.inventory = self.inventory+[items.FOOD_RATION]*8
+
         for item in self.inventory:
             item.equip(self)
 
@@ -37,9 +39,10 @@ class Player:
     def rest(self):
         if self.health < self.max_health:
             self.health += 1
+            self.hunger += 1
             
     def level_up(self, GS):
-        s = math.floor(self.exp/(30+self.level*5))
+        s = math.floor(self.exp/(40+self.level*5))
         prevlev = self.level
         if s >= 1 and s <= self.race.levels:
             self.level = s
@@ -103,50 +106,35 @@ class Player:
         attrs = [self.light(), self.fast()]
         return ', '.join(attrs)+' '+self.race.name
 
-    def move_to(self, pos, GS):
-        if utils.dir_of(pos, (self.x, self.y)) == 'LEFT':
-            return tdl.event.KeyDown('l', 'l', False, False, False, False, False)
-        elif utils.dir_of(pos, (self.x, self.y)) == 'DOWN':
-            return tdl.event.KeyDown('j', 'j', False, False, False, False, False)
-        elif utils.dir_of(pos, (self.x, self.y)) == 'RIGHT':
-            return tdl.event.KeyDown('h', 'h', False, False, False, False, False)
-        elif utils.dir_of(pos, (self.x, self.y)) == 'UP':
-            return tdl.event.KeyDown('k', 'k', False, False, False, False, False)
-
-    def execute(self, path, GS):
-        self.path = path
-    
     def move(self, event, GS):
         for item in self.dequips:
             item.lasts -= 1
             if item.lasts <= 0:
                 item.dequip(self)
                 GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
+                self.dequips.remove(item)
         
         if self.health < 12:
             GS['messages'].insert(0, 'Your health is low. You should rest <r>.')
             
         if self.health < self.max_health and GS['turns'] % 4 == 0:
             self.health += 1
+            self.hunger += 1
 
-        if len(self.path) > 0:
-            event = self.move_to(self.path[0], GS)
-            del self.path[0]
-            
         dX, dY = consts.GAME_KEYS['M'][event.keychar.upper()]
         nX = self.x + dX
         nY = self.y + dY
         if nX >= GS['terrain_map'].width-1 and GS['terrain_map'].more_forests():
             GS['messages'].insert(0, "You move on through the forest.")
             (self.x, self.y) = GS['terrain_map'].generate_new_map()
-        if (nX, nY) == GS['terrain_map'].downstairs and GS['terrain_map'].more_dungeons():
+        if (nX, nY) == GS['terrain_map'].downstairs and GS['terrain_map'].in_dungeons():
             GS['messages'].insert(0, "You decend.")
             (self.x, self.y) = GS['terrain_map'].generate_new_map()
-        if (nX, nY) in GS['terrain_map'].doors:
+        if (nX, nY) in GS['terrain_map'].doors and not GS['terrain_map'].is_walkable(nX, nY):
             GS['terrain_map'].doors[nX, nY] = False
             GS['terrain_map'].terrain_map.walkable[nX, nY] = True
             GS['terrain_map'].terrain_map.transparent[nX, nY] = True
-            #nX, nY = self.x, self.y
+            nX, nY = self.x, self.y
         if GS['terrain_map'].is_walkable(nX, nY):
             self.x = nX
             self.y = nY
@@ -165,8 +153,11 @@ class Player:
             else:
                 GS['messages'].insert(0, "You vanquish the "+type(m).__name__)
                 GS['terrain_map'].proweling_monsters.remove(m)
+                GS['terrain_map'].spawned_items[m.x, m.y] = items.FOOD_RATION
             if self_dead:
                 GS['messages'].insert(0, "You have died.")
                 GS['screen'] = 'DEATH'
+                
+        GS['terrain_map'].dungeon_decor[nX, nY] = None
             
 

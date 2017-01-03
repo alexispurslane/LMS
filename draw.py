@@ -14,7 +14,7 @@ def draw_hud_screen(GS, edge_pos):
     
     rows = [
         'LL: '+str(player.level)+'('+str(player.race.levels)+') | '+player.attributes()+' | '+ display_stat('HT', player)+' | '+display_stat('DF', player),
-        display_stat('ST', player)+' | '+display_stat('SP', player)+' | '+ display_stat('AT', player)+' | EX:'+str(player.exp),
+        display_stat('ST', player)+' | '+display_stat('SP', player)+' | '+ display_stat('AT', player)+' | EX:'+str(player.exp)+' | HR:'+str(player.hunger),
         'GAME INFO: T:'+str(GS['turns'])+
         ' | FL: '+str(GS['terrain_map'].forest_level)+'('+str(consts.FOREST_LEVELS)+')'+
         ' | DL: '+str(GS['terrain_map'].dungeon_level)+'('+str(consts.DUNGEON_LEVELS)+')'+

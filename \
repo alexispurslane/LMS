@@ -100,6 +100,13 @@ class TerrainMap:
         return None
 
     def generate_new_map(self):
+        self.noise = tdl.noise.Noise(
+            mode='FBM',
+            octaves=consts.MAP['OCTAVES'],
+            dimensions=1,
+            hurst=consts.MAP['HURST'],
+            lacunarity=consts.MAP['LA'])
+        
         self.terrain_map = tdl.map.Map(self.width, self.height)
         self.alt_terrain_map = tdl.map.Map(self.width, self.height)
         
@@ -134,6 +141,12 @@ class TerrainMap:
                 draw.draw_dungeon_tile(self, console, (x, y), tint)
 
         tint = (0, 0, 0)
+        
+        # progrss along a 1d perlin noise generator for flicker effect
+        if self.noise.get_point(self.noise_point) >= consts.STONE_LEVEL:
+            tint = (0, 0, -80)
+            self.noise_point += 1
+            
         for x, y in fov2:
             if self.in_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)
