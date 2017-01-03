@@ -101,11 +101,22 @@ create_monster('Giant', 'G', colors.dark_green,
                sound = 'thumping')
 
 def filtch(self, GS, player):
-    item = random.choice(player.inventory)
-    player.inventory.remove(item)
-    GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
-    p = player
-    GS['terrain_map'].spawned_items[p.x+2, p.y+2] = item
+    posns = [
+        (self.x+1, self.y),
+        (self.x+2, self.y),
+        (self.x-1, self.y),
+        (self.x-2, self.y),
+        (self.x, self.y+1),
+        (self.x, self.y+2),
+        (self.x, self.y-1),
+        (self.x, self.y-2),
+    ]
+    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1])))
+    if len(valid) > 0:
+        item = random.choice(player.inventory)
+        player.inventory.remove(item)
+        GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
+        GS['terrain_map'].spawned_items[pos] = item
     
 create_monster('Wizard', 'i', colors.light_blue,
                health = 11,
