@@ -43,8 +43,10 @@ def run_game(GS):
             elif event.type == 'KEYDOWN' and GS['side_screen'] == 'INVENTORY':
                 if event.keychar.upper() == 'UP':
                     GS['selection'] -= 1
+                    GS['selection'] %= len(GS['player'].inventory)
                 elif event.keychar.upper() == 'DOWN':
                     GS['selection'] += 1
+                    GS['selection'] %= len(GS['player'].inventory)
                 elif event.keychar.upper() == 'D':
                     pos = (GS['player'].x, GS['player'].y)
                     GS['terrain_map'].spawned_items[pos] = GS['player'].inventory[GS['selection']]
@@ -55,7 +57,6 @@ def run_game(GS):
                     GS['player'].inventory[GS['selection']].dequip(GS['player'])
                 elif event.keychar.upper() == 'I':
                     GS['side_screen'] = 'HUD'
-                GS['selection'] %= len(GS['player'].inventory)-1
 
             elif event.type == 'KEYDOWN' and GS['screen'] == 'DEATH':
                 if event.keychar.upper() == 'R':

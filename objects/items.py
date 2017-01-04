@@ -49,7 +49,7 @@ class Light(Item):
         p.light_source_radius = 1
 
 class Food(Item):
-    def __init__(self, name='Food Ration', weight=0, nutrition=4, probability=55, char='%'):
+    def __init__(self, name='Food Ration', weight=0, nutrition=20, probability=55, char='%'):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.nutrition = nutrition
 

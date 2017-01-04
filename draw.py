@@ -62,58 +62,26 @@ def draw_hud_screen(GS, edge_pos):
 def draw_inventory_screen(GS, edge_pos):
     console = GS['console']
     lst = groupby(GS['player'].inventory)
-    nlst = {
-        'Light Sources': [],
-        'Armor': [],
-        'Weapons': [],
-        'Missles': [],
-        'Food': []
-    }
-    for grp in lst:
-        item, n = grp
+    for (i, grp) in enumerate(lst):
+        item, number = grp
+        item_display = ""
         if isinstance(item, items.Armor):
-            nlst['Armor'].append(grp)
+            item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
         elif isinstance(item, items.Weapon):
-            nlst['Weapons'].append(grp)
+            item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
         elif isinstance(item, items.RangedWeapon):
-            nlst['Weapons'].append(grp)
+            item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
         elif isinstance(item, items.Missle):
-            nlst['Missles'].append(grp)
+            item_display = '(%s) -> H:%d' % (item.char, item.hit)
         elif isinstance(item, items.Light):
-            nlst['Light Sources'].append(grp)
+            item_display = '(%s) -> R:%d, L:%d' % (item.char, item.radius, item.lasts)
         elif isinstance(item, items.Food):
-            nlst['Food'].append(grp)
-
-    place = 1
-    selection = 0
-    for k, v in nlst.items():
-        console.drawStr(edge_pos+1, place, k, bg=colors.red)
-        place += 1
-        
-        i = 0
-        for item, number in v:
-            item_display = ""
-            if isinstance(item, items.Armor):
-                item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
-            elif isinstance(item, items.Weapon):
-                item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
-            elif isinstance(item, items.RangedWeapon):
-                item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
-            elif isinstance(item, items.Missle):
-                item_display = '(%s) -> H:%d' % (item.char, item.hit)
-            elif isinstance(item, items.Light):
-                item_display = '(%s) -> R:%d, L:%d' % (item.char, item.radius, item.lasts)
-            elif isinstance(item, items.Food):
-                item_display = '(%s) -> N:%d' % (item.char, item.nutrition)
-                
-            color = colors.black
-            if selection == GS['selection']: color = colors.grey
-                
-            console.drawStr(edge_pos+1, place, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
-                            bg=color)
-            place += 1
-            selection += 1
-            i += 1
+            item_display = '(%s) -> N:%d' % (item.char, item.nutrition)
+            
+        color = colors.black
+        if i == GS['selection']: color = colors.grey
+        console.drawStr(edge_pos+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
+                        bg=color)
 
 def draw_man_screen(GS, edge_pos):
     with open('manual.txt', 'r') as myfile:
@@ -203,10 +171,10 @@ def draw_dungeon_tile(terrain_map, console, pos, tint):
                              bg=colors.tint(colors.black, tint))
     elif terrain_map.get_type(x, y) == 'STONE':
         console.drawChar(x, y, '=', fg=colors.tint(colors.dark_grey, tint),
-                         bg=colors.tint(colors.lighten(colors.grey), tint))
+                         bg=colors.tint(colors.extreme_darken(colors.grey), tint))
     if pos in terrain_map.dungeon_decor:
         if terrain_map.dungeon_decor[pos] == 'FM':
-            console.drawChar(x, y, '"', fg=(1, 224, 218), bg=(21, 244, 238))
+            console.drawChar(x, y, '"', fg=(57, 255, 20), bg=(57, 255, 20))
 
 def draw_forest_tile(terrain_map, console, pos, tint):
     (x, y) = pos

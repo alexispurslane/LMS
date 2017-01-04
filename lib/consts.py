@@ -58,7 +58,7 @@ def fire(GS, p):
                                                    diagonal_cost=0) != [] and\
         utils.dist(m, p) < p.ranged_weapon.range,
         GS['terrain_map'].proweling_monsters))
-    if p.ranged_weapon and len(targets) > 0:
+    if p.ranged_weapon != None and len(targets) > 0:
         target = min(targets, key=lambda m: utils.dist(m, p))
         missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
         print(missle.hit)

@@ -80,7 +80,7 @@ class Player:
     def remove_inventory_item(self, i):
         item = self.inventory[i]
         item.dequip(self)
-        del self.inventory[i]
+        self.inventory.remove(item)
 
     def total_weight(self):
         total = 0

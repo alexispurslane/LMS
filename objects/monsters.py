@@ -1,4 +1,4 @@
-import colors, utils, random
+import colors, utils, random, math
 
 class Monster:
     def __init__(self, char, fg):
@@ -10,6 +10,20 @@ class Monster:
     def attack_player(self, player, GS):
         player.health -= self.attack
         self.special_action(GS, player)
+
+    def choose(self, player, lst, key):
+        if self.speed > player.speed:
+            if self.health > player.health:
+                return min(lst, key=key)
+            else:
+                return max(lst, key=key)
+        else:
+            if math.floor(player.health/self.attack) <= 2:
+                return min(lst, key=key)
+            elif self.health > player.health:
+                return min(lst, key=key)
+            else:
+                return max(lst, key=key)
         
     def move(self, GS):
         adj = [
@@ -41,7 +55,7 @@ class Monster:
                     else:
                         choices = valid
 
-                    chosen = min(choices, key=lambda p: utils.dist(p, GS['player']))
+                    chosen = self.choose(GS['player'], choices, lambda p: utils.dist(p, GS['player']))
                     self.x, self.y = chosen.x, chosen.y
             else:
                 if len(valid) > 0:
@@ -90,8 +104,8 @@ create_monster('Dragon', 'D', colors.dark_red,
 
 create_monster('Goblin', 'g', colors.green,
                speed = 3,
-               health = 20,
-               attack = 8,
+               health = 26,
+               attack = 12,
                sound = 'pattering')
 
 create_monster('Giant', 'G', colors.dark_green,
@@ -120,9 +134,9 @@ def filtch(self, GS, player):
         GS['terrain_map'].spawned_items[pos] = item
     
 create_monster('Wizard', 'i', colors.light_blue,
-               health = 11,
+               health = 20,
                speed = 2,
-               attack = 4,
+               attack = 8,
                sound = 'grumbling',
                special_action=filtch)
 
@@ -150,4 +164,4 @@ def select_by_difficulty(d, in_forest=True):
     if in_forest:
         return list(filter(lambda m: m().health <= 12*(d+1), regular_monsters))
     else:
-        return list(filter(lambda m: m().health <= 15*(d+1), regular_monsters))
+        return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))
