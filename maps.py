@@ -4,8 +4,8 @@ import monsters, colors, consts, utils, items, dungeons, forests, draw
 
 class TerrainMap:
     def __init__(self, w, h):
-        self.terrain_map = tdl.map.Map(w, h)
-        self.alt_terrain_map = tdl.map.Map(w, h)
+        self.remembered_terrain = tdl.map.Map(w, h)
+        self.lighted_terrain = tdl.map.Map(w, h)
         self.forest_level = 0
         self.dungeon_level = 0
         self.rooms = []
@@ -14,6 +14,7 @@ class TerrainMap:
         self.proweling_monsters = []
         self.monsterN = 0
         self.water = {}
+        self.hell_level = False
         self.spawned_items = {}
         self.noise = None
         self.noise_point = 0
@@ -53,10 +54,10 @@ class TerrainMap:
             elif l <= consts.WATER_LEVEL:
                 return 'WATER'
         elif self.in_dungeons():
-            if self.terrain_map.transparent[x, y]:
-                return 'FLOOR'
-            elif (x, y) in self.doors:
+            if (x, y) in self.doors:
                 return 'DOOR'
+            elif self.remembered_terrain.transparent[x, y]:
+                return 'FLOOR'
             else:
                 return 'STONE'
         
@@ -72,7 +73,7 @@ class TerrainMap:
     def is_walkable(self, x, y, player=utils.Point(-1, -1)):
         return self.on_map(x,y) and not self.monster_at(x, y)\
             and not x == player.x and not y == player.y\
-            and self.terrain_map.walkable[x, y]
+            and self.remembered_terrain.walkable[x, y]
 
     def in_forests(self):
         return self.forest_level < consts.FOREST_LEVELS
@@ -85,13 +86,13 @@ class TerrainMap:
 
     def add_h_corridor(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2)):
-            self.terrain_map.transparent[x, y] = True
-            self.terrain_map.walkable[x, y] = True
+            self.remembered_terrain.transparent[x, y] = True
+            self.remembered_terrain.walkable[x, y] = True
             
     def add_v_corridor(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2)):
-            self.terrain_map.transparent[x, y] = True
-            self.terrain_map.walkable[x, y] = True
+            self.remembered_terrain.transparent[x, y] = True
+            self.remembered_terrain.walkable[x, y] = True
             
     def generate_new_dungeon_map(self):
         return dungeons.generate_new_dungeon_map(self)
@@ -100,8 +101,8 @@ class TerrainMap:
         return None
 
     def generate_new_map(self):
-        self.terrain_map = tdl.map.Map(self.width, self.height)
-        self.alt_terrain_map = tdl.map.Map(self.width, self.height)
+        self.remembered_terrain = tdl.map.Map(self.width, self.height)
+        self.lighted_terrain = tdl.map.Map(self.width, self.height)
         
         if self.in_forests():
             if consts.DEBUG: print('LEVEL: FOREST')
@@ -115,26 +116,22 @@ class TerrainMap:
 
     def draw_map(self, console, player):
         if consts.FOV:
-            rad = math.ceil(player.light_source_radius/2)
-            for room in self.rooms:
-                if room.intersects(utils.Room(player.x, player.y, 1, 1)):
-                    rad = player.light_source_radius
-                    
-            fov = self.terrain_map.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=rad, sphere=True)
-            fov2 = self.alt_terrain_map.compute_fov(player.x, player.y, radius=rad, sphere=True)
+            rad = player.light_source_radius
+            
+            fov = self.remembered_terrain.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=rad, sphere=True)
+            
+            fov2 = self.lighted_terrain.compute_fov(player.x, player.y, radius=rad, sphere=True)
+            fov2 = [(f[0], f[1]) for f in fov2]
         else:
-            fov = self.terrain_map
+            fov2 = fov = self.remembered_terrain
 
+        if consts.DEBUG:
+            draw.draw_dungeon_tile(self, console, self.downstairs, (0,0,0))
         for x, y in fov:
-            tint = (-100, -80, -80)
+            tint = (-80, -80, -80)
+            if (x, y) in fov2:
+                tint = (0, 0, 0)
                 
-            if self.in_forests():
-                draw.draw_forest_tile(self, console, (x, y), tint)
-            elif self.in_dungeons():
-                draw.draw_dungeon_tile(self, console, (x, y), tint)
-
-        tint = (0, 0, 0)
-        for x, y in fov2:
             if self.in_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)
             elif self.in_dungeons():

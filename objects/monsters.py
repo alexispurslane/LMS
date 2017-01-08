@@ -1,4 +1,4 @@
-import colors, utils, random, math
+import colors, utils, random, math, consts
 
 class Monster:
     def __init__(self, char, fg):
@@ -24,7 +24,10 @@ class Monster:
                 return min(lst, key=key)
             else:
                 return max(lst, key=key)
-        
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+    
     def move(self, GS):
         adj = [
             utils.Point(self.x+1, self.y),
@@ -45,7 +48,7 @@ class Monster:
             valid = list(filter(lambda p:
                                 GS['terrain_map'].is_walkable(p.x, p.y),
                                 adj))
-            if random.randint(0, 20) <= 5:
+            if random.randint(0, 20) <= 15:
                 if len(valid) > 0:
                     like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
                     choices = []
@@ -114,6 +117,29 @@ create_monster('Giant', 'G', colors.dark_green,
                attack = 25,
                sound = 'thumping')
 
+def breed(self, GS, player):
+    if consts.DEBUG: print("Slime breeding.")
+    posns = [
+        (self.x+1, self.y),
+        (self.x+2, self.y),
+        (self.x-1, self.y),
+        (self.x-2, self.y),
+        (self.x, self.y+1),
+        (self.x, self.y+2),
+        (self.x, self.y-1),
+        (self.x, self.y-2),
+    ]
+    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
+    if len(valid) > 0:
+        pos = random.choice(valid)
+        GS['terrain_map'].proweling_monsters[pos] = Slime()
+        
+create_monster('Slime', 's', (27, 226, 21),
+               health=15,
+               speed=1,
+               attack = 1,
+               sound = 'squeltching')
+
 def filtch(self, GS, player):
     posns = [
         (self.x+1, self.y),
@@ -133,17 +159,17 @@ def filtch(self, GS, player):
         GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
         GS['terrain_map'].spawned_items[pos] = item
     
-create_monster('Wizard', 'i', colors.light_blue,
-               health = 20,
-               speed = 2,
+create_monster('Imp', 'i', colors.light_blue,
+               health = 15,
+               speed = 4,
                attack = 8,
                sound = 'grumbling',
                special_action=filtch)
 
-create_monster('Witch', 'w', colors.grey,
-               health = 11,
-               speed = 3,
-               attack = 2,
+create_monster('Hag', 'h', colors.grey,
+               health = 12,
+               speed = 4,
+               attack = 5,
                sound = 'tapping')
 
 create_monster('Wyvern', 'W', colors.grey,
@@ -158,10 +184,7 @@ create_monster('FlyingDragon', 'F', colors.dark_yellow,
                attack = 70,
                sound = 'crashing')
 
-regular_monsters = [Fury, Wyvern, Witch, Wizard, Giant, Goblin, BabyDragon]
+regular_monsters = [Fury, Wyvern, Hag, Imp, Giant, Goblin, BabyDragon, Slime, Slime, Slime]
 
 def select_by_difficulty(d, in_forest=True):
-    if in_forest:
-        return list(filter(lambda m: m().health <= 12*(d+1), regular_monsters))
-    else:
-        return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))
+    return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))

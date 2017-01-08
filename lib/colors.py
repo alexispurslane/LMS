@@ -1,8 +1,11 @@
 brown = (130, 82, 1)
 black = (0,0,0)
+white = (255,255,255)
 
-grey = (198,188,188)
+grey = (188,188,188)
 dark_grey = (108,108,108)
+darkmed_grey = (120,120,120)
+very_dark_grey = (80,80,80)
 
 red = (255, 10, 10)
 dark_red = (205, 10, 10)

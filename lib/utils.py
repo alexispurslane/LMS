@@ -38,8 +38,16 @@ class Room:
         self.y2 = y + h
         self.w = w
         self.h = h
+        self.radius = math.floor(w/2)
         self.center = Point(math.floor((self.x1 + self.x2) / 2),
                             math.floor((self.y1 + self.y2) / 2));
+        
+        self.room_type = random.choice([
+            'Square', 'Square',
+            'Square', 'Square',
+            'Square', 'Square',
+            'Square', 'Round',
+        ])
 
     def intersects(self, room):
         return self.x1 <= room.x2 and self.x2 >= room.x1 and\
@@ -58,17 +66,36 @@ class Room:
         return pnts
 
     def draw_into_map(self, tmap):
-        waters = 0
-        for x in range(0, self.w):
-            for y in range(0, self.h):
-                pos = x+self.x1, y+self.y1
-                tmap.terrain_map.transparent[pos] = True
-                tmap.terrain_map.walkable[pos] = True
-                
-                tmap.alt_terrain_map.transparent[pos] = True
-                tmap.alt_terrain_map.walkable[pos] = True
-                
-                tmap.dungeon_decor[pos] = random.choice(['FM', None, None, None, None])
+        def putpixel(x, y, wall=False):
+            pos = max(0, x), max(0, y)
+            tmap.remembered_terrain.transparent[pos] = not wall
+            tmap.remembered_terrain.walkable[pos] = not wall
+            tmap.lighted_terrain.transparent[pos] = not wall
+            tmap.lighted_terrain.walkable[pos] = not wall
+            
+        if self.room_type == 'Square':
+            n = random.randint(1, 100)
+            rand_walls = n < 25 and math.floor(n/5) != 0
+            for x in range(0, self.w):
+                for y in range(0, self.h):
+                    wall = False
+                    if rand_walls and x+y % math.floor(n/5) == 0:
+                        wall = True
+
+                    putpixel(x+self.x1, y+self.y1, wall=wall)
+
+                    if not wall:
+                        pos = x+self.x1, y+self.y1
+                        if tmap.hell_level:
+                            tmap.dungeon_decor[pos] = random.choice(['FR', 'FL', None, None, None, None])
+                        else:
+                            tmap.dungeon_decor[pos] = random.choice(['FM', None, None, None, None])
+                        
+        elif self.room_type == 'Round':
+            for x in range(-self.radius, self.radius):
+                for y in range(-self.radius, self.radius):
+                        if x*x + y*y <= pow(self.radius, 2):
+                            putpixel(self.x1 + x, self.y1 + y);
 
 def dir_of(pos1, pos2):
     if pos1[0] < pos2[0]:
@@ -81,3 +108,13 @@ def dir_of(pos1, pos2):
         return 'UP'
     else:
         return 'SAME'
+
+def streight_line(a, b):
+    As = [
+        (a[0]-1, a[1]),
+        (a[0]+1, a[1]),
+        (a[0], a[1]-1),
+        (a[0], a[1]+1),
+    ]
+
+    return b in As

@@ -1,4 +1,4 @@
-import utils, draw
+import utils, draw, itertools
 
 FONT_SIZE        = 8
 FLOOR_LEVEL      = 0.43
@@ -12,7 +12,7 @@ FOREST_LEVELS    = 0
 MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
 DUNGEON_LEVELS   = 21
-DEBUG = True
+DEBUG            = True
 
 MIN_ROOM_WIDTH = 8
 MIN_ROOM_HEIGHT = 4
@@ -37,6 +37,12 @@ GAME_MOVEMENT_KEYS = {
     'U': [1, -1],
     'N': [-1, 1],
     'B': [1, 1],
+
+    # For losers
+    'RIGHT': [1, 0],
+    'LEFT': [-1, 0],
+    'UP': [0, -1],
+    'DOWN': [0, 1],
 }
 def pickup(GS, p):
     if (p.x, p.y) in GS['terrain_map'].spawned_items:
@@ -82,12 +88,32 @@ def inventory(GS, p):
     else:
         GS['side_screen'] = 'INVENTORY'
 
+def reset(GS, p):
+    if DEBUG: print("Screens reset")
+    GS['side_screen'] = 'HUD'
+    
+    if GS['screen'] != 'DEATH' or GS['screen'] != 'CHARSEL' or GS['screen'] != 'INTRO':
+        GS['screen'] = 'GAME'
+
+def quit(GS, p):
+    print('\nGame Stats')
+    print('----------')
+    print('  Turns: ' + str(GS['turns']))
+    print('  Score: ' + str(p.score()))
+    print('  Inventory:\n' +\
+          ',\n'.join(list(map(lambda x:
+                              '    '+x[0].name+' x'+str(len(list(x[1]))),
+                              itertools.groupby(p.inventory)))))
+    exit(0)
+
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),
     ',': pickup,
     ';': auto_rest,
     'F': fire,
-    'I': inventory
+    'I': inventory,
+    'ESCAPE': reset,
+    'Q': quit
 }
 GAME_KEYS = {
     'M': GAME_MOVEMENT_KEYS,

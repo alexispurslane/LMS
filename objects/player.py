@@ -1,4 +1,4 @@
-import tdl, copy
+import tdl, copy, random
 import utils, consts, math, items
 
 class Player:
@@ -9,6 +9,7 @@ class Player:
         self.hunger = 0
         self.level = 0
         self.exp = 0
+        self.prev_pos = (-1,-1)
 
         # Setup character's race.
         self.race = race
@@ -16,7 +17,7 @@ class Player:
         self.max_strength = self.strength = self.race.first_level['strength']
         self.attack = self.race.first_level['strength']
         self.max_attack = self.attack
-        self.inventory = self.race.first_level['inventory']
+        self.inventory = list(map(copy.copy, self.race.first_level['inventory']))
         self.speed = self.max_speed = self.race.speed
         self.max_defence = self.defence = 0
         self.killed_monsters = 0
@@ -28,6 +29,9 @@ class Player:
 
         for item in self.inventory:
             item.equip(self)
+
+    def score(self):
+        return self.level + self.killed_monsters
 
     def remember_to_dequip(self, item):
         self.dequips.append(item)
@@ -74,13 +78,13 @@ class Player:
     def add_inventory_item(self, item):
         self.inventory.append(copy.copy(item))
         self.inventory.sort(key = lambda x: x.weight)
-        self.speed = 4 + max(0, self.inventory[0].weight-self.strength)
-        # item.equip(self) Autoequip
+        self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.inventory)))
 
     def remove_inventory_item(self, i):
         item = self.inventory[i]
         item.dequip(self)
         self.inventory.remove(item)
+        self.inventory.sort(key = lambda x: x.weight)
 
     def total_weight(self):
         total = 0
@@ -90,10 +94,15 @@ class Player:
         return total
 
     def light(self):
-        if self.total_weight() <= 5:
-            return 'light'
+        num_armor = len(list(filter(lambda a: isinstance(a, items.Armor), self.inventory)))
+        num_weapon = len(list(filter(lambda a: isinstance(a, items.Weapon), self.inventory)))
+
+        if self.race.name == 'Elf':
+            if num_armor <= 2 and num_weapon <= 3:
+                return 'light'
         else:
-            return ''
+            if num_armor < 2 and num_weapon <= 3:
+                return 'light'
 
     def fast(self):
         if self.speed <= 5:
@@ -103,6 +112,8 @@ class Player:
 
     def attributes(self):
         attrs = [self.light(), self.fast()]
+        attrs = [x for x in attrs if x is not None]
+        
         return ', '.join(attrs)+' '+self.race.name
 
     def move(self, event, GS):
@@ -113,14 +124,16 @@ class Player:
                 GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
                 self.dequips.remove(item)
         
-        if self.health < 12:
+        if self.health/self.max_health < 0.46:
             GS['messages'].insert(0, 'Your health is low. You should rest <r>.')
             
         if self.health < self.max_health and GS['turns'] % 4 == 0:
             self.health += 1
+            
+        if GS['turns'] % 5 == 0:
             self.hunger += 1
 
-        if self.hunger > 20:
+        if self.hunger > 20 and GS['turns'] % 3 == 0:
             GS['messages'].insert(0, 'You feel hungry. Your stomach gurgles. You feel weak.')
             self.health -= 1
 
@@ -135,18 +148,24 @@ class Player:
             (self.x, self.y) = GS['terrain_map'].generate_new_map()
         if (nX, nY) in GS['terrain_map'].doors and not GS['terrain_map'].is_walkable(nX, nY):
             GS['terrain_map'].doors[nX, nY] = False
-            GS['terrain_map'].terrain_map.walkable[nX, nY] = True
-            GS['terrain_map'].terrain_map.transparent[nX, nY] = True
+            GS['terrain_map'].remembered_terrain.walkable[nX, nY] = True
+            GS['terrain_map'].remembered_terrain.transparent[nX, nY] = True
             nX, nY = self.x, self.y
         if GS['terrain_map'].is_walkable(nX, nY):
+            self.prev_pos = (self.x, self.y)
             self.x = nX
             self.y = nY
             if (nX, nY) in GS['terrain_map'].water:
                 GS['messages'].insert(0, "You slosh through the cold water.")
         else:
-            GS['messages'].insert(0, "You hit a tree")
+            GS['messages'].insert(0, "You hit a wall. Stoppit.")
 
         m = GS['terrain_map'].monster_at(nX, nY)
+        speed = self.speed
+        if utils.streight_line(self.prev_pos, (nX, nY)) and self.light() and m:
+            GS['messages'].insert(0, "You gallantly charge the monster!")
+            self.speed = 0
+            
         if m:
             (self_dead, monster_dead) = self.attack_monster(GS, m)
             GS['messages'].insert(0, "You attack the "+type(m).__name__)
@@ -156,11 +175,19 @@ class Player:
             else:
                 GS['messages'].insert(0, "You vanquish the "+type(m).__name__)
                 GS['terrain_map'].proweling_monsters.remove(m)
-                GS['terrain_map'].spawned_items[m.x, m.y] = items.FOOD_RATION
+                GS['terrain_map'].spawned_items[m.x, m.y] = random.choice([items.FOOD_RATION, items.TORCH])
             if self_dead:
                 GS['messages'].insert(0, "You have died.")
                 GS['screen'] = 'DEATH'
                 
-        GS['terrain_map'].dungeon_decor[nX, nY] = None
+            self.speed = speed
+
+        if GS['terrain_map'].dungeon_decor[nX, nY] == 'FM':
+            GS['terrain_map'].dungeon_decor[nX, nY] = None
+        elif GS['terrain_map'].dungeon_decor[nX, nY] == 'FR' or\
+             GS['terrain_map'].dungeon_decor[nX, nY] == 'FL':
+            GS['terrain_map'].dungeon_decor[nX, nY] = None
+            player.health -= 1
+            GS['messages'].insert(0, 'The fire burns you.')
             
 

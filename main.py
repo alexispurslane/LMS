@@ -2,6 +2,9 @@ import tdl
 import time
 import math, random
 
+# Note to self: This uses libtcod 1.5.2, libtcod 1.6.1 is now out, but to use it
+# The lib is *very* different, and more verbose. https://bitbucket.org/libtcod/libtcod
+
 import sys
 sys.path.append('generators/')
 sys.path.append('lib/')
@@ -18,7 +21,7 @@ def run_game(GS):
         'screen': 'INTRO',
         'player': player.Player(races.HUMAN),
         'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
-        'messages': [
+        'messages': list(reversed([
             'Welcome ye to the sphere of Alchemy,',
             'a terrible and dangerous World into which',
             'alchemists\' lowely apprentices are dispatched',
@@ -26,7 +29,7 @@ def run_game(GS):
             'or die epicly.',
             'Get ye to the last forest, from thence to the',
             'caves. You\'re pereformance will be evaluated.'
-        ],
+        ])),
         'selection': 0,
         'side_screen': 'HUD',
         'turns': 0
@@ -37,9 +40,10 @@ def run_game(GS):
             GS['screen'] = 'DEATH'
         draw.draw_screen(GS)
 
+        tdl.event.set_key_repeat(delay=400, interval=1)
         for event in tdl.event.get():
             if event.type == 'QUIT':
-                raise SystemExit('The window has been closed.')
+                consts.quit(GS, GS['player'])
             elif event.type == 'KEYDOWN' and GS['side_screen'] == 'INVENTORY':
                 if event.keychar.upper() == 'UP':
                     GS['selection'] -= 1
@@ -66,7 +70,7 @@ def run_game(GS):
             elif event.type == 'KEYDOWN' and GS['screen'] == 'CHARSEL':
                 if event.keychar.isalpha():
                     racen = ord(event.keychar.lower())-97
-                    if racen < 3:
+                    if racen < len(races.RACES):
                         selected_race = races.RACES[racen]
                         GS['player'] = player.Player(selected_race)
                         (GS['player'].x, GS['player'].y) = GS['terrain_map'].generate_new_map()

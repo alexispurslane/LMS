@@ -1,4 +1,4 @@
-import colors
+import colors, consts
 
 class Item:
     def __init__(self, name='Unknown item', weight=1, probability=50, char='*'):
@@ -7,35 +7,54 @@ class Item:
         self.probability = probability
         self.char = char
         self.fg = colors.grey
+        self.equipped = False
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+    
     def equip(self, player):
         pass
 
 class Armor(Item):
     def __init__(self, name='Unknown armor', weight=3, probability=40, char=']'):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
+        self.equipped = False
 
     def equip(self, player):
-        player.defence += self.weight
-        player.max_defence = player.defence
+        if not self.equipped:
+            if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
+            player.defence += self.weight
+            player.max_defence = player.defence
+            self.equipped = True
 
     def dequip(self, player):
-        player.defence -= self.weight
-        player.max_defence = player.defence
+        if self.equipped:
+            if consts.DEBUG: print('dequip '+self.name+' ('+str(self.equipped)+')')
+            player.defence -= self.weight
+            player.max_defence = player.defence
+            self.equipped = False
     
 class Weapon(Item):
     def __init__(self, name='Unknown weapon', weight=2, attack=5, probability=20, char='|'):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.attack = attack
+        self.equipped = False
         
     def equip(self, player):
-        player.max_attack = player.attack = self.attack
+        if not self.equipped:
+            if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
+            player.max_attack = player.attack = self.attack
+            print(player.attack)
+            self.equipped = True
         
     def dequip(self, player):
-        player.max_attack = player.attack = 0
+        if self.equipped:
+            if consts.DEBUG: print('dequip '+self.name+' ('+str(self.equipped)+')')
+            player.max_attack = player.attack = 0
+            self.equipped = False
 
 class Light(Item):
-    def __init__(self, name='Torch', weight=1, radius=10, lasts=2000, probability=55, char='\\'):
+    def __init__(self, name='Torch', weight=1, radius=10, lasts=500, probability=55, char='\\'):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.radius = radius
         self.lasts = lasts
@@ -49,7 +68,7 @@ class Light(Item):
         p.light_source_radius = 1
 
 class Food(Item):
-    def __init__(self, name='Food Ration', weight=0, nutrition=20, probability=55, char='%'):
+    def __init__(self, name='Food Ration', weight=0, nutrition=10, probability=55, char='%'):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.nutrition = nutrition
 
@@ -102,3 +121,7 @@ ITEMS = [
 ]
 
 for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
+
+DUNGEON_ITEMS = ITEMS[:]
+DUNGEON_ITEMS.remove(TORCH)
+DUNGEON_ITEMS.remove(FOOD_RATION)
