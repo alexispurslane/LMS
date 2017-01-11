@@ -22,12 +22,12 @@ def draw_hud_screen(GS, edge_pos):
             display_stat('ST', player), display_stat('SP', player),
             display_stat('AT', player), player.exp, player.hunger
         ),
-        'GAME - TuN: %d; FoL: %d/%d; DuL: %d/%d; MoC: %d; Pos: (%d, %d)' % (
+        'GAME - TuN: %d; FoL: %d/%d; DuL: %d/%d; MoC: %d; Pos: %s' % (
             GS['turns'],
             GS['terrain_map'].forest_level, consts.FOREST_LEVELS,
             GS['terrain_map'].dungeon_level, consts.DUNGEON_LEVELS,
-            len(GS['terrain_map'].proweling_monsters),
-            player.x, player.y
+            len(GS['terrain_map'].dungeon['monsters']),
+            player.pos
         )
     ]
     for i in range(len(rows)):
@@ -159,49 +159,66 @@ def draw_game_screen(GS):
     console = GS['console']
     GS['messages'] = draw_hud(GS)
     GS['terrain_map'].draw_map(GS['console'], GS['player'])
-    for m in GS['terrain_map'].proweling_monsters:
-        fov = GS['terrain_map'].lighted_terrain.fov
-        if fov[m.x, m.y] or not consts.FOV:
+    
+    for m in GS['terrain_map'].dungeon['monsters']:
+        fov = GS['terrain_map'].dungeon['lighted'].fov
+        if fov[m.pos] or not consts.FOV:
             color = (0,0,0)
-            if (m.x, m.y) in GS['terrain_map'].water:
+            if m.pos in GS['terrain_map'].dungeon['water']:
                 color = colors.blue
                 
-            GS['console'].drawChar(m.x, m.y, m.char, fg=m.fg, bg=color)
+            GS['console'].drawChar(m.pos[0], m.pos[1], m.char, fg=m.fg, bg=color)
 
     color = (0,0,0)
-    if (GS['player'].x, GS['player'].y) in GS['terrain_map'].water:
+    if GS['player'].pos in GS['terrain_map'].dungeon['water']:
         color = colors.blue
-    elif GS['terrain_map'].dungeon_decor[GS['player'].x, GS['player'].y] == 'FM':
+    elif GS['terrain_map'].dungeon['decor'][GS['player'].pos] == 'FM':
         color = (21, 244, 238)
-    console.drawChar(GS['player'].x, GS['player'].y, '@', bg=color)
+        
+    console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color)
 
 
+# Refactor to use self.dungeon
 def draw_dungeon_tile(terrain_map, console, pos, tint):
-    (x, y) = pos
-    if pos == terrain_map.downstairs:
+    x, y = pos
+    if pos == terrain_map.dungeon['down_stairs']:
         console.drawChar(x, y, '>', fg=colors.grey, bg=colors.red)
-    elif (x, y) in terrain_map.spawned_items:
-        console.drawChar(x, y, terrain_map.spawned_items[x, y].char,
-                            fg=colors.tint(terrain_map.spawned_items[x, y].fg, tint))
-    elif terrain_map.get_type(x, y) == 'FLOOR':
-        console.drawChar(x, y, ' ', bg=colors.tint(colors.extreme_darken(colors.very_dark_grey), tint))
-    elif terrain_map.get_type(x, y) == 'DOOR':
-        if terrain_map.doors[x, y]:
+    elif pos == terrain_map.dungeon['up_stairs']:
+        console.drawChar(x, y, '<', fg=colors.grey, bg=colors.blue)
+    elif pos in terrain_map.dungeon['items']:
+        item = terrain_map.dungeon['items'][pos]
+        console.drawChar(x, y, item.char, fg=colors.tint(item.fg, tint))
+    elif terrain_map.dungeon['decor'][pos]:
+        decor = terrain_map.dungeon['decor']
+        
+        if decor[pos] == 'FM':
+            console.drawChar(x, y, '"', fg=(57, 255, 20),
+                             bg=(57, 255, 20))
+        elif decor[pos] == 'FR':
+            console.drawChar(x, y, '^', fg=colors.darken(colors.red),
+                             bg=colors.red)
+        elif decor[pos] == 'FL':
+            console.drawChar(x, y, '^', fg=colors.darken(colors.yellow),
+                             bg=colors.darken(colors.red))
+    elif terrain_map.get_type(pos) == 'FLOOR':
+        console.drawChar(x, y, ' ',
+                         bg=colors.tint(
+                             colors.extreme_darken(
+                                 colors.very_dark_grey), tint))
+    elif terrain_map.get_type(pos) == 'DOOR':
+        if terrain_map.dungeon['doors'][pos]:
             console.drawChar(x, y, '-', fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.extreme_darken(colors.brown), tint))
         else:
             console.drawChar(x, y, '\\', fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.black, tint))
-    elif terrain_map.get_type(x, y) == 'STONE':
+    elif terrain_map.get_type(pos) == 'STONE':
         color = colors.tint(colors.darkmed_grey, tint)
-        console.drawChar(x, y, '=', fg=colors.tint(colors.grey, tint), bg=color)
-    if pos in terrain_map.dungeon_decor:
-        if terrain_map.dungeon_decor[pos] == 'FM':
-            console.drawChar(x, y, '"', fg=(57, 255, 20), bg=(57, 255, 20))
-        elif terrain_map.dungeon_decor[pos] == 'FR':
-            console.drawChar(x, y, '^', fg=colors.darken(colors.red), bg=colors.red)
-        elif terrain_map.dungeon_decor[pos] == 'FL':
-            console.drawChar(x, y, '^', fg=colors.darken(colors.yellow), bg=colors.darken(colors.red))
+        
+        console.drawChar(x, y, '=', fg=colors.tint(colors.grey, tint), bg=color) 
+    if pos in terrain_map.dungeon['numbers']:
+        n = terrain_map.dungeon['numbers'][pos]
+        console.drawStr(x, y, str(n), fg=colors.extreme_lighten((n, n, n)))
 
 def draw_forest_tile(terrain_map, console, pos, tint):
     (x, y) = pos

@@ -2,33 +2,65 @@ import tdl
 import random, math
 import monsters, colors, consts, utils, items, dungeons, forests, draw
 
+# TODO: Add comments
+# TODO: Refactor for less mutation
 class TerrainMap:
     def __init__(self, w, h):
-        self.remembered_terrain = tdl.map.Map(w, h)
-        self.lighted_terrain = tdl.map.Map(w, h)
         self.forest_level = 0
         self.dungeon_level = 0
         self.rooms = []
         self.width = w
         self.height = h
-        self.proweling_monsters = []
-        self.monsterN = 0
-        self.water = {}
-        self.hell_level = False
-        self.spawned_items = {}
-        self.noise = None
-        self.noise_point = 0
-        self.downstairs = None
-        self.doors = {}
-        self.dungeon_decor = {}
+
+        self.dungeon = {}
+        self.reset_dungeon()
+
+        self.dungeons = []
+
+    # Restors the nth stored dungeon.
+    def restore_dungeon(self, n):
+        if n < len(self.dungeons):
+            self.dungeon = self.dungeons[n]
+            return True
         
-    def adjacent_water(self, x, y):
+        return False
+
+    # Creates a new dungeon ready for creation.
+    def reset_dungeon(self):
+        self.dungeon = {
+            'monsters': [],
+            
+            'water': {},
+            'numbers': {},
+            'noise': None,
+            
+            'down_stairs': (-20, -20),
+            'up_stairs': (-20, -20),
+            
+            'decor': {},
+            'items': {},
+            'doors': {},
+            'rooms': [],
+
+            'player_starting_pos': (0, 0),
+
+            'lighted': tdl.map.Map(self.width, self.height),
+            'visited': tdl.map.Map(self.width, self.height)
+        }
+
+    # Checks if a water cell is adjacent to (x, y) co-ords.
+    def adjacent_water(self, p):
+        x, y = p
         return (max(x-1, 0), y) in self.water or\
             (max(x+1, 0), y) in self.water or\
             (x, max(y+1, 0)) in self.water or\
             (x, max(y-1, 0)) in self.water
 
-    def all_around_floor(self, x, y):
+    # FIXME: Refactor somehow.
+    # This checks if there is a reasonable amount of floorspace around a point.
+    # (For forest levels.)
+    def all_around_floor(self, p):
+        x, y = p
         return self.get_type(max(x-1, 0), y) == 'FLOOR' and\
             self.get_type(max(x-2, 0), y) == 'FLOOR' and\
             self.get_type(max(x-3, 0), y) == 'FLOOR' and\
@@ -41,10 +73,12 @@ class TerrainMap:
             self.get_type(x, max(y-1, 0)) == 'FLOOR' and\
             self.get_type(x, max(y-2, 0)) == 'FLOOR' and\
             self.get_type(x, max(y-3, 0)) == 'FLOOR'
-    
-    def get_type(self, x, y):
-        if self.in_forests():
-            l = self.noise.get_point(x, y)
+
+    # Retreives the type of the cell at (x, y).
+    def get_type(self, p):
+        x, y = utils.clamp_point(p, maxs=(self.width, self.height))
+        if self.is_forests():
+            l = self.dungeon['noise'].get_point(x, y)
             if l > consts.FLOOR_LEVEL and l < consts.STONE_LEVEL:
                 return 'TREE'
             elif l >= consts.STONE_LEVEL:
@@ -53,86 +87,130 @@ class TerrainMap:
                 return 'FLOOR'
             elif l <= consts.WATER_LEVEL:
                 return 'WATER'
-        elif self.in_dungeons():
-            if (x, y) in self.doors:
+        elif self.is_dungeons():
+            if (x, y) in self.dungeon['doors']:
                 return 'DOOR'
-            elif self.remembered_terrain.transparent[x, y]:
+            elif self.dungeon['visited'].transparent[x, y]:
                 return 'FLOOR'
             else:
                 return 'STONE'
-        
-    def on_map(self, x, y):
-        return x >= 0 and x < self.width and y >= 0 and y < self.height
 
-    def monster_at(self, x, y):
-        for m in self.proweling_monsters:
-            if m.x == x and m.y == y:
+    # Checks if a point is on the map.
+    def on_map(self, p):
+        return p >= (0, 0) and p < (self.width, self.height)
+
+    # Returns a monster at the given point.
+    def monster_at(self, p):
+        for m in self.dungeon['monsters']:
+            if m.pos == p:
                 return m
         return None
-    
-    def is_walkable(self, x, y, player=utils.Point(-1, -1)):
-        return self.on_map(x,y) and not self.monster_at(x, y)\
-            and not x == player.x and not y == player.y\
-            and self.remembered_terrain.walkable[x, y]
 
-    def in_forests(self):
+    # Checks if level is hard.
+    def is_hell_level(self):
+        return self.dungeon_level > math.floor(consts.DUNGEON_LEVELS/2)
+
+    # Checks if the character can stand on a point.
+    def is_walkable(self, p, player=(-1, -1)):
+        return self.on_map(p) and not self.monster_at(p)\
+            and p != player and self.dungeon['visited'].walkable[p]
+
+    # Checks if the current level is in a forest.
+    def is_forests(self):
         return self.forest_level < consts.FOREST_LEVELS
 
-    def in_dungeons(self):
+    # Checks if the current level is in a dungeon.
+    def is_dungeons(self):
         return self.dungeon_level < consts.DUNGEON_LEVELS
 
+    # Generates a new forest map (redirected to forests.py)
     def generate_new_forest_map(self):
         return forests.generate_new_forest_map(self)
 
+    # Draws a horizontal corridor to the 'visited' map.
     def add_h_corridor(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2)):
-            self.remembered_terrain.transparent[x, y] = True
-            self.remembered_terrain.walkable[x, y] = True
+            x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
+            self.dungeon['visited'].transparent[x, y] = True
+            self.dungeon['visited'].walkable[x, y] = True
             
+    # Draws a horizontal corridor to the 'visited' map.
     def add_v_corridor(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2)):
-            self.remembered_terrain.transparent[x, y] = True
-            self.remembered_terrain.walkable[x, y] = True
+            x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
+            self.dungeon['visited'].transparent[x, y] = True
+            self.dungeon['visited'].walkable[x, y] = True
             
+    # Generates a new dungeon map (ridirected to dungeons.py)
+    # and saves it to the level list.
     def generate_new_dungeon_map(self):
         return dungeons.generate_new_dungeon_map(self)
-    
+
+    # Generates the final level.
+    # TODO: Not implemented
     def generate_final_level(self):
         return None
 
+    # Generates the new map, forest or dungeon, appropriately by level number.
+    # FIXME: Calls generate_final_level, which will return None.
     def generate_new_map(self):
-        self.remembered_terrain = tdl.map.Map(self.width, self.height)
-        self.lighted_terrain = tdl.map.Map(self.width, self.height)
+        self.dungeons.append(self.dungeon)
+        self.reset_dungeon()
         
-        if self.in_forests():
+        if self.is_forests():
             if consts.DEBUG: print('LEVEL: FOREST')
             return self.generate_new_forest_map()
-        elif self.in_dungeons():
+        elif self.is_dungeons():
             if consts.DEBUG: print('LEVEL: DUNGEON')
             return self.generate_new_dungeon_map()
         else:
             if consts.DEBUG: print('LEVEL: FINAL')
             return self.generate_final_level()
+        
+    # Adds cell to terrain map.
+    def place_cell(self, p, is_wall=False):
+        pos = utils.clamp_point(p, maxs=(self.width, self.height))
 
+        self.dungeon['visited'].transparent[pos] = not is_wall
+        self.dungeon['visited'].walkable[pos] = not is_wall
+
+        self.dungeon['lighted'].transparent[pos] = not is_wall
+        self.dungeon['lighted'].walkable[pos] = not is_wall
+
+    # Calculates the player's visited map and current FoV, then draws the visited
+    # map while brightening the player's FoV.
     def draw_map(self, console, player):
         if consts.FOV:
             rad = player.light_source_radius
+
+            x, y = player.pos
+            fov = self.dungeon['visited'].compute_fov(
+                x, y,
+                cumulative=consts.CUMULATE_FOV,
+                radius=rad,
+                sphere=True)
             
-            fov = self.remembered_terrain.compute_fov(player.x, player.y, cumulative=consts.CUMULATE_FOV, radius=rad, sphere=True)
-            
-            fov2 = self.lighted_terrain.compute_fov(player.x, player.y, radius=rad, sphere=True)
+            fov2 = self.dungeon['lighted'].compute_fov(
+                x, y,
+                radius=rad,
+                sphere=True)
             fov2 = [(f[0], f[1]) for f in fov2]
         else:
-            fov2 = fov = self.remembered_terrain
+            fov2 = fov = self.dungeon['visited']
 
-        if consts.DEBUG:
-            draw.draw_dungeon_tile(self, console, self.downstairs, (0,0,0))
+        # Draw up-stairs and down-stairs no matter what.
+        if len(self.dungeon['monsters']) == 0:
+            draw.draw_dungeon_tile(self, console, self.dungeon['down_stairs'], (0,0,0))
+            
+        draw.draw_dungeon_tile(self, console, self.dungeon['up_stairs'], (0,0,0))
+
+        # Draw map
         for x, y in fov:
             tint = (-80, -80, -80)
             if (x, y) in fov2:
                 tint = (0, 0, 0)
                 
-            if self.in_forests():
+            if self.is_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)
-            elif self.in_dungeons():
+            elif self.is_dungeons():
                 draw.draw_dungeon_tile(self, console, (x, y), tint)

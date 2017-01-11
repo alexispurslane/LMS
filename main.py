@@ -68,14 +68,17 @@ def run_game(GS):
             elif event.type == 'KEYDOWN' and GS['screen'] == 'INTRO':
                 GS['screen'] = 'CHARSEL'
             elif event.type == 'KEYDOWN' and GS['screen'] == 'CHARSEL':
-                if event.keychar.isalpha():
+                if event.keychar.isalpha() and len(event.keychar.lower()) == 1:
                     racen = ord(event.keychar.lower())-97
                     if racen < len(races.RACES):
                         selected_race = races.RACES[racen]
                         GS['player'] = player.Player(selected_race)
-                        (GS['player'].x, GS['player'].y) = GS['terrain_map'].generate_new_map()
-                        GS['terrain_map'].proweling_monsters = sorted(
-                            GS['terrain_map'].proweling_monsters, key=lambda m: m.speed)
+                        
+                        GS['player'].pos = GS['terrain_map'].generate_new_map()
+                        
+                        GS['terrain_map'].dungeon['monsters'] = sorted(
+                            GS['terrain_map'].dungeon['monsters'], key=lambda m: m.speed)
+                        
                         GS['screen'] = 'GAME'
             elif event.type == 'KEYDOWN' and GS['screen'] == 'GAME':
                 if event.keychar.upper() in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':

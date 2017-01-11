@@ -3,14 +3,16 @@ import colors, utils, random, math, consts
 class Monster:
     def __init__(self, char, fg):
         self.char = char
-        self.x = 0
-        self.y = 0
+        self.pos = (0, 0)
         self.fg = fg
 
+    # Removes the monster's attack value from the players health, then
+    # runs the monster's special action on the player reference.
     def attack_player(self, player, GS):
         player.health -= self.attack
         self.special_action(GS, player)
 
+    # Decide wether to approach the player or not.
     def choose(self, player, lst, key):
         if self.speed > player.speed:
             if self.health > player.health:
@@ -25,54 +27,59 @@ class Monster:
             else:
                 return max(lst, key=key)
 
+    # Check equality
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-    
+        return other != None and self.__dict__ == other.__dict__
+
+    # Gets the returns the points the monster would prefer to go to, or if there
+    # are none, the points the monster *can* go to.
+    def get_movement_choices(self, tmap, adj):
+        valid = list(filter(lambda p:
+                            tmap.is_walkable(p), adj))
+
+        def liked(p):
+            decor = tmap.dungeon['decor'][p]
+            return not p in tmap.dungeon['water'] and decor != 'FL' and decor != 'FR'
+        
+        like = list(filter(liked, valid))
+        
+        if len(like) > 0:
+            return like
+        else:
+            return valid
+
+    # Move monster according to choose() and deal with movement effects.
     def move(self, GS):
+        x, y = self.pos
         adj = [
-            utils.Point(self.x+1, self.y),
-            utils.Point(self.x-1, self.y),
-            utils.Point(self.x, self.y+1),
-            utils.Point(self.x, self.y-1)
+            (x+1, y),
+            (x-1, y),
+            (x, y+1),
+            (x, y-1)
         ]
         sight = int(self.speed/2)
         if sight < 8: sight = 8
-        if GS['player'].light(): sight = 1
+        if GS['player'].light(): sight = 3
+        
+        choices = self.get_movement_choices(GS['terrain_map'], adj)
 
-        if utils.Point(GS['player'].x, GS['player'].y) in adj:
+        if GS['player'].pos in adj:
             GS['messages'].insert(0, 'The '+type(self).__name__+' attacks you suddenly!')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
                 GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
-        elif utils.dist(self, GS['player']) <= sight:
-            valid = list(filter(lambda p:
-                                GS['terrain_map'].is_walkable(p.x, p.y),
-                                adj))
-            if random.randint(0, 20) <= 15:
-                if len(valid) > 0:
-                    like = list(filter(lambda p: not (p.x, p.y) in GS['terrain_map'].water, valid))
-                    choices = []
-
-                    if len(like) > 0:
-                        choices = like
-                    else:
-                        choices = valid
-
-                    chosen = self.choose(GS['player'], choices, lambda p: utils.dist(p, GS['player']))
-                    self.x, self.y = chosen.x, chosen.y
-            else:
-                if len(valid) > 0:
-                    chosen = random.choice(valid)
-                    self.x, self.y = chosen.x, chosen.y
-
-# g - goblin
-# G - giant
-# D - dragon
-# d - baby dragon
-# w - witch
-# W - wyvern
-# f - fury
-# F - flying dragon
+                GS['terrain_map'].dungeon['monsters'].remove(self)
+                GS['terrain_map'].dungeon['items'][self.pos] = random.choice([items.FOOD_RATION, items.TORCH])
+        elif utils.dist(self.pos, GS['player'].pos) <= sight:
+            if random.randint(0, 20) <= 15: # Monster moves in proactive direction.
+                if len(choices) > 0:
+                    self.pos = self.choose(
+                        GS['player'],
+                        choices,
+                        lambda p: utils.dist(p, GS['player'].pos))
+            else:                            # Monster moves in random direction.
+                if len(choices) > 0:
+                    self.pos = random.choice(choices)
 
 def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
     def __init__(self):
@@ -118,16 +125,17 @@ create_monster('Giant', 'G', colors.dark_green,
                sound = 'thumping')
 
 def breed(self, GS, player):
-    if consts.DEBUG: print("Slime breeding.")
+    if consts.DEBUG: print('Slime breeding.')
+    x, y = self.pos
     posns = [
-        (self.x+1, self.y),
-        (self.x+2, self.y),
-        (self.x-1, self.y),
-        (self.x-2, self.y),
-        (self.x, self.y+1),
-        (self.x, self.y+2),
-        (self.x, self.y-1),
-        (self.x, self.y-2),
+        (x+1, y),
+        (x+2, y),
+        (x-1, y),
+        (x-2, y),
+        (x, y+1),
+        (x, y+2),
+        (x, y-1),
+        (x, y-2),
     ]
     valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
     if len(valid) > 0:
@@ -141,23 +149,25 @@ create_monster('Slime', 's', (27, 226, 21),
                sound = 'squeltching')
 
 def filtch(self, GS, player):
+    x, y = self.pos
     posns = [
-        (self.x+1, self.y),
-        (self.x+2, self.y),
-        (self.x-1, self.y),
-        (self.x-2, self.y),
-        (self.x, self.y+1),
-        (self.x, self.y+2),
-        (self.x, self.y-1),
-        (self.x, self.y-2),
+        (x+1, y),
+        (x+2, y),
+        (x-1, y),
+        (x-2, y),
+        (x, y+1),
+        (x, y+2),
+        (x, y-1),
+        (x, y-2),
     ]
-    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
+    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p), posns))
+    
     if len(valid) > 0:
         pos = random.choice(valid)
         item = random.choice(player.inventory)
         player.inventory.remove(item)
         GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
-        GS['terrain_map'].spawned_items[pos] = item
+        GS['terrain_map'].dungeon['items'][pos] = item
     
 create_monster('Imp', 'i', colors.light_blue,
                health = 15,
@@ -186,5 +196,6 @@ create_monster('FlyingDragon', 'F', colors.dark_yellow,
 
 regular_monsters = [Fury, Wyvern, Hag, Imp, Giant, Goblin, BabyDragon, Slime, Slime, Slime]
 
+# Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
     return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))

@@ -1,114 +1,117 @@
 import math, random
 
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    def __eq__(self, other):
-        """Override the default Equals behavior"""
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        return False
-    def __ne__(self, other):
-        """Define a non-equality test"""
-        return not self.__eq__(other)
-
+# Calculate distance.
 def dist(p1, p2):
-    return math.ceil(math.sqrt(math.pow(p2.x - p1.x, 2) +
-                                math.pow(p2.y - p1.y, 2)))
+    return math.ceil(math.sqrt(math.pow(p2[0] - p1[0], 2) +
+                               math.pow(p2[1] - p1[1], 2)))
 
-def f7(seq):
-    seen = set()
-    seen_add = seen.add
-    return [x for x in seq if not (x in seen or seen_add(x))]
+def flip(t, do_it=True):
+    if do_it:
+        return t[1], t[0]
+    else:
+        return t
 
+def clamp(x, a=1, b=2):
+    return max(a, min(x, b-1))
+
+def clamp_point(p, mins=(1, 1), maxs=(1, 1)):
+    return (clamp(p[0], a=mins[0], b=maxs[0]),
+            clamp(p[1], a=mins[1], b=maxs[1]))
+
+def tuple_add(a, b):
+    return tuple(map(sum, zip(a, b)))
+
+# TODO: Allow for animation by waiting to move, but remember moves.
 def monster_turn(GS):
-    for m in GS['terrain_map'].proweling_monsters:
+    for m in GS['terrain_map'].dungeon['monsters']:
         speed = math.ceil(m.speed/10)
         if speed == 1:
             m.move(GS)
         elif speed > 1 and GS['turns'] % speed == 0:
             m.move(GS)
 
+# Represents a dungeon room.
 class Room:
     def __init__(self, x, y, w, h):
-        self.x1 = x
-        self.x2 = x + w
-        self.y1 = y
-        self.y2 = y + h
+        # Diagnostic: is this room connected according to the DGA?
+        self.connected = False
+        
+        # Starting point position
+        self.pos1 = (x, y)
+        
+        # Ending point position
+        self.pos2 = (x + w, y + h)
+
+        # Dimentions
         self.w = w
         self.h = h
+
+        # Circle dimentions
         self.radius = math.floor(w/2)
-        self.center = Point(math.floor((self.x1 + self.x2) / 2),
-                            math.floor((self.y1 + self.y2) / 2));
-        
+
+        # Room type:
+        # 3/4 chance to be square,
+        # 1/4 chance to be round.
         self.room_type = random.choice([
-            'Square', 'Square',
-            'Square', 'Square',
             'Square', 'Square',
             'Square', 'Round',
         ])
 
-    def intersects(self, room):
-        return self.x1 <= room.x2 and self.x2 >= room.x1 and\
-               self.y1 <= room.y2 and self.y2 >= room.y1
+        # Room center.
+        if self.room_type == 'Square':
+            self.center = (math.floor((self.pos1[0] + self.pos2[0]) / 2),
+                           math.floor((self.pos1[1] + self.pos2[1]) / 2))
+        else:
+            self.center = tuple_add(self.pos1, (math.floor(w/2),
+                                                math.floor(h/2)))
 
     def edge_points(self):
         pnts = [(0,0)]
-        for x in range(1, self.x2):
-            pnts.append((x, self.y1))
-            pnts.append((x, self.y2-1))
-
-        for y in range(1, self.y2):
-            pnts.append((self.x1, y))
-            pnts.append((self.x2-1, y))
+        for x in range(1, self.pos2[0]):
+            pnts.append((x, self.pos1[1]))
+            pnts.append((x, self.pos2[1]-1))
+            
+        for y in range(1, self.pos2[1]):
+            pnts.append((self.pos1[0], y))
+            pnts.append((self.pos2[0]-1, y))
 
         return pnts
-
-    def draw_into_map(self, tmap):
-        def putpixel(x, y, wall=False):
-            pos = max(0, x), max(0, y)
-            tmap.remembered_terrain.transparent[pos] = not wall
-            tmap.remembered_terrain.walkable[pos] = not wall
-            tmap.lighted_terrain.transparent[pos] = not wall
-            tmap.lighted_terrain.walkable[pos] = not wall
-            
+    
+    # Checks if a room intersects the other.
+    def intersects(self, room):
+        x1, y1 = self.pos1
+        x2, y2 = self.pos2
+        return x1 <= room.pos2[0] and x2 >= room.pos1[0] and\
+            y1 <= room.pos2[1] and y2 >= room.pos1[1]
+    
+    # Draws the room into the supplied terrain map.
+    def draw_into_map(self, i, tmap):
+        spacing = random.randint(4, 31)
         if self.room_type == 'Square':
-            n = random.randint(1, 100)
-            rand_walls = n < 25 and math.floor(n/5) != 0
             for x in range(0, self.w):
                 for y in range(0, self.h):
-                    wall = False
-                    if rand_walls and x+y % math.floor(n/5) == 0:
-                        wall = True
+                    pos = tuple_add(self.pos1, (x, y))
+                    wall = x % spacing == 0 and y % spacing == 0
 
-                    putpixel(x+self.x1, y+self.y1, wall=wall)
+                    tmap.place_cell(pos, is_wall=wall)
 
                     if not wall:
-                        pos = x+self.x1, y+self.y1
-                        if tmap.hell_level:
-                            tmap.dungeon_decor[pos] = random.choice(['FR', 'FL', None, None, None, None])
+                        if tmap.is_hell_level():
+                            tmap.dungeon['decor'][pos] = random.choice(['FR', 'FL', None, None, None, None])
                         else:
-                            tmap.dungeon_decor[pos] = random.choice(['FM', None, None, None, None])
+                            tmap.dungeon['decor'][pos] = random.choice(['FM', None, None, None, None])
                         
         elif self.room_type == 'Round':
             for x in range(-self.radius, self.radius):
                 for y in range(-self.radius, self.radius):
-                        if x*x + y*y <= pow(self.radius, 2):
-                            putpixel(self.x1 + x, self.y1 + y);
+                    if x*x + y*y <= pow(self.radius, 2):
+                        tmap.place_cell(tuple_add(self.pos1, (x, y)));
 
-def dir_of(pos1, pos2):
-    if pos1[0] < pos2[0]:
-        return 'LEFT'
-    elif pos1[0] > pos2[0]:
-        return 'RIGHT'
-    elif pos1[1] > pos2[1]:
-        return 'DOWN'
-    elif pos1[1] < pos2[1]:
-        return 'UP'
-    else:
-        return 'SAME'
+def f7(seq):
+    seen = set()
+    return [x for x in seq if not (x in seen or seen.add(x))]
 
+# Checks if b is adjacent to (in a streight line of) a.
 def streight_line(a, b):
     As = [
         (a[0]-1, a[1]),

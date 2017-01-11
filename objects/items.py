@@ -10,7 +10,7 @@ class Item:
         self.equipped = False
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        return other != None and self.__dict__ == other.__dict__
     
     def equip(self, player):
         pass
@@ -44,7 +44,6 @@ class Weapon(Item):
         if not self.equipped:
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = self.attack
-            print(player.attack)
             self.equipped = True
         
     def dequip(self, player):
@@ -62,7 +61,7 @@ class Light(Item):
     def equip(self, p):
         if self.lasts > 0:
             p.light_source_radius = self.radius
-            p.remember_to_dequip(self)
+            p.dequips.append(self)
 
     def dequip(self, p):
         p.light_source_radius = 1
