@@ -1,14 +1,14 @@
-# Alchemy Sphere: A Magic-Focused Roguelike
+# Last Man Standing: A Magic-Focused Roguelike
 
 ## Introduction
 
-The goal of Alchemy Sphere is to provide a well-calibrated and simple
+The goal of Last Man Standing is to provide a well-calibrated and simple
 roguelike world as a background for a rich, complex, and interesting
 magic system.
 
 ## The Color Magic System
 
-In Alchemy Sphere's magic system, there are two main categories and
+In Last Man Standing's magic system, there are two main categories and
 several sub-categories.  The two main categories are _magic
 generators_ and _magic channelers_.
 
