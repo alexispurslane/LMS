@@ -56,7 +56,6 @@ GAME_MOVEMENT_KEYS = {
 # Have the player pick up an item
 def pickup(GS, p):
     dun_items = GS['terrain_map'].dungeon['items']
-    if DEBUG: print('Dungeon items: ' + str(dun_items) + ', position: ' + str(p.pos))
     if p.pos in dun_items:
         item = dun_items[p.pos]
         GS['messages'].insert(0, 'You pick up a '+item.name)

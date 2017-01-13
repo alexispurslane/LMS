@@ -126,28 +126,28 @@ create_monster('Giant', 'G', colors.dark_green,
                sound = 'thumping')
 
 def breed(self, GS, player):
-    if consts.DEBUG: print('Slime breeding.')
     x, y = self.pos
     posns = [
         (x+1, y),
-        (x+2, y),
         (x-1, y),
-        (x-2, y),
         (x, y+1),
-        (x, y+2),
         (x, y-1),
-        (x, y-2),
     ]
-    valid = list(filter(lambda p: GS['terrain_map'].is_walkable(p[0], p[1]), posns))
+    valid = list(filter(GS['terrain_map'].is_walkable, posns))
     if len(valid) > 0:
-        pos = random.choice(valid)
-        GS['terrain_map'].proweling_monsters[pos] = Slime()
+        GS['messages'].insert(0, "You chop the slime in half. The new half is alive!")
+        if consts.DEBUG:
+            print('Slime breeding.')
+        slime = Slime()
+        slime.pos = random.choice(valid)
+        GS['terrain_map'].dungeon['monsters'].append(slime)
         
 create_monster('Slime', 's', (27, 226, 21),
-               health=15,
-               speed=1,
-               attack = 1,
-               sound = 'squeltching')
+               health=13,
+               speed=8,
+               attack=1,
+               sound='squeltching',
+               special_action=breed)
 
 def filtch(self, GS, player):
     x, y = self.pos

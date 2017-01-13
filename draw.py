@@ -42,7 +42,7 @@ def draw_hud_screen(GS, edge_pos):
                                 rows[i].ljust(math.floor(consts.WIDTH/2)-2),
                                 bg=color, fg=colors.black)
 
-    if len(GS['messages']) > consts.MESSAGE_NUMBER:
+    if len(GS['messages']) >= consts.MESSAGE_NUMBER:
         GS['messages'] = [GS['messages'][0]]
         
     occurences = {}
