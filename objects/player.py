@@ -116,7 +116,7 @@ class Player:
             
         return total
 
-    # For the Elf:
+    # For the Ranger:
     # If the player has two or less armor items and three or less weapons,
     # he is light, and therefore quiet.
     # For others:
@@ -126,7 +126,7 @@ class Player:
         num_armor = len(list(filter(lambda a: isinstance(a, items.Armor), self.inventory)))
         num_weapon = len(list(filter(lambda a: isinstance(a, items.Weapon), self.inventory)))
 
-        if self.race.name == 'Elf':
+        if self.race.name == 'Ranger':
             if num_armor <= 2 and num_weapon <= 3:
                 return 'light'
         else:
@@ -226,7 +226,7 @@ class Player:
                 GS['messages'].insert(0, "You vanquish the "+type(m).__name__)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
-                GS['terrain_map'].dungeon['items'][m.pos] = random.choice([items.FOOD_RATION, items.TORCH])
+                GS['terrain_map'].dungeon['items'][m.pos] = random.choice(m.drops)
                 
             if self_dead:
                 GS['messages'].insert(0, "You have died.")

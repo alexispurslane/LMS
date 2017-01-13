@@ -2,13 +2,14 @@ import utils, draw, itertools
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 8
+GAME_TITLE       = 'Last Man Standing'
 FLOOR_LEVEL      = 0.43
 WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
 WIDTH, HEIGHT    = int(1380/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
 CUMULATE_FOV     = True
-MESSAGE_NUMBER   = 31
+MESSAGE_NUMBER   = 80
 FOREST_LEVELS    = 0
 MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
@@ -40,8 +41,8 @@ GAME_MOVEMENT_KEYS = {
     'J': [0, 1],
     'Y': [-1, -1],
     'U': [1, -1],
-    'N': [-1, 1],
-    'B': [1, 1],
+    'M': [-1, 1],
+    'N': [1, 1],
 
     # For losers
     'RIGHT': [1, 0],

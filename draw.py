@@ -1,6 +1,7 @@
 import tdl, math, re, random
 import maps, monsters, consts, colors, utils, races, player, items
 from itertools import groupby
+from pyfiglet import Figlet
 
 def display_stat(name, obj):
     a = getattr(obj, 'max_'+consts.ABBREV[name])
@@ -133,12 +134,21 @@ def draw_charsel_screen(GS):
         race_display = 'LuB:%d, Sp:%d, MxL:%d; ST:%d, HT: %d' %\
                        (race.level_up_bonus, race.speed, race.levels,
                         race.first_level['strength'], race.first_level['max_health'])
-        console.drawStr(4, i+1, '('+chr(97+i)+') '+race.name+' -> '+race_display)
+        console.drawStr(int(consts.WIDTH/2)-28, i*2+5,
+                        '('+chr(97+i)+') '+race.name+' -> '+race_display)
 
 def draw_intro_screen(GS):
     console = GS['console']
-    console.drawStr(int(consts.WIDTH/2)-12, 2, 'Welcome to Alchemy Sphere')
-    console.drawStr(int(consts.WIDTH/2)-13, 3, '*press any key to continue*')
+    
+    f = Figlet(font='doom')
+    l = 24
+    for i, line in enumerate(f.renderText(consts.GAME_TITLE).split("\n")):
+        if i == 0:
+            l = math.floor(len(line)/2)
+        console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.green)
+
+    console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
+                    fg=colors.darken(colors.green))
 
 def draw_death_screen(GS):
     console = GS['console']

@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 import tdl
 import time
 import math, random
@@ -17,18 +18,18 @@ import maps, monsters, consts, colors, utils, races, player, draw
 def run_game(GS):
     tdl.setFont('font/consolas12x12_gs_tc.png', greyscale=True, altLayout=True)
     GS = GS or {
-        'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Alchemy Sphere'),
+        'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing'),
         'screen': 'INTRO',
-        'player': player.Player(races.HUMAN),
+        'player': player.Player(races.SOLDIER),
         'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
         'messages': list(reversed([
-            'Welcome ye to the sphere of Alchemy,',
-            'a terrible and dangerous World into which',
-            'alchemists\' lowely apprentices are dispatched',
-            'to either learn their trade the hard way',
-            'or die epicly.',
-            'Get ye to the last forest, from thence to the',
-            'caves. You\'re pereformance will be evaluated.'
+            'After the apocolyptic culmination of humanity\'s battle',
+            'with the dark god Chaom, you are the last trained warrior left.',
+            'Your task is to clear out the last lurking monsters that served',
+            'Chaom in order to protect your people. The portal to the next ',
+            'dungeon level will appear once you have destroyed all the monsters.',
+            'You have heat vision, so you can see monsters through doors.',
+            'You are on your own. Best of luck, soldier.'
         ])),
         'selection': 0,
         'side_screen': 'HUD',
@@ -52,7 +53,7 @@ def run_game(GS):
                     GS['selection'] += 1
                     GS['selection'] %= len(GS['player'].inventory)
                 elif event.keychar.upper() == 'D':
-                    pos = (GS['player'].x, GS['player'].y)
+                    pos = GS['player'].pos
                     GS['terrain_map'].spawned_items[pos] = GS['player'].inventory[GS['selection']]
                     GS['player'].remove_inventory_item(GS['selection'])
                 elif event.keychar.upper() == 'W':

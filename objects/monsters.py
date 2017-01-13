@@ -1,10 +1,11 @@
-import colors, utils, random, math, consts
+import colors, utils, random, math, consts, items
 
 class Monster:
     def __init__(self, char, fg):
         self.char = char
         self.pos = (0, 0)
         self.fg = fg
+        self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
 
     # Removes the monster's attack value from the players health, then
     # runs the monster's special action on the player reference.
@@ -69,7 +70,7 @@ class Monster:
             if monster_dead:
                 GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
-                GS['terrain_map'].dungeon['items'][self.pos] = random.choice([items.FOOD_RATION, items.TORCH])
+                GS['terrain_map'].dungeon['items'][self.pos] = random.choice(self.drops)
         elif utils.dist(self.pos, GS['player'].pos) <= sight:
             if random.randint(0, 20) <= 15: # Monster moves in proactive direction.
                 if len(choices) > 0:

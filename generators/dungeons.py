@@ -125,7 +125,9 @@ def generate_new_dungeon_map(self):
                 last_was_door < 3:
                 
                 self.dungeon['doors'][x, y] = True
-                self.place_cell((x, y))
+                
+                self.dungeon['visited'].transparent[x, y] = False
+                self.dungeon['visited'].walkable[x, y] = False
 
                 last_was_door += 1
             elif last_was_door >= 3:

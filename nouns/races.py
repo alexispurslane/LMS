@@ -14,7 +14,7 @@ defaults = {
     ]
 }
 default_settings = {
-    'name': 'Human',
+    'name': 'Soldier',
     'bonus': 25,
     'speed': 4,
     'levels': 8
@@ -28,8 +28,8 @@ class Race:
         self.name = settings['name']
         self.levels = settings['levels']
 
-HUMAN      = Race() # Its raceist!
-HALF_GIANT = Race({
+SOLDIER      = Race() # Its raceist!
+HEAVY = Race({
     'max_health': 100,
     'strength': 10,
     'inventory': [
@@ -41,12 +41,12 @@ HALF_GIANT = Race({
         'range': 0
     }
 }, {
-    'name': 'Half-Giant',
+    'name': 'Heavy Soldier',
     'bonus': 2,
     'speed': 10,
     'levels': 3
 })
-ELF = Race({
+RANGER = Race({
     'max_health': 18,
     'strength': 2,
     'inventory': [
@@ -61,10 +61,10 @@ ELF = Race({
         'range': 1.2
     }
 }, {
-    'name': 'Elf',
+    'name': 'Ranger',
     'bonus': 30,
     'speed': 2,
     'levels': 13
 })
 
-RACES = [HUMAN, HALF_GIANT, ELF]
+RACES = [SOLDIER, HEAVY, RANGER]
