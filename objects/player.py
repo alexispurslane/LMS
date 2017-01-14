@@ -184,7 +184,7 @@ class Player:
             self.pos = GS['terrain_map'].generate_new_map()
 
         if new_pos == GS['terrain_map'].dungeon['up_stairs'] and\
-           GS['terrain_map'].is_dungeons():
+           len(GS['terrain_map'].dungeons) > 0:
             
             if GS['terrain_map'].restore_dungeon(GS['terrain_map'].dungeon_level-1):
                 GS['messages'].insert(0, "You ascend.")

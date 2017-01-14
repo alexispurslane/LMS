@@ -1,4 +1,5 @@
-import colors, utils, random, math, consts, items
+import random, math
+import colors, utils, consts, items
 
 class Monster:
     def __init__(self, char, fg):
@@ -72,14 +73,14 @@ class Monster:
                 GS['terrain_map'].dungeon['monsters'].remove(self)
                 GS['terrain_map'].dungeon['items'][self.pos] = random.choice(self.drops)
         elif utils.dist(self.pos, GS['player'].pos) <= sight:
-            if random.randint(0, 20) <= 15: # Monster moves in proactive direction.
+            if random.randint(0, 20) <= self.speed: # Monster moves in proactive direction.
                 if len(choices) > 0:
                     self.pos = self.choose(
                         GS['player'],
                         choices,
                         lambda p: utils.dist(p, GS['player'].pos))
             else:                            # Monster moves in random direction.
-                if len(choices) > 0:
+                if len(choices) >= 2:
                     self.pos = random.choice(choices)
 
 def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
@@ -134,7 +135,7 @@ def breed(self, GS, player):
         (x, y-1),
     ]
     valid = list(filter(GS['terrain_map'].is_walkable, posns))
-    if len(valid) > 0:
+    if len(valid) > 0 and random.randint(1,3) == 1:
         GS['messages'].insert(0, "You chop the slime in half. The new half is alive!")
         if consts.DEBUG:
             print('Slime breeding.')

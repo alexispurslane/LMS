@@ -48,26 +48,6 @@ def generate_new_dungeon_map(self):
                 failed = True
 
         if not failed:
-            #################### ADD ITEMS ####################
-            for i in range(0, consts.ITEMS_PER_ROOM):
-                if random.randint(1, 2) == 1:
-                    n = random.randint(1, 100)
-                    for item in items.DUNGEON_ITEMS:
-                        if n < item.probability:
-                            pos = (-1,-1)
-                            
-                            dim = room.w, True
-                            if random.randint(1, 2) == 1:
-                                dim = room.h, False
-                                
-                            offset = random.randint(i, math.floor(dim[0]/2)-1)
-                            if room.room_type == 'Round':
-                                offset = random.randint(-room.radius+1, room.radius-1)
-
-                            pos = utils.tuple_add(room.center, utils.flip((0, offset), dim[1]))
-                            if self.dungeon['visited'].walkable[pos]:
-                                self.dungeon['items'][pos] = item
-
             #################### ADD PASSAGES ####################
             connect_rooms(self, room, self.dungeon['rooms'][-1])
 

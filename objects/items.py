@@ -109,11 +109,11 @@ ITEMS = [
     Weapon('Fencing foil', weight=1, attack=10, probability=11, char='`'),
     Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=4),
     Weapon('Short sword', attack=12, weight=2, char='(', probability=12),
-    Armor('Breastplate', probability=20, char='['),
+    Armor('Breastplate', probability=16, char='['),
     Armor('Sheild', weight=2, probability=18),
     Armor('Elven Helm', weight=1, probability=5, char='*'),
     RangedWeapon('Light Bow', weight=1, probability=20, range=10),
-    Missle('Mahogeny Arrow', hit=30, char='_', probability=23),
+    Missle('Mahogeny Arrow', hit=30, char='_', probability=12),
     Missle(),
     Light(probability=30),
     Food()

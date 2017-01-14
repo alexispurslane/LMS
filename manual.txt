@@ -1,10 +1,10 @@
-****ALCHEMY SPEHRE IN-GAME REFERENCE
+****LAST MAN STANDING IN-GAME REFERENCE
 
 ***KEY COMMANDS
 The hjkl keys govern movement, like so:
     u k i   
    h  .  l   
-    n j m
+    b j m
 While the . key means "stay in place".
 
 The arrow keys also work, but whatever.

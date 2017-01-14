@@ -1,4 +1,4 @@
-import math, random
+import math, random, consts, items
 
 # Calculate distance.
 def dist(p1, p2):
@@ -35,6 +35,7 @@ class Room:
     def __init__(self, x, y, w, h):
         # Diagnostic: is this room connected according to the DGA?
         self.connected = False
+        self.item_attempts = 0
         
         # Starting point position
         self.pos1 = (x, y)
@@ -83,41 +84,53 @@ class Room:
         x2, y2 = self.pos2
         return x1 <= room.pos2[0] and x2 >= room.pos1[0] and\
             y1 <= room.pos2[1] and y2 >= room.pos1[1]
-    
+
+    def create_block(self, tmap, spacing, raw_pos):
+        pos = tuple_add(self.pos1, raw_pos)
+        wall = raw_pos[0] % spacing == 0 and raw_pos[1] % spacing == 0
+        tmap.place_cell(pos, is_wall=wall)
+
+        # Add decoration/fire and items.
+        if not wall:
+            decor = ['FM', None, None, None, None]
+            if tmap.is_hell_level():
+                decor = ['FR', 'FL', None, None, None, None]
+            tmap.dungeon['decor'][pos] = random.choice(decor)
+
+            if self.item_attempts < consts.ITEMS_PER_ROOM:
+                if random.randint(1, 5) == 1:
+                    n = random.randint(1, 100)
+                    pitems = list(filter(lambda x: x.probability < n,
+                                         sorted(items.DUNGEON_ITEMS,
+                                                key=lambda x: x.weight)))
+                    if len(pitems) > 0:
+                        tmap.dungeon['items'][pos] = pitems[0]
+                        
+                    self.item_attempts += 1
+
     # Draws the room into the supplied terrain map.
     def draw_into_map(self, i, tmap):
         spacing = random.randint(4, 31)
+                
         if self.room_type == 'Square':
             for x in range(0, self.w):
                 for y in range(0, self.h):
-                    pos = tuple_add(self.pos1, (x, y))
-                    wall = x % spacing == 0 and y % spacing == 0
-
-                    tmap.place_cell(pos, is_wall=wall)
-
-                    if not wall:
-                        if tmap.is_hell_level():
-                            tmap.dungeon['decor'][pos] = random.choice(['FR', 'FL', None, None, None, None])
-                        else:
-                            tmap.dungeon['decor'][pos] = random.choice(['FM', None, None, None, None])
-                        
+                    self.create_block(tmap, spacing, (x, y))
         elif self.room_type == 'Round':
             for x in range(-self.radius, self.radius):
                 for y in range(-self.radius, self.radius):
                     if x*x + y*y <= pow(self.radius, 2):
-                        tmap.place_cell(tuple_add(self.pos1, (x, y)));
-
+                        self.create_block(tmap, spacing, (x, y))
+                        
 def f7(seq):
     seen = set()
     return [x for x in seq if not (x in seen or seen.add(x))]
 
 # Checks if b is adjacent to (in a streight line of) a.
 def streight_line(a, b):
-    As = [
+    return b in [
         (a[0]-1, a[1]),
         (a[0]+1, a[1]),
         (a[0], a[1]-1),
-        (a[0], a[1]+1),
+        (a[0], a[1]+1)
     ]
-
-    return b in As
