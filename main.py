@@ -69,7 +69,7 @@ def run_game(GS):
                 elif GS['screen'] == 'DEATH':
                     if event.keychar.upper() == 'R':
                         run_game(None)
-                elif GS['screen'] == 'INTRO':
+                elif GS['screen'] == 'INTRO' and len(event.keychar) == 1:
                     GS['screen'] = 'CHARSEL'
                 elif GS['screen'] == 'CHARSEL':
                     if event.keychar.isalpha() and len(event.keychar.lower()) == 1:
