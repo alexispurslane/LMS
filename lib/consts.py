@@ -117,7 +117,9 @@ def quit(GS, p):
     print('\nGame Stats')
     print('----------')
     print('  Turns: ' + str(GS['turns']))
-    print('  Score: ' + str(p.score()))
+    print('  Score: ' + str(p.score(GS)))
+    print('  Kills: ' + str(p.killed_monsters))
+    print('  Exp:   ' + str(p.exp))
     print('  Inventory:\n' +\
           ',\n'.join(list(map(lambda x:
                               '    '+x[0].name+' x'+str(len(list(x[1]))),

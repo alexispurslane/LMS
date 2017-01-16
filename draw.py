@@ -18,6 +18,8 @@ def draw_hud_screen(GS, edge_pos):
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: '+display_stat('health', player))
 
+    console.drawStr(base, 81, '—'*(base-1))
+
     # Description
     console.drawStr(base, 82, player.race.name + ' ('+player.attributes()+')')
     
@@ -43,25 +45,27 @@ def draw_hud_screen(GS, edge_pos):
     # Light Source Radius
     nm = len(GS['terrain_map'].dungeon['monsters'])
     console.drawStr(base, 84, 'LoS dist: ' + str(player.light_source_radius))
-    console.drawStr(base+bounds+4, 84, 'Monsters: ' + str(nm))
+
+    # Kills
+    console.drawStr(base, 85, 'Monsters: ' + str(nm))
+    console.drawStr(base+bounds+4, 85, 'Kills: ' + str(player.killed_monsters))
 
     # Level
     lvl = math.floor(player.level/player.race.levels)
     color = colors.light_blue
     if lvl <= 50:
         color = colors.dark_yellow
-    console.drawStr(base, 85,
+    console.drawStr(base, 86,
                     'Level: '+str(player.level)+'/'+str(player.race.levels),
                     fg=color)
 
-    # Experience
-    console.drawStr(base+bounds+4, 85, 'EXP: '+str(player.exp))
+    console.drawStr(base+bounds+4, 87, 'Exp: '+str(player.exp))
 
     # Other Stats
-    console.drawStr(base, 88, 'Character Stats')
-    console.drawStr(base, 89, 'Speed: '+str(player.speed), fg=colors.light_blue)
-    console.drawStr(base, 90, 'Attack: '+str(player.attack), fg=colors.red)
-    console.drawStr(base, 91, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
+    console.drawStr(base, 89, 'Character Stats')
+    console.drawStr(base, 90, 'Speed: '+str(player.speed), fg=colors.light_blue)
+    console.drawStr(base, 91, 'Attack: '+str(player.attack), fg=colors.red)
+    console.drawStr(base, 92, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
 
     # Ranged Weapon
     if player.ranged_weapon:
@@ -70,7 +74,7 @@ def draw_hud_screen(GS, edge_pos):
 
     # Game State
     console.drawStr(base, 93, 'Turn '+str(GS['turns']))
-    console.drawStr(base+bounds+4, 93, str(player.pos))
+    console.drawStr(base+bounds+4, 93, 'Score: '+str(player.score(GS)))
     
     #################### DRAW MESSAGES ####################
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
@@ -181,18 +185,17 @@ def draw_intro_screen(GS, frame):
 
 def draw_death_screen(GS, frame):
     console = GS['console']
-    console.drawStr(int(consts.WIDTH/2)-5, 0, '/--------------\\', bg=colors.grey)
-    for i in range(1, 11):
-        console.drawStr(int(consts.WIDTH/2)-5, i, '|              |', bg=colors.grey)
-        
-    console.drawStr(int(consts.WIDTH/2)-5, 10, '+--------------+', bg=colors.grey)
-    console.drawStr(int(consts.WIDTH/2)-7, 11, '\/(/\/(/((\/\\(//(\)', bg=colors.green)
-        
-    console.drawStr(int(consts.WIDTH/2)-1, 2, 'R.I.P', fg=colors.red, bg=colors.white)
-    p = GS['player']
-    console.drawStr(int(consts.WIDTH/2)-4, 5, 'Final Level: ' + str(p.level), fg=colors.black, bg=colors.grey)
-    console.drawStr(int(consts.WIDTH/2)-4, 8, 'Final Score: ' + str(p.score()), fg=colors.black, bg=colors.grey)
-    console.drawStr(int(consts.WIDTH/2)-10, 15, '*press R to restart*')
+    player = GS['player']
+    
+    console.drawStr(0, 1, 'Game Stats')
+    console.drawStr(0, 2, '----------')
+    console.drawStr(4, 3, 'Turns: ' + str(GS['turns']))
+    console.drawStr(4, 4, 'Score: ' + str(player.score(GS)))
+    console.drawStr(4, 5, 'Kills: ' + str(player.killed_monsters))
+    console.drawStr(4, 6, 'Exp:   ' + str(player.exp))
+    console.drawStr(4, 7, 'Inventory: ')
+    for i, g in enumerate(groupby(player.inventory)):
+        console.drawStr(8, 8+i, g[0].name + ' x'+str(len(list(g[1]))))
 
 def draw_game_screen(GS, frame):
     console = GS['console']
@@ -212,7 +215,7 @@ def draw_game_screen(GS, frame):
     if GS['player'].pos in GS['terrain_map'].dungeon['water']:
         color = colors.blue
     elif GS['terrain_map'].dungeon['decor'][GS['player'].pos] == 'FM':
-        color = (21, 244, 238)
+        color = (0, 100, 0)
         
     console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color)
 
@@ -228,6 +231,11 @@ def draw_dungeon_tile(terrain_map, console, pos, tint):
         items = terrain_map.dungeon['items'][pos]
         console.drawChar(x, y, items[-1].char,
                             fg=colors.tint(items[-1].fg, tint))
+    elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
+        decor = terrain_map.dungeon['decor']
+        if decor[pos] == 'FM':
+            console.drawChar(x, y, '=', fg=colors.tint(colors.grey, tint),
+                             bg=colors.tint((0, 100, 0), tint))
     elif terrain_map.dungeon['decor'][pos]:
         decor = terrain_map.dungeon['decor']
         

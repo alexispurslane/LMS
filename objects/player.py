@@ -38,8 +38,9 @@ class Player:
         self.missles = []
 
     # Calculate the player's overall score.
-    def score(self):
-        return (self.level + self.killed_monsters) * self.defence + self.exp
+    def score(self, GS):
+        return math.floor(GS['turns']/3) +\
+            (self.level + self.killed_monsters + self.defence) * self.exp
 
     # Calculate new XP points based on monster danger-level.
     # If the XP is enough to graduate the player to the next level,
@@ -100,6 +101,9 @@ class Player:
         self.inventory.append(copy.copy(item))
         self.inventory.sort(key = lambda x: x.weight)
         self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.inventory)))
+        
+        if isinstance(item, items.Missle):
+            item.equip(self)
 
     # Removes the i-th item from the inventory, dequips it, and resorts the inventory.
     def remove_inventory_item(self, i):

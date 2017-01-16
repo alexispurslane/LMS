@@ -99,10 +99,15 @@ class Missle(Item):
         self.hit = hit
 
     def equip(self, player):
-        player.missles.append(self)
+        if not self.equipped:
+            player.missles.append(self)
+            self.equipped = True
 
     def dequip(self, player):
-        player.missles.remove(self)
+        if self.equipped:
+            if self in player.missles:
+                player.missles.remove(self)
+            self.equipped = False
 
 ITEMS = [
     Weapon('Broad sword', weight=10, attack=20, probability=8, char='|'),

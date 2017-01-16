@@ -180,7 +180,7 @@ create_monster('Imp', 'i', colors.light_blue,
                sound = 'grumbling',
                special_action=filtch)
 
-create_monster('Hag', 'h', colors.grey,
+create_monster('Rat', 'r', colors.brown,
                health = 12,
                speed = 4,
                attack = 5,
@@ -198,7 +198,7 @@ create_monster('FlyingDragon', 'F', colors.dark_yellow,
                attack = 70,
                sound = 'crashing')
 
-regular_monsters = [Fury, Wyvern, Hag, Imp, Giant, Goblin, BabyDragon, Slime, Slime, Slime]
+regular_monsters = [Fury, Wyvern, Rat, Imp, Giant, Goblin, BabyDragon, Slime, Slime, Slime]
 
 # Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
