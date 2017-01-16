@@ -144,7 +144,7 @@ class Player:
         attrs = [self.light(), self.fast()]
         attrs = [x for x in attrs if x is not None]
         
-        return ', '.join(attrs)+' '+self.race.name
+        return ', '.join(attrs)
 
     # Moves the player and deals with any results of that. FIXME: Refactor this!
     def move(self, event, GS):
@@ -226,7 +226,7 @@ class Player:
                 GS['messages'].insert(0, "You vanquish the "+type(m).__name__)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
-                GS['terrain_map'].dungeon['items'][m.pos] = random.choice(m.drops)
+                GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
                 
             if self_dead:
                 GS['messages'].insert(0, "You have died.")

@@ -51,20 +51,28 @@ class Room:
         self.radius = math.floor(w/2)
 
         # Room type:
-        # 3/4 chance to be square,
-        # 1/4 chance to be round.
+        # 3/5 chance to be square,
+        # 1/5 chance to be round,
+        # 1/5 chance to be a sanctuary.
         self.room_type = random.choice([
             'Square', 'Square',
             'Square', 'Round',
+            'Sanctuary'
         ])
 
         # Room center.
         if self.room_type == 'Square':
             self.center = (math.floor((self.pos1[0] + self.pos2[0]) / 2),
                            math.floor((self.pos1[1] + self.pos2[1]) / 2))
+        elif self.room_type == 'Sanctuary':
+            if w < 6:
+                self.room_type = 'Square'
+                
+            self.center = tuple_add(self.pos1, (math.ceil(w/2),
+                                                math.ceil(h/2)))
         else:
-            self.center = tuple_add(self.pos1, (math.floor(w/2),
-                                                math.floor(h/2)))
+            self.center = tuple_add(self.pos1, (math.ceil(w/2),
+                                                math.ceil(h/2)))
 
     def edge_points(self):
         pnts = [(0,0)]
@@ -104,14 +112,16 @@ class Room:
                                          sorted(items.DUNGEON_ITEMS,
                                                 key=lambda x: x.weight)))
                     if len(pitems) > 0:
-                        tmap.dungeon['items'][pos] = pitems[0]
+                        tmap.dungeon['items'][pos] = [pitems[0]]
                         
                     self.item_attempts += 1
+            else:
+                tmap.dungeon['items'][pos] = []
 
     # Draws the room into the supplied terrain map.
     def draw_into_map(self, i, tmap):
         spacing = random.randint(4, 31)
-                
+        
         if self.room_type == 'Square':
             for x in range(0, self.w):
                 for y in range(0, self.h):
@@ -121,7 +131,22 @@ class Room:
                 for y in range(-self.radius, self.radius):
                     if x*x + y*y <= pow(self.radius, 2):
                         self.create_block(tmap, spacing, (x, y))
-                        
+        elif self.room_type == 'Sanctuary':
+            for x in range(0, self.w):
+                for y in range(0, self.h):
+                    self.create_block(tmap, spacing, (x, y))
+                    
+            gap = random.randint(1, math.floor(self.w/2)-3)
+            for x in range(gap, self.w-gap):
+                for y in range(gap, self.h-gap):
+                    pos = tuple_add(self.pos1, (x, y))
+                    if x != gap+1: 
+                        tmap.place_cell(pos, is_wall=True)
+
+            for x in range(gap+1, self.w-gap-1):
+                for y in range(gap+1, self.h-gap-1):
+                    pos = tuple_add(self.pos1, (x, y))
+                    tmap.place_cell(pos)
 def f7(seq):
     seen = set()
     return [x for x in seq if not (x in seen or seen.add(x))]

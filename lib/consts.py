@@ -56,11 +56,10 @@ GAME_MOVEMENT_KEYS = {
 # Have the player pick up an item
 def pickup(GS, p):
     dun_items = GS['terrain_map'].dungeon['items']
-    if p.pos in dun_items:
-        item = dun_items[p.pos]
+    if p.pos in dun_items and len(dun_items[p.pos]) > 0:
+        item = dun_items[p.pos].pop()
         GS['messages'].insert(0, 'You pick up a '+item.name)
         
-        del dun_items[p.pos]
         p.add_inventory_item(item)
 
 # Have the player rest until no more rest is needed.
@@ -76,12 +75,12 @@ def auto_rest(GS, p):
 # Fire the first available missle using the player's current ranged weapon at
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
-    targets = list(filter(
+    targets = list(ilter(
         lambda m:
         GS['terrain_map'].lighted_terrain.compute_path(p.x, p.y, m.x, m.y,
                                                    diagonal_cost=0) != [] and\
         utils.dist(m, p) < p.ranged_weapon.range,
-        GS['terrain_map'].proweling_monsters))
+        GS['terrain_map'].dungeon['monsters']))
     if p.ranged_weapon != None and len(targets) > 0:
         target = min(targets, key=lambda m: utils.dist(m, p))
         missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
@@ -94,10 +93,9 @@ def fire(GS, p):
             (0, 1)
         ]
         for a in adj:
-            x = target.x + a[0]
-            y = target.y + a[1]
+            pos = utils.tuple_add(target.pos, adj)
             if GS['terrain_map'].get_type(x, y) != 'STONE':
-                GS['terrain_map'].spawned_items[x, y] = missle
+                GS['terrain_map'].dungeon['items'][pos] = missle
 
 # Switches between inventory and HUD screens.
 def inventory(GS, p):

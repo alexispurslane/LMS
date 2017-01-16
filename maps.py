@@ -133,6 +133,7 @@ class TerrainMap:
             x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
             self.dungeon['visited'].transparent[x, y] = True
             self.dungeon['visited'].walkable[x, y] = True
+            self.dungeon['items'][x, y] = []
             
     # Draws a horizontal corridor to the 'visited' map.
     def add_v_corridor(self, y1, y2, x):
@@ -140,6 +141,7 @@ class TerrainMap:
             x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
             self.dungeon['visited'].transparent[x, y] = True
             self.dungeon['visited'].walkable[x, y] = True
+            self.dungeon['items'][x, y] = []
             
     # Generates a new dungeon map (ridirected to dungeons.py)
     # and saves it to the level list.

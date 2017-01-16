@@ -71,7 +71,7 @@ class Monster:
             if monster_dead:
                 GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
-                GS['terrain_map'].dungeon['items'][self.pos] = random.choice(self.drops)
+                GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
         elif utils.dist(self.pos, GS['player'].pos) <= sight:
             if random.randint(0, 20) <= self.speed: # Monster moves in proactive direction.
                 if len(choices) > 0:
@@ -166,10 +166,12 @@ def filtch(self, GS, player):
     
     if len(valid) > 0:
         pos = random.choice(valid)
-        item = random.choice(player.inventory)
-        player.inventory.remove(item)
-        GS['messages'].insert(0, 'The Wizard filtches your ' + item.name + ' and throws it away.')
-        GS['terrain_map'].dungeon['items'][pos] = item
+        item = random.randint(0, len(player.inventory)-1)
+        iitem = player.inventory[item]
+        player.remove_inventory_item(item)
+        
+        GS['messages'].insert(0, 'The Wizard filtches your ' + iitem.name + ' and throws it away.')
+        GS['terrain_map'].dungeon['items'][pos].append(iitem)
     
 create_monster('Imp', 'i', colors.light_blue,
                health = 15,

@@ -4,69 +4,83 @@ from itertools import groupby
 from pyfiglet import Figlet
 
 def display_stat(name, obj):
-    a = getattr(obj, 'max_'+consts.ABBREV[name])
-    b = getattr(obj, consts.ABBREV[name])
-    return '%s:%d/%d' % (name, b, a)
+    a = getattr(obj, 'max_'+name)
+    b = getattr(obj, name)
+    return '%d/%d' % (b, a)
 
 def draw_hud_screen(GS, edge_pos):
+    console = GS['console']
     if not GS['messages']:
         GS['messages'] = []
+        
+    #################### DRAW HEADS-UP DISPLAY ####################
     player = GS['player']
-    
-    rows = [
-        'LL: %d/%d; %s; %s; %s; LRW: %r' % (
-            player.level, player.race.levels,
-            player.attributes(), display_stat('HT', player),
-            display_stat('DF', player), player.ranged_weapon != None
-        ),
-        '%s; %s; %s; EX: %d; HR: %d' % (
-            display_stat('ST', player), display_stat('SP', player),
-            display_stat('AT', player), player.exp, player.hunger
-        ),
-        'GAME - TuN: %d; FoL: %d/%d; DuL: %d/%d; MoC: %d; Pos: %s' % (
-            GS['turns'],
-            GS['terrain_map'].forest_level, consts.FOREST_LEVELS,
-            GS['terrain_map'].dungeon_level, consts.DUNGEON_LEVELS,
-            len(GS['terrain_map'].dungeon['monsters']),
-            player.pos
-        )
-    ]
-    for i in range(len(rows)):
-        color = colors.medium_blue
-        if i <= 1:
-            if GS['player'].health > GS['player'].max_health/2:
-                color = colors.dark_green
-            else:
-                color = colors.red
-        GS['console'].drawStr(edge_pos, (consts.HEIGHT-len(rows))+i,
-                                rows[i].ljust(math.floor(consts.WIDTH/2)-2),
-                                bg=color, fg=colors.black)
+    base = math.ceil(consts.WIDTH/2)+1
+    bounds = len('Health: '+display_stat('health', player))
 
+    # Description
+    console.drawStr(base, 82, player.race.name + ' ('+player.attributes()+')')
+    
+    # Health
+    hp = math.floor(player.health/player.max_health*100)
+    color = colors.red
+    if hp >= 90:
+        color = colors.green
+    elif hp >= 40:
+        color = colors.yellow
+        
+    console.drawStr(base, 83, 'Health: '+display_stat('health', player),
+                    fg=color)
+
+    # Hunger
+    if player.hunger >= 40:
+        console.drawStr(base+bounds+4, 83, 'Very Hungry', fg=colors.red)
+    elif player.hunger >= 20:
+        console.drawStr(base+bounds+4, 83, 'Hungry', fg=colors.yellow)
+    elif player.hunger >= 15:
+        console.drawStr(base+bounds+4, 83, 'Getting Hungry', fg=colors.green)
+
+    # Light Source Radius
+    nm = len(GS['terrain_map'].dungeon['monsters'])
+    console.drawStr(base, 84, 'LoS dist: ' + str(player.light_source_radius))
+    console.drawStr(base+bounds+4, 84, 'Monsters: ' + str(nm))
+
+    # Level
+    lvl = math.floor(player.level/player.race.levels)
+    color = colors.light_blue
+    if lvl <= 50:
+        color = colors.dark_yellow
+    console.drawStr(base, 85,
+                    'Level: '+str(player.level)+'/'+str(player.race.levels),
+                    fg=color)
+
+    # Experience
+    console.drawStr(base+bounds+4, 85, 'EXP: '+str(player.exp))
+
+    # Other Stats
+    console.drawStr(base, 88, 'Character Stats')
+    console.drawStr(base, 89, 'Speed: '+str(player.speed), fg=colors.light_blue)
+    console.drawStr(base, 90, 'Attack: '+str(player.attack), fg=colors.red)
+    console.drawStr(base, 91, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
+
+    # Ranged Weapon
+    if player.ranged_weapon:
+        console.drawStr(base, 92, 'Ranged Weapon: '+str(player.ranged_weapon.name))
+        console.drawStr(base+bounds+4, 92, 'Missles: '+str(len(player.missles)))
+    
+    #################### DRAW MESSAGES ####################
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
         GS['messages'] = [GS['messages'][0]]
         
-    occurences = {}
     for (i, m) in enumerate(reversed(GS['messages'])):
         c = int((i + 1) * (255 / len(GS['messages'])))
-        # caps
-        if c < 0: c = 0
-        elif c > 255: c = 255
-        if GS['turns'] == 0: c = 255
-
-        nm = re.sub(r" \(x.*\)", "", m)
-        if nm in occurences:
-            occurences[nm] = occurences[nm] + 1
-        else:
-            occurences[nm] = 1
-
-        if len(m) > 59: m = m[:59]
+        c = max(0, min(c, 255))
+        
+        if GS['turns'] == 0:
+            c = 255
+        if len(m) > 59:
+            m = m[:59]
         GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
-
-    GS['messages'] = utils.f7(GS['messages'])
-    for (i, m) in enumerate(GS['messages']):
-        m = re.sub(r" \(x.*\)", "", m)
-        if occurences[m] > 1:
-            GS['messages'][i] = m+' (x'+str(occurences[m])+')'
 
     return GS['messages']
 
@@ -120,15 +134,22 @@ def draw_hud(GS):
         
     return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS, edge_pos)
 
+frame = 0
 def draw_screen(GS):
+    global frame
+    
     console = GS['console']
     console.clear()
 
-    globals()['draw_'+GS['screen'].lower()+'_screen'](GS)
+    globals()['draw_'+GS['screen'].lower()+'_screen'](GS, frame)
+    frame += 1
 
     tdl.flush()
 
-def draw_charsel_screen(GS):
+def draw_static(console, frame):
+    pass
+
+def draw_charsel_screen(GS, frame):
     console = GS['console']
     for (i, race) in enumerate(races.RACES):
         race_display = 'LuB:%d, Sp:%d, MxL:%d; ST:%d, HT: %d' %\
@@ -137,7 +158,9 @@ def draw_charsel_screen(GS):
         console.drawStr(int(consts.WIDTH/2)-28, i*2+5,
                         '('+chr(97+i)+') '+race.name+' -> '+race_display)
 
-def draw_intro_screen(GS):
+    draw_static(console, frame)
+
+def draw_intro_screen(GS, frame):
     console = GS['console']
     
     f = Figlet(font='doom')
@@ -148,9 +171,11 @@ def draw_intro_screen(GS):
         console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.green)
 
     console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
-                    fg=colors.darken(colors.green))
+                    fg=colors.darken(colors.grey))
 
-def draw_death_screen(GS):
+    draw_static(console, frame)
+
+def draw_death_screen(GS, frame):
     console = GS['console']
     console.drawStr(int(consts.WIDTH/2)-5, 0, '/--------------\\', bg=colors.grey)
     for i in range(1, 11):
@@ -165,7 +190,7 @@ def draw_death_screen(GS):
     console.drawStr(int(consts.WIDTH/2)-4, 8, 'Final Score: ' + str(p.score()), fg=colors.black, bg=colors.grey)
     console.drawStr(int(consts.WIDTH/2)-10, 15, '*press R to restart*')
 
-def draw_game_screen(GS):
+def draw_game_screen(GS, frame):
     console = GS['console']
     GS['messages'] = draw_hud(GS)
     GS['terrain_map'].draw_map(GS['console'], GS['player'])
@@ -195,9 +220,10 @@ def draw_dungeon_tile(terrain_map, console, pos, tint):
         console.drawChar(x, y, '>', fg=colors.grey, bg=colors.red)
     elif pos == terrain_map.dungeon['up_stairs']:
         console.drawChar(x, y, '<', fg=colors.grey, bg=colors.blue)
-    elif pos in terrain_map.dungeon['items']:
-        item = terrain_map.dungeon['items'][pos]
-        console.drawChar(x, y, item.char, fg=colors.tint(item.fg, tint))
+    elif pos in terrain_map.dungeon['items'] and terrain_map.dungeon['items'][pos] != []:
+        items = terrain_map.dungeon['items'][pos]
+        console.drawChar(x, y, items[-1].char,
+                            fg=colors.tint(items[-1].fg, tint))
     elif terrain_map.dungeon['decor'][pos]:
         decor = terrain_map.dungeon['decor']
         
