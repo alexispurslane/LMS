@@ -4,4 +4,4 @@
 
 The goal of Last Man Standing is to provide a well-calibrated and simple
 roguelike world as a background for a rich, complex, and interesting
-magic system.
+magic system. For more information, visit the [wiki](https://github.com/christopherdumas/LMS/wiki).
