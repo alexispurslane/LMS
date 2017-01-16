@@ -67,6 +67,10 @@ def draw_hud_screen(GS, edge_pos):
     if player.ranged_weapon:
         console.drawStr(base, 92, 'Ranged Weapon: '+str(player.ranged_weapon.name))
         console.drawStr(base+bounds+4, 92, 'Missles: '+str(len(player.missles)))
+
+    # Game State
+    console.drawStr(base, 93, 'Turn '+str(GS['turns']))
+    console.drawStr(base+bounds+4, 93, str(player.pos))
     
     #################### DRAW MESSAGES ####################
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
