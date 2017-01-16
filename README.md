@@ -1,6 +1,3 @@
-# Last Man Standing: A Magic-Focused Roguelike
-
-![
 <pre>
  _               _    ___  ___
 | |             | |   |  \/  |
@@ -18,8 +15,10 @@
 									 __/ |
 									|___/
 </pre>
-](LMS\ intro.png)
+									
+![LMS intro screen](LMS\ intro.png)
 
+# Last Man Standing: A Magic-Focused Roguelike
 ## Introduction
 
 The goal of Last Man Standing is to provide a well-calibrated and simple
