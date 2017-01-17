@@ -18,7 +18,7 @@ def draw_hud_screen(GS, edge_pos):
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: '+display_stat('health', player))
 
-    console.drawStr(base, 81, '—'*(base-1))
+    console.drawStr(base, 81, '-'*(base-1))
 
     # Description
     console.drawStr(base, 82, player.race.name + ' ('+player.attributes()+')')
@@ -234,7 +234,7 @@ def draw_dungeon_tile(terrain_map, console, pos, tint):
     elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
         decor = terrain_map.dungeon['decor']
         if decor[pos] == 'FM':
-            console.drawChar(x, y, '=', fg=colors.tint(colors.grey, tint),
+            console.drawChar(x, y, '{', fg=colors.tint(colors.grey, tint),
                              bg=colors.tint((0, 100, 0), tint))
     elif terrain_map.dungeon['decor'][pos]:
         decor = terrain_map.dungeon['decor']
@@ -263,7 +263,7 @@ def draw_dungeon_tile(terrain_map, console, pos, tint):
     elif terrain_map.get_type(pos) == 'STONE':
         color = colors.tint(colors.darkmed_grey, tint)
         
-        console.drawChar(x, y, '=', fg=colors.tint(colors.grey, tint), bg=color) 
+        console.drawChar(x, y, ' ', bg=color) 
     if pos in terrain_map.dungeon['numbers']:
         n = terrain_map.dungeon['numbers'][pos]
         console.drawStr(x, y, str(n), fg=colors.extreme_lighten((n, n, n)))

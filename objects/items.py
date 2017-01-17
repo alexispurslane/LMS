@@ -111,11 +111,11 @@ class Missle(Item):
 
 ITEMS = [
     Weapon('Broad sword', weight=10, attack=20, probability=8, char='|'),
-    Weapon('Fencing foil', weight=1, attack=10, probability=11, char='`'),
+    Weapon('Fencing foil', weight=1, attack=10, probability=10, char='`'),
     Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=4),
     Weapon('Short sword', attack=12, weight=2, char='(', probability=12),
-    Armor('Breastplate', probability=16, char='['),
-    Armor('Sheild', weight=2, probability=18),
+    Armor('Breastplate', probability=18, char='['),
+    Armor('Sheild', weight=2, probability=20),
     Armor('Elven Helm', weight=1, probability=5, char='*'),
     RangedWeapon('Light Bow', weight=1, probability=20, range=10),
     Missle('Mahogeny Arrow', hit=30, char='_', probability=12),
