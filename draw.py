@@ -17,11 +17,12 @@ def draw_hud_screen(GS, edge_pos):
     player = GS['player']
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: '+display_stat('health', player))
+    start = consts.MESSAGE_NUMBER
 
-    console.drawStr(base, 81, '-'*(base-1))
+    console.drawStr(base, start-1, '-'*(base-1))
 
     # Description
-    console.drawStr(base, 82, player.race.name + ' ('+player.attributes()+')')
+    console.drawStr(base, start, player.race.name + ' ('+player.attributes()+')')
     
     # Health
     hp = math.floor(player.health/player.max_health*100)
@@ -31,50 +32,50 @@ def draw_hud_screen(GS, edge_pos):
     elif hp >= 40:
         color = colors.yellow
         
-    console.drawStr(base, 83, 'Health: '+display_stat('health', player),
+    console.drawStr(base, start+1, 'Health: '+display_stat('health', player),
                     fg=color)
 
     # Hunger
     if player.hunger >= 40:
-        console.drawStr(base+bounds+4, 83, 'Very Hungry', fg=colors.red)
+        console.drawStr(base+bounds+4, start+2, 'Very Hungry', fg=colors.red)
     elif player.hunger >= 20:
-        console.drawStr(base+bounds+4, 83, 'Hungry', fg=colors.yellow)
+        console.drawStr(base+bounds+4, start+2, 'Hungry', fg=colors.yellow)
     elif player.hunger >= 15:
-        console.drawStr(base+bounds+4, 83, 'Getting Hungry', fg=colors.green)
+        console.drawStr(base+bounds+4, start+2, 'Getting Hungry', fg=colors.green)
 
     # Light Source Radius
     nm = len(GS['terrain_map'].dungeon['monsters'])
-    console.drawStr(base, 84, 'LoS dist: ' + str(player.light_source_radius))
+    console.drawStr(base, start+3, 'LoS dist: ' + str(player.light_source_radius))
 
     # Kills
-    console.drawStr(base, 85, 'Monsters: ' + str(nm))
-    console.drawStr(base+bounds+4, 85, 'Kills: ' + str(player.killed_monsters))
+    console.drawStr(base, start+4, 'Monsters: ' + str(nm))
+    console.drawStr(base+bounds+4, start+4, 'Kills: ' + str(player.killed_monsters))
 
     # Level
     lvl = math.floor(player.level/player.race.levels)
     color = colors.light_blue
     if lvl <= 50:
         color = colors.dark_yellow
-    console.drawStr(base, 86,
+    console.drawStr(base, start+5,
                     'Level: '+str(player.level)+'/'+str(player.race.levels),
                     fg=color)
 
-    console.drawStr(base+bounds+4, 87, 'Exp: '+str(player.exp))
+    console.drawStr(base+bounds+4, start+5, 'Exp: '+str(player.exp))
 
     # Other Stats
-    console.drawStr(base, 89, 'Character Stats')
-    console.drawStr(base, 90, 'Speed: '+str(player.speed), fg=colors.light_blue)
-    console.drawStr(base, 91, 'Attack: '+str(player.attack), fg=colors.red)
-    console.drawStr(base, 92, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
+    console.drawStr(base, start+6, 'Strength: '+str(player.strength), fg=(0,100,0))
+    console.drawStr(base, start+7, 'Speed: '+str(player.speed), fg=colors.light_blue)
+    console.drawStr(base, start+8, 'Attack: '+str(player.attack), fg=colors.red)
+    console.drawStr(base, start+9, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
 
     # Ranged Weapon
     if player.ranged_weapon:
-        console.drawStr(base, 92, 'Ranged Weapon: '+str(player.ranged_weapon.name))
-        console.drawStr(base+bounds+4, 92, 'Missles: '+str(len(player.missles)))
+        console.drawStr(base, start+10, 'Ranged Weapon: '+str(player.ranged_weapon.name))
+        console.drawStr(base+bounds+4, start+10, 'Missles: '+str(len(player.missles)))
 
     # Game State
-    console.drawStr(base, 93, 'Turn '+str(GS['turns']))
-    console.drawStr(base+bounds+4, 93, 'Score: '+str(player.score(GS)))
+    console.drawStr(base, start+11, 'Turn '+str(GS['turns']))
+    console.drawStr(base+bounds+4, start+11, 'Score: '+str(player.score(GS)))
     
     #################### DRAW MESSAGES ####################
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
@@ -86,8 +87,8 @@ def draw_hud_screen(GS, edge_pos):
         
         if GS['turns'] == 0:
             c = 255
-        if len(m) > 59:
-            m = m[:59]
+        if len(m) > consts.WIDTH-1:
+            m = m[:consts.WIDTH-1]
         GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
 
     return GS['messages']
@@ -200,7 +201,7 @@ def draw_death_screen(GS, frame):
 def draw_game_screen(GS, frame):
     console = GS['console']
     GS['messages'] = draw_hud(GS)
-    GS['terrain_map'].draw_map(GS['console'], GS['player'])
+    GS['terrain_map'].draw_map(GS, GS['console'], GS['player'])
     
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
@@ -221,7 +222,9 @@ def draw_game_screen(GS, frame):
 
 
 # Refactor to use self.dungeon
-def draw_dungeon_tile(terrain_map, console, pos, tint):
+def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
+    if GS['mouse_cell'] == pos:
+        tint = colors.yellow
     x, y = pos
     if pos == terrain_map.dungeon['down_stairs']:
         console.drawChar(x, y, '>', fg=colors.grey, bg=colors.red)

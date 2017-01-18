@@ -7,6 +7,8 @@ class Monster:
         self.pos = (0, 0)
         self.fg = fg
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
+        if self.health >= 20:
+            self.drops.append(items.ITEMS)
 
     # Removes the monster's attack value from the players health, then
     # runs the monster's special action on the player reference.
@@ -71,7 +73,8 @@ class Monster:
             if monster_dead:
                 GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
-                if GS['terrain_map'].dungeon['items']:
+                
+                if self.pos in GS['terrain_map'].dungeon['items']:
                     GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
                 else:
                     GS['terrain_map'].dungeon['items'][self.pos] = [random.choice(self.drops)]
@@ -173,7 +176,7 @@ def filtch(self, GS, player):
         iitem = player.inventory[item]
         player.remove_inventory_item(item)
         
-        GS['messages'].insert(0, 'The Wizard filtches your ' + iitem.name + ' and throws it away.')
+        GS['messages'].insert(0, 'The Imp steals your ' + iitem.name + ' and throws it.')
         GS['terrain_map'].dungeon['items'][pos].append(iitem)
     
 create_monster('Imp', 'i', colors.light_blue,
@@ -205,4 +208,4 @@ regular_monsters = [Fury, Wyvern, Rat, Imp, Giant, Goblin, BabyDragon, Slime, Sl
 
 # Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
-    return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))
+    return list(filter(lambda m: m().health <= 18*(d+1) and m().attack >= 8*d, regular_monsters))

@@ -106,9 +106,9 @@ class Room:
             tmap.dungeon['decor'][pos] = random.choice(decor)
 
             if self.item_attempts < consts.ITEMS_PER_ROOM:
-                if random.randint(1, 3) == 1:
+                if random.randint(1, 2) == 1:
                     n = random.randint(1, 100)
-                    pitems = list(filter(lambda x: x.probability < n,
+                    pitems = list(filter(lambda x: n < x.probability,
                                          sorted(items.DUNGEON_ITEMS,
                                                 key=lambda x: x.probability)))
                     if len(pitems) > 0:

@@ -17,15 +17,15 @@ def run_game(GS):
         'player': player.Player(races.SOLDIER),
         'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
         'messages': list(reversed([
-            'After the apocolyptic culmination of humanity\'s battle',
-            'with the dark god Chaom, you are the last trained warrior left.',
-            'Your task is to clear out the last lurking monsters that served',
-            'Chaom in order to protect your people. The portal to the next ',
-            'dungeon level will appear once you have destroyed all the monsters.',
-            'You have heat vision, so you can see monsters through doors.',
-            'You are on your own. Best of luck, soldier.'
+            'After the end of humanity\'s battle',
+            'with the god Chaom, you\'re the last warrior left.',
+            'Your task is to kill the monsters that serve',
+            'the new Boss. The stairs to the next',
+            'level will appear once you have killed \'em all.',
+            'You are on your own. Best of luck, soldier!'
         ])),
         'selection': 0,
+        'mouse_cell': (-1, -1),
         'side_screen': 'HUD',
         'turns': 0
     }
@@ -44,6 +44,8 @@ def run_game(GS):
         for event in tdl.event.get():
             if event.type == 'QUIT':
                 consts.quit(GS, GS['player'])
+            elif event.type == 'MOUSEDOWN':
+                GS['mouse_cell'] = event.cell
             elif event.type == 'KEYDOWN':
                 if GS['side_screen'] == 'INVENTORY':
                     if event.keychar.upper() == 'UP':

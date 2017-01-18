@@ -7,7 +7,7 @@ import monsters, colors, consts, utils, items, dungeons, forests, draw
 class TerrainMap:
     def __init__(self, w, h):
         self.forest_level = 0
-        self.dungeon_level = 0
+        self.dungeon_level = 1
         self.rooms = []
         self.width = w
         self.height = h
@@ -181,7 +181,7 @@ class TerrainMap:
 
     # Calculates the player's visited map and current FoV, then draws the visited
     # map while brightening the player's FoV.
-    def draw_map(self, console, player):
+    def draw_map(self, GS, console, player):
         if consts.FOV:
             rad = player.light_source_radius
 
@@ -202,9 +202,9 @@ class TerrainMap:
 
         # Draw up-stairs and down-stairs no matter what.
         if len(self.dungeon['monsters']) == 0:
-            draw.draw_dungeon_tile(self, console, self.dungeon['down_stairs'], (0,0,0))
+            draw.draw_dungeon_tile(self, GS, console, self.dungeon['down_stairs'], (0,0,0))
             
-        draw.draw_dungeon_tile(self, console, self.dungeon['up_stairs'], (0,0,0))
+        draw.draw_dungeon_tile(self, GS, console, self.dungeon['up_stairs'], (0,0,0))
 
         # Draw map
         for x, y in fov:
@@ -215,4 +215,4 @@ class TerrainMap:
             if self.is_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)
             elif self.is_dungeons():
-                draw.draw_dungeon_tile(self, console, (x, y), tint)
+                draw.draw_dungeon_tile(self, GS, console, (x, y), tint)

@@ -159,9 +159,6 @@ class Player:
                 GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
                 self.dequips.remove(item)
                 
-        if self.health/self.max_health < 0.46:
-            GS['messages'].insert(0, 'Your health is low. You should rest <r>.')
-            
         if self.health < self.max_health and GS['turns'] % 4 == 0:
             self.health += 1
             
@@ -169,7 +166,7 @@ class Player:
             self.hunger += 1
 
         if self.hunger > 20 and GS['turns'] % 3 == 0:
-            GS['messages'].insert(0, 'You feel hungry. Your stomach gurgles. You feel weak.')
+            GS['messages'].insert(0, 'You feel hungry.')
             self.health -= 1
 
         delta = consts.GAME_KEYS['M'][event.keychar.upper()]

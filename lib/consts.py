@@ -1,15 +1,15 @@
-import utils, draw, itertools
+import utils, draw, itertools, math
 
 ################### GAME SETTINGS ###################
-FONT_SIZE        = 8
+FONT_SIZE        = 12
 GAME_TITLE       = 'Last Man Standing'
 FLOOR_LEVEL      = 0.43
 WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
-WIDTH, HEIGHT    = int(1380/FONT_SIZE), int(800/FONT_SIZE)
+WIDTH, HEIGHT    = int(1280/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
 CUMULATE_FOV     = True
-MESSAGE_NUMBER   = 80
+MESSAGE_NUMBER   = HEIGHT-12
 FOREST_LEVELS    = 0
 MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
@@ -18,7 +18,7 @@ DEBUG            = True
 
 MIN_ROOM_WIDTH = 8
 MIN_ROOM_HEIGHT = 4
-MAX_ROOM_SIZE = 20
+MAX_ROOM_SIZE = math.floor(WIDTH/8.83)
 
 MAP = {
     'OCTAVES': 2, # Controls the amount of detail in the noise.
@@ -75,14 +75,8 @@ def auto_rest(GS, p):
 # Fire the first available missle using the player's current ranged weapon at
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
-    targets = list(ilter(
-        lambda m:
-        GS['terrain_map'].lighted_terrain.compute_path(p.x, p.y, m.x, m.y,
-                                                   diagonal_cost=0) != [] and\
-        utils.dist(m, p) < p.ranged_weapon.range,
-        GS['terrain_map'].dungeon['monsters']))
-    if p.ranged_weapon != None and len(targets) > 0:
-        target = min(targets, key=lambda m: utils.dist(m, p))
+    if p.ranged_weapon != None:
+        target = GS['terrain_map'].monster_at(GS['mouse_cell'])
         missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
         target.health -= missle.hit
         p.missles.remove(missle)
