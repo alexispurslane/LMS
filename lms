@@ -47,7 +47,9 @@ def run_game(GS):
             elif event.type == 'MOUSEDOWN':
                 GS['mouse_cell'] = event.cell
             elif event.type == 'KEYDOWN':
-                if GS['side_screen'] == 'INVENTORY':
+                if event.keychar.upper() == 'Q':
+                    consts.quit(GS, GS['player'])
+                elif GS['side_screen'] == 'INVENTORY':
                     if event.keychar.upper() == 'UP':
                         GS['selection'] -= 1
                         GS['selection'] %= len(GS['player'].inventory)

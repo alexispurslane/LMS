@@ -46,6 +46,7 @@ def draw_hud_screen(GS, edge_pos):
     # Light Source Radius
     nm = len(GS['terrain_map'].dungeon['monsters'])
     console.drawStr(base, start+3, 'LoS dist: ' + str(player.light_source_radius))
+    console.drawStr(base+bounds+4, start+3, 'Dungeon '+str(GS['terrain_map'].dungeon_level))
 
     # Kills
     console.drawStr(base, start+4, 'Monsters: ' + str(nm))

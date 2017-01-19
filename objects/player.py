@@ -178,8 +178,7 @@ class Player:
             self.pos = GS['terrain_map'].generate_new_map()
             
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
-           GS['terrain_map'].is_dungeons() and\
-           len(GS['terrain_map'].dungeon['monsters']) == 0:
+           GS['terrain_map'].is_dungeons():
             
             GS['messages'].insert(0, "You decend.")
             self.pos = GS['terrain_map'].generate_new_map()

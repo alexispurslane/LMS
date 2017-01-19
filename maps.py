@@ -7,7 +7,7 @@ import monsters, colors, consts, utils, items, dungeons, forests, draw
 class TerrainMap:
     def __init__(self, w, h):
         self.forest_level = 0
-        self.dungeon_level = 1
+        self.dungeon_level = 0
         self.rooms = []
         self.width = w
         self.height = h

@@ -64,8 +64,7 @@ def generate_new_dungeon_map(self):
             #################### ADD MONSTERS ####################
             cal_size = math.floor(room.w*room.h/100)
             x_i, y_i = (0, 0)
-            for i in range(0, max(self.dungeon_level*2+1+cal_size, 4)):
-                print(self.dungeon_level)
+            for i in range(0, max(self.dungeon_level*2+cal_size, 4)):
                 ms = monsters.select_by_difficulty(self.dungeon_level)
                 m = random.choice(ms)()
                 m.pos = room.center

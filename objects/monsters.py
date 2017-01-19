@@ -208,4 +208,4 @@ regular_monsters = [Fury, Wyvern, Rat, Imp, Giant, Goblin, BabyDragon, Slime, Sl
 
 # Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
-    return list(filter(lambda m: m().health <= 18*(d+1) and m().attack >= 8*d, regular_monsters))
+    return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))

@@ -16,14 +16,14 @@ class Item:
         pass
 
 class Armor(Item):
-    def __init__(self, name='Unknown armor', weight=3, probability=40, char=']'):
+    def __init__(self, name='Unknown armor', weight=3, probability=40, char=']', defence=None):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.equipped = False
 
     def equip(self, player):
         if not self.equipped:
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
-            player.defence += self.weight
+            player.defence += self.defence or self.weight
             player.max_defence = player.defence
             self.equipped = True
 
@@ -93,7 +93,7 @@ class RangedWeapon(Item):
         player.ranged_weapon = None
 
 class Missle(Item):
-    def __init__(self, name='Regular Arrow', weight=0, probability=45, char='-', hit=1):
+    def __init__(self, name='Regular Arrow', weight=0, probability=45, char='-', hit=15):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.missle_type = name.split()[1]
         self.hit = hit
@@ -110,18 +110,28 @@ class Missle(Item):
             self.equipped = False
 
 ITEMS = [
-    Weapon('Broad sword', weight=10, attack=20, probability=8, char='|'),
-    Weapon('Fencing foil', weight=1, attack=10, probability=10, char='`'),
-    Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=4),
+    Weapon('Broad sword', weight=10, attack=20, probability=5, char='|'),
+    Weapon('Fencing foil', weight=1, attack=12, probability=10, char='`'),
+    Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=8),
     Weapon('Short sword', attack=12, weight=2, char='(', probability=12),
     Armor('Breastplate', probability=18, char='['),
+    Armor('Chain Mail', probability=13, char='['),
+    Armor('Mythril Mail', weight=0, probability=3, char=']', defence=11),
+    Armor('Plate Armor', weight=10, probability=10, char='&'),
     Armor('Sheild', weight=2, probability=20),
+    Armor('Wood Buckler', weight=3, probability=15, char='}'),
+    Armor('Iron Buckler', weight=6, probability=15, char='{'),
     Armor('Elven Helm', weight=1, probability=5, char='*'),
+    Armor('Viking Helm', weight=3, probability=8, char='*'),
     RangedWeapon('Light Bow', weight=1, probability=20, range=10),
-    Missle('Mahogeny Arrow', hit=30, char='_', probability=12),
+    RangedWeapon('Heavy Bow', weight=3, probability=10, range=20),
+    Missle('Mahogeny Arrow', hit=18, char='_', probability=12),
+    Missle('Iron Arrow', hit=24, char='-', probability=10),
     Missle(),
     Light(probability=30),
-    Food()
+    Food(),
+    Food('Raw Meat', nutrition=20, char='='),
+    Food('Bread', nutrition=15, char='m'),
 ]
 
 for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
@@ -129,3 +139,4 @@ for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
 DUNGEON_ITEMS = ITEMS[:]
 DUNGEON_ITEMS.remove(TORCH)
 DUNGEON_ITEMS.remove(FOOD_RATION)
+DUNGEON_ITEMS.remove(RAW_MEAT)
