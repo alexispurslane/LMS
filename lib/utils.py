@@ -30,6 +30,24 @@ def monster_turn(GS):
         elif speed > 1 and GS['turns'] % speed == 0:
             m.move(GS)
 
+# Represents a stylistic area of the dungeon.
+class Area:
+    def __init__(self, x, y, w, h, at=None):
+        self.pos1 = (x, y)
+        self.pos2 = (x+w, y+h)
+        self.w = w
+        self.h = h
+
+        self.area_type = random.choice(['Marble',
+                                        'Cave', 'Cave',
+                                        'Planted', 'Planted', 'Planted'])
+        if at: self.area_type = at
+        
+    def inside(self, pos):
+        x1, y1 = self.pos1
+        x2, y2 = self.pos2
+        return x1 <= pos[0] and x2 >= pos[0] and y1 <= pos[1] and y2 >= pos[1]
+    
 # Represents a dungeon room.
 class Room:
     def __init__(self, x, y, w, h):
@@ -74,18 +92,6 @@ class Room:
             self.center = tuple_add(self.pos1, (math.ceil(w/2),
                                                 math.ceil(h/2)))
 
-    def edge_points(self):
-        pnts = [(0,0)]
-        for x in range(1, self.pos2[0]):
-            pnts.append((x, self.pos1[1]))
-            pnts.append((x, self.pos2[1]-1))
-            
-        for y in range(1, self.pos2[1]):
-            pnts.append((self.pos1[0], y))
-            pnts.append((self.pos2[0]-1, y))
-
-        return pnts
-    
     # Checks if a room intersects the other.
     def intersects(self, room):
         x1, y1 = self.pos1
@@ -106,18 +112,30 @@ class Room:
             tmap.dungeon['decor'][pos] = random.choice(decor)
 
             if self.item_attempts < consts.ITEMS_PER_ROOM:
-                if random.randint(1, 2) == 1:
-                    n = random.randint(1, 100)
-                    pitems = list(filter(lambda x: n < x.probability,
-                                         sorted(items.DUNGEON_ITEMS,
-                                                key=lambda x: x.probability)))
-                    if len(pitems) > 0:
-                        tmap.dungeon['items'][pos] = [pitems[0]]
-                        
+                n = random.randint(1, 100)
+                pitems = list(filter(lambda x: n < x.probability,
+                                     sorted(items.DUNGEON_ITEMS,
+                                            key=lambda x: x.probability)))
+                if len(pitems) > 0:
+                    tmap.dungeon['items'][pos] = [pitems[0]]
                     self.item_attempts += 1
+                else:
+                    tmap.dungeon['items'][pos] = []
             else:
                 tmap.dungeon['items'][pos] = []
+                
+    def edge_points(self):
+        pnts = [(0,0)]
+        for x in range(1, self.pos2[0]):
+            pnts.append((x, self.pos1[1]))
+            pnts.append((x, self.pos2[1]-1))
+            
+        for y in range(1, self.pos2[1]):
+            pnts.append((self.pos1[0], y))
+            pnts.append((self.pos2[0]-1, y))
 
+        return pnts
+ 
     # Draws the room into the supplied terrain map.
     def draw_into_map(self, i, tmap):
         spacing = random.randint(4, 31)
@@ -132,6 +150,7 @@ class Room:
                     if x*x + y*y <= pow(self.radius, 2):
                         self.create_block(tmap, spacing, (x, y))
         elif self.room_type == 'Sanctuary':
+            tmap.dungeon['areas'].append(Area(self.pos1[0]-1, self.pos1[1]-1, self.w+1, self.h+1, at='Marble'))
             for x in range(0, self.w):
                 for y in range(0, self.h):
                     self.create_block(tmap, spacing, (x, y))

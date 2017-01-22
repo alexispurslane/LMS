@@ -34,6 +34,9 @@ def draw_hud_screen(GS, edge_pos):
         
     console.drawStr(base, start+1, 'Health: '+display_stat('health', player),
                     fg=color)
+    
+    if player.poisoned > 0:
+        console.drawStr(base+bounds+4, start+1, '(poisoned)', fg=colors.green)
 
     # Hunger
     if player.hunger >= 40:
@@ -216,16 +219,12 @@ def draw_game_screen(GS, frame):
     color = (0,0,0)
     if GS['player'].pos in GS['terrain_map'].dungeon['water']:
         color = colors.blue
-    elif GS['terrain_map'].dungeon['decor'][GS['player'].pos] == 'FM':
-        color = (0, 100, 0)
         
     console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color)
 
 
 # Refactor to use self.dungeon
 def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
-    if GS['mouse_cell'] == pos:
-        tint = colors.yellow
     x, y = pos
     if pos == terrain_map.dungeon['down_stairs']:
         console.drawChar(x, y, '>', fg=colors.grey, bg=colors.red)
@@ -244,8 +243,17 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         decor = terrain_map.dungeon['decor']
         
         if decor[pos] == 'FM':
-            console.drawChar(x, y, '"', fg=(57, 255, 20),
-                             bg=(57, 255, 20))
+            if terrain_map.in_area(pos) == 'Planted':
+                console.drawChar(x, y, '`', fg=colors.tint(colors.green, tint))
+            else:
+                area = terrain_map.in_area(pos)
+                color = colors.tint((12, 12, 12), tint)
+                if area == 'Marble':
+                    color = colors.tint((20,20,20), tint)
+                elif area == 'Cave':
+                    color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
+
+                console.drawChar(x, y, ' ', bg=color)
         elif decor[pos] == 'FR':
             console.drawChar(x, y, '^', fg=colors.darken(colors.red),
                              bg=colors.red)
@@ -253,10 +261,14 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, '^', fg=colors.darken(colors.yellow),
                              bg=colors.darken(colors.red))
     elif terrain_map.get_type(pos) == 'FLOOR':
-        console.drawChar(x, y, ' ',
-                         bg=colors.tint(
-                             colors.extreme_darken(
-                                 colors.very_dark_grey), tint))
+        area = terrain_map.in_area(pos)
+        color = colors.tint((12, 12, 12), tint)
+        if area == 'Marble':
+            color = colors.tint((20,20,20), tint)
+        elif area == 'Cave':
+            color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
+            
+        console.drawChar(x, y, ' ', bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
             console.drawChar(x, y, '-', fg=colors.tint(colors.brown, tint),
@@ -265,7 +277,12 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, '\\', fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.black, tint))
     elif terrain_map.get_type(pos) == 'STONE':
+        area = terrain_map.in_area(pos)
         color = colors.tint(colors.darkmed_grey, tint)
+        if area == 'Marble':
+            color = colors.tint(colors.white, tint)
+        elif area == 'Cave':
+            color = colors.tint(colors.brown, tint)
         
         console.drawChar(x, y, ' ', bg=color) 
     if pos in terrain_map.dungeon['numbers']:

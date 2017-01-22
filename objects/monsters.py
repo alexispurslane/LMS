@@ -1,11 +1,17 @@
 import random, math
-import colors, utils, consts, items
+import colors, utils, consts, items, copy
 
 class Monster:
-    def __init__(self, char, fg):
+    def __init__(self, name, char, fg, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
         self.char = char
+        self.name = name
         self.pos = (0, 0)
         self.fg = fg
+        self.speed = speed
+        self.health = health
+        self.attack = attack
+        self.sound = sound
+        self.special_action = special_action
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
         if self.health >= 20:
             self.drops.append(items.ITEMS)
@@ -14,7 +20,7 @@ class Monster:
     # runs the monster's special action on the player reference.
     def attack_player(self, player, GS):
         player.health -= self.attack
-        self.special_action(GS, player)
+        self.special_action(self, GS, player)
 
     # Decide wether to approach the player or not.
     def choose(self, player, lst, key):
@@ -90,17 +96,7 @@ class Monster:
                     self.pos = random.choice(choices)
 
 def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
-    def __init__(self):
-        Monster.__init__(self, char, color)
-        
-    globals()[name] = type(name, (Monster,), {
-        '__init__': __init__,
-        'speed': speed,
-        'health': health,
-        'attack': attack,
-        'sound': sound,
-        'special_action': special_action
-    })
+    globals()[name] = Monster(name, char, color, speed, health, attack, sound, special_action)
 
 create_monster('Fury', 'f', colors.yellow,
                speed=1,
@@ -145,7 +141,7 @@ def breed(self, GS, player):
         GS['messages'].insert(0, "You chop the slime in half. The new half is alive!")
         if consts.DEBUG:
             print('Slime breeding.')
-        slime = Slime()
+        slime = copy.copy(Slime)
         slime.pos = random.choice(valid)
         GS['terrain_map'].dungeon['monsters'].append(slime)
         
@@ -186,6 +182,28 @@ create_monster('Imp', 'i', colors.light_blue,
                sound = 'grumbling',
                special_action=filtch)
 
+def poison(self, GS, player):
+    if player.defence <= 5:
+        if player.poisoned <= 0 and random.randint(1, 100) < 80:
+            player.poisoned = self.health
+            GS['messages'].insert(0, 'You have been poisoned!')
+    else:
+        GS['messages'].insert(0, 'You\'re armor protects you from bite.')
+
+create_monster('Snake', 'S', colors.green,
+               health = 12,
+               speed = 2,
+               attack = 4,
+               sound = 'hissing',
+               special_action=poison)
+
+create_monster('Adder', 'A', colors.dark_red,
+               health = 25,
+               speed = 1,
+               attack = 12,
+               sound = 'hissing',
+               special_action=poison)
+
 create_monster('Rat', 'r', colors.brown,
                health = 12,
                speed = 4,
@@ -204,8 +222,21 @@ create_monster('FlyingDragon', 'F', colors.dark_yellow,
                attack = 70,
                sound = 'crashing')
 
-regular_monsters = [Fury, Wyvern, Rat, Imp, Giant, Goblin, BabyDragon, Slime, Slime, Slime]
+regular_monsters = [Fury,
+                    Wyvern,
+                    Rat, Rat, Rat,
+                    Imp,
+                    Adder, Adder,
+                    Giant,
+                    Goblin, Goblin,
+                    BabyDragon,
+                    Slime, Slime, Slime,
+                    Snake]
 
 # Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
-    return list(filter(lambda m: m().health <= 15*(d+1) and m().attack >= 8*d, regular_monsters))
+    n = consts.DIFFICULTY
+    return list(map(copy.copy, filter(lambda m:
+                                      (m.health <= n*(d+1) and\
+                                       m.attack >= (n-10)*d) or m == Snake,
+                                      regular_monsters)))

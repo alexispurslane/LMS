@@ -13,6 +13,7 @@ class Player:
         self.exp = 0
         
         self.prev_pos = (-1,-1)
+        self.poisoned = 0
 
         # Setup character's race.
         self.race = race
@@ -39,7 +40,7 @@ class Player:
 
     # Calculate the player's overall score.
     def score(self, GS):
-        return math.floor(GS['turns']/3) +\
+        return math.floor(GS['turns']/10) +\
             (self.level + self.killed_monsters + self.defence) * self.exp
 
     # Calculate new XP points based on monster danger-level.
@@ -56,6 +57,9 @@ class Player:
     def rest(self):
         if self.health < self.max_health:
             self.health += 1
+        if self.poisoned > 0 and GS['turns'] % 4:
+            self.poisoned -= 2
+            self.health -= 1   
 
     # Handles leveling a player up, takes the calculated level as an argument,
     # checks if it is a new level, and if so upgrades the player's stats.
@@ -152,6 +156,10 @@ class Player:
 
     # Moves the player and deals with any results of that. FIXME: Refactor this!
     def move(self, event, GS):
+        if self.poisoned > 0 and GS['turns'] % 2:
+            self.poisoned -= 1
+            self.health -= 1
+            
         for item in self.dequips:
             item.lasts -= 1
             if item.lasts <= 0:
@@ -159,7 +167,7 @@ class Player:
                 GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
                 self.dequips.remove(item)
                 
-        if self.health < self.max_health and GS['turns'] % 4 == 0:
+        if self.health < self.max_health and GS['turns'] % 3 == 0:
             self.health += 1
             
         if GS['turns'] % 4 == 0:
@@ -169,7 +177,7 @@ class Player:
             GS['messages'].insert(0, 'You feel hungry.')
             self.health -= 1
 
-        delta = consts.GAME_KEYS['M'][event.keychar.upper()]
+        delta = consts.GAME_KEYS['M'][event.keychar]
         new_pos = utils.tuple_add(self.pos, delta)
         n_x, n_y = new_pos
         
@@ -179,7 +187,7 @@ class Player:
             
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
            GS['terrain_map'].is_dungeons():
-            
+           
             GS['messages'].insert(0, "You decend.")
             self.pos = GS['terrain_map'].generate_new_map()
 
@@ -205,9 +213,12 @@ class Player:
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "You slosh through the cold water.")
         else:
-            GS['messages'].insert(0, "You hit a wall. Stoppit.")
-            new_pos = self.pos
-            n_x, n_y = new_pos
+            if GS['terrain_map'].in_area(new_pos) == 'Cave':
+                GS['terrain_map'].place_cell(new_pos)
+            else:
+                GS['messages'].insert(0, "You hit a wall. Stoppit.")
+                new_pos = self.pos
+                n_x, n_y = new_pos
             
         m = GS['terrain_map'].monster_at(new_pos)
         speed = self.speed

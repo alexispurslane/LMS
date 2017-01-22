@@ -31,6 +31,7 @@ class TerrainMap:
             'monsters': [],
             
             'water': {},
+            'areas': [],
             'numbers': {},
             'noise': None,
             
@@ -106,6 +107,12 @@ class TerrainMap:
                 return m
         return None
 
+    def in_area(self, p):
+        for a in self.dungeon['areas']:
+            if a.inside(p):
+                return a.area_type
+        return 'Regular'
+
     # Checks if level is hard.
     def is_hell_level(self):
         return self.dungeon_level > math.floor(consts.DUNGEON_LEVELS/2)
@@ -153,11 +160,25 @@ class TerrainMap:
     def generate_final_level(self):
         return None
 
+    def generate_areas(self):
+        areas = []
+        while len(areas) < 6:
+            area = utils.Area(random.randint(0, self.width-1),
+                              random.randint(0, self.height-1),
+                              random.randint(5, math.floor(self.width/4)),
+                              random.randint(5, math.floor(self.height/4)))
+            
+            if area.pos2 < (self.width-1, self.height-1) and area.pos1 > (0, 0):
+                areas.append(area)
+            
+        return areas
+    
     # Generates the new map, forest or dungeon, appropriately by level number.
     # FIXME: Calls generate_final_level, which will return None.
     def generate_new_map(self):
         self.dungeons.append(self.dungeon)
         self.reset_dungeon()
+        self.dungeon['areas'] = self.generate_areas()
         
         if self.is_forests():
             if consts.DEBUG: print('LEVEL: FOREST')

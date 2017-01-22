@@ -14,6 +14,9 @@ def connect_rooms(self, r1, r2):
     r2.connected = True
 
 def generate_new_dungeon_map(self):
+    return generate_new_standard_dungeon_map(self)
+    
+def generate_new_standard_dungeon_map(self):
     self.dungeon['decor'][0, 0] = None
     for pos in self.dungeon['visited']:
         self.dungeon['decor'][pos] = None
@@ -65,8 +68,16 @@ def generate_new_dungeon_map(self):
             cal_size = math.floor(room.w*room.h/100)
             x_i, y_i = (0, 0)
             for i in range(0, max(self.dungeon_level*2+cal_size, 4)):
+                # Choose monster selection
                 ms = monsters.select_by_difficulty(self.dungeon_level)
-                m = random.choice(ms)()
+                area = self.in_area(room.center)
+                if area == 'Cave':
+                    ms = ms + [monsters.Rat, monsters.Imp] * 3
+                elif area == 'Marble':
+                    ms = ms + [monsters.Snake] * 5
+                    
+                # Deal with chosen monster
+                m = random.choice(ms)
                 m.pos = room.center
 
                 offset = (0, 0)
@@ -76,10 +87,9 @@ def generate_new_dungeon_map(self):
                 else:
                     offset = (0, y_i)
                     y_i += 1
-                    
-                m.pos = utils.tuple_add(m.pos, offset)
 
-                if self.is_walkable(m.pos):
+                m.pos = utils.tuple_add(m.pos, offset)
+                if m and self.is_walkable(m.pos) and self.get_type(m.pos) == 'FLOOR':
                     proweling_monsters.append(m)
                     
             self.dungeon['monsters'] = proweling_monsters

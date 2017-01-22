@@ -1,4 +1,4 @@
-import utils, draw, itertools, math
+import utils, draw, itertools, math, tdl
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -13,8 +13,9 @@ MESSAGE_NUMBER   = HEIGHT-12
 FOREST_LEVELS    = 0
 MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
-DUNGEON_LEVELS   = 21
+DUNGEON_LEVELS   = 20
 DEBUG            = True
+DIFFICULTY       = 15
 
 MIN_ROOM_WIDTH = 8
 MIN_ROOM_HEIGHT = 4
@@ -35,20 +36,20 @@ MAP = {
 
 ################### PLAYER MOVEMENT ###################
 GAME_MOVEMENT_KEYS = {
-    'L': [1, 0],
-    'H': [-1, 0],
-    'K': [0, -1],
-    'J': [0, 1],
-    'Y': [-1, -1],
-    'U': [1, -1],
-    'B': [-1, 1],
-    'N': [1, 1],
+    'l': [1, 0],
+    'h': [-1, 0],
+    'k': [0, -1],
+    'j': [0, 1],
+    'y': [-1, -1],
+    'u': [1, -1],
+    'b': [-1, 1],
+    'n': [1, 1],
 
     # For losers
-    'RIGHT': [1, 0],
-    'LEFT': [-1, 0],
-    'UP': [0, -1],
-    'DOWN': [0, 1],
+    'right': [1, 0],
+    'left': [-1, 0],
+    'up': [0, -1],
+    'down': [0, 1],
 }
 
 ################### PLAYER ACTIONS ###################
@@ -76,20 +77,25 @@ def auto_rest(GS, p):
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
     if p.ranged_weapon != None:
-        target = GS['terrain_map'].monster_at(GS['mouse_cell'])
-        missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
-        target.health -= missle.hit
-        p.missles.remove(missle)
-        adj = [
-            (-1, 0),
-            (1, 0),
-            (0, -1),
-            (0, 1)
-        ]
-        for a in adj:
-            pos = utils.tuple_add(target.pos, adj)
-            if GS['terrain_map'].get_type(x, y) != 'STONE':
-                GS['terrain_map'].dungeon['items'][pos] = missle
+        click = tdl.event.wait(timeout=1000, flush=True)
+        if click and click.type == 'MOUSEDOWN' and click.button == 'LEFT':
+            target = GS['terrain_map'].monster_at(click.cell)
+            if target:
+                missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
+                target.health -= missle.hit
+                p.missles.remove(missle)
+                adj = [
+                    (-1, 0),
+                    (1, 0),
+                    (0, -1),
+                    (0, 1)
+                ]
+                for a in adj:
+                    pos = utils.tuple_add(target.pos, adj)
+                    if GS['terrain_map'].get_type(x, y) != 'STONE':
+                        GS['terrain_map'].dungeon['items'][pos] = missle
+        else:
+            GS['messages'].insert(0, 'Nevermind.')
 
 # Switches between inventory and HUD screens.
 def inventory(GS, p):
@@ -120,15 +126,34 @@ def quit(GS, p):
                               itertools.groupby(p.inventory)))))
     exit(0)
 
-
+def auto_move(d):
+    event = tdl.event.KeyDown(d, d, False, False, False, False, False)
+    def do(GS, p):
+        changed = True
+        while changed:
+            pp = p.pos
+            p.move(event, GS)
+            changed = pp != p.pos
+    return do
+    
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),
     ',': pickup,
     ';': auto_rest,
-    'F': fire,
-    'I': inventory,
-    'ESCAPE': reset,
-    'Q': quit
+    'f': fire,
+    'i': inventory,
+    'escape': inventory,
+    'q': quit,
+
+    # Auto-movement
+    'L': auto_move('l'),
+    'H': auto_move('h'),
+    'K': auto_move('k'),
+    'J': auto_move('j'),
+    'Y': auto_move('y'),
+    'U': auto_move('u'),
+    'B': auto_move('b'),
+    'N': auto_move('n'),
 }
 
  

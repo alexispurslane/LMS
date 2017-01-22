@@ -19,6 +19,7 @@ class Armor(Item):
     def __init__(self, name='Unknown armor', weight=3, probability=40, char=']', defence=None):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.equipped = False
+        self.defence = defence
 
     def equip(self, player):
         if not self.equipped:
@@ -118,6 +119,7 @@ ITEMS = [
     Armor('Chain Mail', probability=13, char='['),
     Armor('Mythril Mail', weight=0, probability=3, char=']', defence=11),
     Armor('Plate Armor', weight=10, probability=10, char='&'),
+    Armor('Full Body Armor', weight=20, defence=25, probability=8, char='&'),
     Armor('Sheild', weight=2, probability=20),
     Armor('Wood Buckler', weight=3, probability=15, char='}'),
     Armor('Iron Buckler', weight=6, probability=15, char='{'),
@@ -129,6 +131,7 @@ ITEMS = [
     Missle('Iron Arrow', hit=24, char='-', probability=10),
     Missle(),
     Light(probability=30),
+    Light('Lamp', weight=2, radius=20, lasts=200, probability=20, char='#'),
     Food(),
     Food('Raw Meat', nutrition=20, char='='),
     Food('Bread', nutrition=15, char='m'),
@@ -139,4 +142,3 @@ for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
 DUNGEON_ITEMS = ITEMS[:]
 DUNGEON_ITEMS.remove(TORCH)
 DUNGEON_ITEMS.remove(FOOD_RATION)
-DUNGEON_ITEMS.remove(RAW_MEAT)

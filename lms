@@ -25,9 +25,9 @@ def run_game(GS):
             'You are on your own. Best of luck, soldier!'
         ])),
         'selection': 0,
-        'mouse_cell': (-1, -1),
         'side_screen': 'HUD',
-        'turns': 0
+        'turns': 0,
+        'wins': 0
     }
 
     def signal_handler(signal, frame):
@@ -40,12 +40,22 @@ def run_game(GS):
             GS['screen'] = 'DEATH'
         draw.draw_screen(GS)
 
-        tdl.event.set_key_repeat(delay=400, interval=1)
+        tdl.event.set_key_repeat(delay=100, interval=0)
         for event in tdl.event.get():
             if event.type == 'QUIT':
                 consts.quit(GS, GS['player'])
-            elif event.type == 'MOUSEDOWN':
-                GS['mouse_cell'] = event.cell
+            elif event.type == 'MOUSEDOWN' and event.button == 'RIGHT':
+                monster = GS['terrain_map'].monster_at(event.cell)
+                item    = GS['terrain_map'].dungeon['items'][event.cell]
+                terrain = GS['terrain_map'].get_type(event.cell)
+
+                obj = terrain
+                if monster:
+                    obj = monster
+                elif len(item) > 0:
+                    obj = item[0]
+                    
+                GS['messages'].insert(0, 'You see a ' + obj)
             elif event.type == 'KEYDOWN':
                 if event.keychar.upper() == 'Q':
                     consts.quit(GS, GS['player'])
@@ -74,7 +84,7 @@ def run_game(GS):
                      event.keychar.upper() == 'SPACE':
                     GS['screen'] = 'CHARSEL'
                 elif GS['screen'] == 'CHARSEL':
-                    if event.keychar.isalpha() and len(event.keychar.lower()) == 1:
+                    if event.keychar.isalpha() and len(event.keychar) == 1:
                         racen = ord(event.keychar.lower())-97
                         if racen < len(races.RACES):
                             selected_race = races.RACES[racen]
@@ -87,10 +97,10 @@ def run_game(GS):
 
                             GS['screen'] = 'GAME'
                 elif GS['screen'] == 'GAME':
-                    if event.keychar.upper() in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':
+                    if event.keychar in consts.GAME_KEYS['M'] and GS['side_screen'] != 'MAN':
                         GS['player'].move(event, GS)
-                    elif event.keychar.upper() in consts.GAME_KEYS['A']:
-                        consts.GAME_KEYS['A'][event.keychar.upper()](GS, GS['player'])
+                    elif event.keychar in consts.GAME_KEYS['A']:
+                        consts.GAME_KEYS['A'][event.keychar](GS, GS['player'])
                     elif event.keychar == '?' and GS['side_screen'] == 'HUD':
                         GS['side_screen'] = 'MAN'
                     elif event.keychar == '?' and GS['side_screen'] == 'MAN':
