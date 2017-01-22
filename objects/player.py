@@ -164,7 +164,7 @@ class Player:
             item.lasts -= 1
             if item.lasts <= 0:
                 item.dequip(self)
-                GS['messages'].insert(0, 'Your '+type(item).__name__+' flickers out.')
+                GS['messages'].insert(0, 'Your '+item.name+' flickers out.')
                 self.dequips.remove(item)
                 
         if self.health < self.max_health and GS['turns'] % 3 == 0:
@@ -228,13 +228,13 @@ class Player:
             
         if m != None:
             (self_dead, monster_dead) = self.attack_monster(GS, m)
-            GS['messages'].insert(0, "You attack the "+type(m).__name__)
+            GS['messages'].insert(0, "You attack the "+m.name)
             
             if not monster_dead:
-                GS['messages'].insert(0, "The "+type(m).__name__+" attacks you")
+                GS['messages'].insert(0, "The "+m.name+" attacks you")
                 GS['messages'].insert(0, "It's health is now "+str(m.health))
             else:
-                GS['messages'].insert(0, "You vanquish the "+type(m).__name__)
+                GS['messages'].insert(0, "You vanquish the "+m.name)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))

@@ -74,10 +74,10 @@ class Monster:
         choices = self.get_movement_choices(GS['terrain_map'], adj)
 
         if GS['player'].pos in adj:
-            GS['messages'].insert(0, 'The '+type(self).__name__+' attacks you suddenly!')
+            GS['messages'].insert(0, 'The '+self.name+' attacks you suddenly!')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
-                GS['messages'].insert(0, 'You destroy the sneaky '+type(self).__name__)
+                GS['messages'].insert(0, 'You destroy the sneaky '+self.name)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
