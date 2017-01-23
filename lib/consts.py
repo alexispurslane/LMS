@@ -68,9 +68,13 @@ def pickup(GS, p):
 def auto_rest(GS, p):
     while p.health < p.max_health:
         p.rest()
+        if self.poisoned > 0 and GS['turns'] % 4:
+            self.poisoned -= 2
+            self.health -= 1
+        if GS['turns'] % 6 == 0:
+            p.hunger += 1
         utils.monster_turn(GS)
         
-        if GS['turns'] % 6 == 0: p.hunger += 1
         GS['turns'] += 1
 
 # Fire the first available missle using the player's current ranged weapon at

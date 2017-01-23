@@ -45,17 +45,31 @@ def run_game(GS):
             if event.type == 'QUIT':
                 consts.quit(GS, GS['player'])
             elif event.type == 'MOUSEDOWN' and event.button == 'RIGHT':
-                monster = GS['terrain_map'].monster_at(event.cell)
-                item    = GS['terrain_map'].dungeon['items'][event.cell]
-                terrain = GS['terrain_map'].get_type(event.cell)
+                t = GS['terrain_map']
+                monster = t.monster_at(event.cell)
+                item    = event.cell in t.dungeon['items']
+                decor   = event.cell in t.dungeon['decor']
+                terrain = t.get_type(event.cell)
 
-                obj = terrain
+                obj = terrain.lower()
                 if monster:
-                    obj = monster
-                elif len(item) > 0:
-                    obj = item[0]
+                    obj = 'a ' + monster.name
+                elif terrain == 'STONE' and decor:
+                    obj = 'lichen-covered stone'
+                elif item:
+                    if len(t.dungeon['items'][event.cell]) > 0:
+                        obj = t.dungeon['items'][event.cell][0].name
+                elif decor:
+                    if t.dungeon['decor'][event.cell] == 'FM':
+                        obj = 'a weed'
+                    elif t.dungeon['decor'][event.cell] == 'FR':
+                        obj = 'flames'
+                    elif not t.dungeon['decor'][event.cell]:
+                        obj = 'floor'
+                    else:
+                        obj = 'hot rocks'
                     
-                GS['messages'].insert(0, 'You see a ' + obj)
+                GS['messages'].insert(0, 'You see ' + obj + ' there.')
             elif event.type == 'KEYDOWN':
                 if event.keychar.upper() == 'Q':
                     consts.quit(GS, GS['player'])

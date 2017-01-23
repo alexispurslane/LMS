@@ -57,9 +57,6 @@ class Player:
     def rest(self):
         if self.health < self.max_health:
             self.health += 1
-        if self.poisoned > 0 and GS['turns'] % 4:
-            self.poisoned -= 2
-            self.health -= 1   
 
     # Handles leveling a player up, takes the calculated level as an argument,
     # checks if it is a new level, and if so upgrades the player's stats.
