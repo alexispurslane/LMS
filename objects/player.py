@@ -86,7 +86,7 @@ class Player:
             monster.health -= self.attack
             if monster.health > 0:
                 monster.attack_player(self, GS)
-                self.health += self.defence
+                self.health += min(self.max_health - self.health, self.defence)
                 
         if self.health > 0 and monster.health <= 0:
             self.learn(GS, monster)
