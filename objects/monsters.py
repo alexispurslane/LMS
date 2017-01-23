@@ -1,8 +1,8 @@
-import random, math
-import colors, utils, consts, items, copy
+import random, math, yaml, copy, os
+import colors, utils, consts, items
 
 class Monster:
-    def __init__(self, name, char, fg, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
+    def __init__(self, name, char, fg, speed=0, health=0, attack=0, special_action=lambda self, GS, p: -1):
         self.char = char
         self.name = name
         self.pos = (0, 0)
@@ -10,7 +10,6 @@ class Monster:
         self.speed = speed
         self.health = health
         self.attack = attack
-        self.sound = sound
         self.special_action = special_action
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
         if self.health >= 20:
@@ -95,39 +94,8 @@ class Monster:
                 if len(choices) >= 2:
                     self.pos = random.choice(choices)
 
-def create_monster(name, char, color, speed=0, health=0, attack=0, sound='sniffling', special_action=lambda self, GS, p: -1):
-    globals()[name] = Monster(name, char, color, speed, health, attack, sound, special_action)
 
-create_monster('Fury', 'f', colors.yellow,
-               speed=1,
-               health=80,
-               attack=8,
-               sound='flapping')
-
-create_monster('BabyDragon', 'd', colors.red,
-               speed=4,
-               health=30,
-               attack=15,
-               sound='scratching')
-
-create_monster('Dragon', 'D', colors.dark_red,
-               health = 300,
-               speed = 15,
-               attack = 80,
-               sound = 'scraping')
-
-create_monster('Goblin', 'g', colors.green,
-               speed = 3,
-               health = 26,
-               attack = 12,
-               sound = 'pattering')
-
-create_monster('Giant', 'G', colors.dark_green,
-               health = 50,
-               speed = 20,
-               attack = 25,
-               sound = 'thumping')
-
+############################ MONSTER ACTIONS ############################ 
 def breed(self, GS, player):
     x, y = self.pos
     posns = [
@@ -145,13 +113,6 @@ def breed(self, GS, player):
         slime.pos = random.choice(valid)
         GS['terrain_map'].dungeon['monsters'].append(slime)
         
-create_monster('Slime', 's', (27, 226, 21),
-               health=13,
-               speed=8,
-               attack=1,
-               sound='squeltching',
-               special_action=breed)
-
 def filtch(self, GS, player):
     x, y = self.pos
     posns = [
@@ -175,13 +136,6 @@ def filtch(self, GS, player):
         GS['messages'].insert(0, 'The Imp steals your ' + iitem.name + ' and throws it.')
         GS['terrain_map'].dungeon['items'][pos].append(iitem)
     
-create_monster('Imp', 'i', colors.light_blue,
-               health = 15,
-               speed = 4,
-               attack = 8,
-               sound = 'grumbling',
-               special_action=filtch)
-
 def poison(self, GS, player):
     if player.defence <= 5:
         if player.poisoned <= 0 and random.randint(1, 100) < 80:
@@ -189,54 +143,38 @@ def poison(self, GS, player):
             GS['messages'].insert(0, 'You have been poisoned!')
     else:
         GS['messages'].insert(0, 'You\'re armor protects you from bite.')
-
-create_monster('Snake', 'S', colors.green,
-               health = 12,
-               speed = 2,
-               attack = 4,
-               sound = 'hissing',
-               special_action=poison)
-
-create_monster('Adder', 'A', colors.dark_red,
-               health = 25,
-               speed = 1,
-               attack = 12,
-               sound = 'hissing',
-               special_action=poison)
-
-create_monster('Rat', 'r', colors.brown,
-               health = 12,
-               speed = 4,
-               attack = 5,
-               sound = 'tapping')
-
-create_monster('Wyvern', 'W', colors.grey,
-               speed = 10,
-               health = 80,
-               attack = 7,
-               sound = 'swishing')
+ 
+def create_monster(name, mon):
+    color = None
+    try:
+        color = getattr(colors, mon['color'])
+    except:
+        color = exec(mon['color'])
         
-create_monster('FlyingDragon', 'F', colors.dark_yellow,
-               speed = 6,
-               health = 200,
-               attack = 70,
-               sound = 'crashing')
+    globals()[name] = Monster(name,
+                              mon['char'],
+                              color,
+                              mon['speed'],
+                              mon['health'],
+                              mon['attack'])
+    if 'action' in mon:
+        globals()[name].special_action = globals()[mon['action']]
 
-regular_monsters = [Fury,
-                    Wyvern,
-                    Rat, Rat, Rat,
-                    Imp,
-                    Adder, Adder,
-                    Giant,
-                    Goblin, Goblin,
-                    BabyDragon,
-                    Slime, Slime, Slime,
-                    Snake]
+############################ LOAD MONSTERS ############################ 
+monsters = []
+yaml_monsters = []
+with open("./objects/conf/monsters.yaml", 'r') as stream:
+    yaml_monsters = yaml.load(stream)['monsters']
 
+for m in yaml_monsters:
+    k, v = list(m.items())[0]
+    create_monster(k, v)
+    monsters.append(globals()[k])
+      
 # Selects the correct monster for the current difficulty level based on health and attack.
 def select_by_difficulty(d, in_forest=True):
     n = consts.DIFFICULTY
     return list(map(copy.copy, filter(lambda m:
                                       (m.health <= n*(d+1) and\
                                        m.attack >= (n-10)*d) or m == Snake,
-                                      regular_monsters)))
+                                      monsters)))

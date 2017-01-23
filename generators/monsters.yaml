@@ -1,0 +1,88 @@
+Fury:
+  char: f
+  color: yellow
+  speed: 1
+  health: 80
+  attack: 8
+
+BabyDragon:
+  char: d
+  color: red
+  speed: 4
+  health: 30
+  attack: 15
+
+Dragon:
+  char: D
+  color: dark_red
+  health :  300
+  speed :  15
+  attack :  80
+
+Goblin:
+  char: g
+  color: green
+  speed :  3
+  health :  26
+  attack :  12
+
+Giant:
+  char: G
+  color: dark_green
+  health :  50
+  speed :  20
+  attack :  25
+        
+Slime:
+  char: s
+  color: green
+  health: 13
+  speed: 8
+  attack: 1
+  action: breed
+  
+Imp:
+  char: i
+  color: light_blue
+  health :  15
+  speed :  4
+  attack :  8
+  action: filtch
+
+Snake:
+  char: S
+  color: green
+  health :  12
+  speed :  2
+  attack :  4
+  action: poison
+
+Adder:
+  char: A
+  color: dark_red
+  health :  25
+  speed :  1
+  attack :  12
+  action: poison
+
+Rat:
+  char: r
+  color: brown
+  health :  12
+  speed :  4
+  attack :  5
+
+Wyvern:
+  char: W
+  color: grey
+  speed :  10
+  health :  80
+  attack :  7
+ 
+
+FlyingDragon:
+  char: F
+  health: 200
+  speed: 6
+  attack: 70
+  action: none
