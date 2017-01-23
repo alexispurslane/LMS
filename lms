@@ -17,12 +17,6 @@ def run_game(GS):
         'player': player.Player(races.SOLDIER),
         'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
         'messages': list(reversed([
-            'After the end of humanity\'s battle',
-            'with the god Chaom, you\'re the last warrior left.',
-            'Your task is to kill the monsters that serve',
-            'the new Boss. The stairs to the next',
-            'level will appear once you have killed \'em all.',
-            'You are on your own. Best of luck, soldier!'
         ])),
         'selection': 0,
         'side_screen': 'HUD',

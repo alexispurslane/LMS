@@ -178,10 +178,6 @@ class Player:
         new_pos = utils.tuple_add(self.pos, delta)
         n_x, n_y = new_pos
         
-        if n_x >= GS['terrain_map'].width-1 and GS['terrain_map'].more_forests():
-            GS['messages'].insert(0, "You move on through the forest.")
-            self.pos = GS['terrain_map'].generate_new_map()
-            
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
            GS['terrain_map'].is_dungeons():
            
@@ -204,7 +200,9 @@ class Player:
             new_pos = self.pos
             n_x, n_y = new_pos
 
-        if GS['terrain_map'].is_walkable(new_pos):
+        w, h = GS['terrain_map'].width, GS['terrain_map'].height
+        if GS['terrain_map'].is_walkable(new_pos) and new_pos < (w-1, h-1) and\
+           new_pos >= (0,0):
             self.prev_pos = self.pos
             self.pos = new_pos
             if new_pos in GS['terrain_map'].dungeon['water']:

@@ -1,6 +1,6 @@
 import tdl
 import random, math
-import monsters, colors, consts, utils, items, dungeons, forests
+import monsters, colors, consts, utils, items, dungeons, forests, area
 
 def connect_rooms(self, r1, r2):
     if random.randint(1, 2) == 1:
@@ -28,7 +28,7 @@ def generate_new_standard_dungeon_map(self):
     h = 8
     x = random.randint(1, self.width - w - 1)
     y = random.randint(1, self.height - h - 1)
-    room = utils.Room(x, y, w, h)
+    room = area.Room(x, y, w, h)
     room.connected = True
     self.dungeon['rooms'].append(room)
     room.draw_into_map(0, self)
@@ -38,12 +38,12 @@ def generate_new_standard_dungeon_map(self):
         h = random.randint(consts.MIN_ROOM_HEIGHT, consts.MAX_ROOM_SIZE)
         x = random.randint(1, self.width - w - 1)
         y = random.randint(1, self.height - h - 1)
-        room = utils.Room(x, y, w, h)
+        room = area.Room(x, y, w, h)
 
         w2 = random.randint(consts.MIN_ROOM_WIDTH, consts.MAX_ROOM_SIZE)
         h2 = random.randint(consts.MIN_ROOM_HEIGHT, consts.MAX_ROOM_SIZE)
         x2, y2 = random.choice(room.edge_points())
-        adjoin = utils.Room(x2, y2, w2, h2)
+        adjoin = area.Room(x2, y2, w2, h2)
 
         failed = False
         for r in self.dungeon['rooms']:
@@ -70,10 +70,10 @@ def generate_new_standard_dungeon_map(self):
             for i in range(0, max(self.dungeon_level*2+cal_size, 4)):
                 # Choose monster selection
                 ms = monsters.select_by_difficulty(self.dungeon_level)
-                area = self.in_area(room.center)
-                if area == 'Cave':
+                a = self.in_area(room.center)
+                if a == 'Cave':
                     ms = ms + [monsters.Rat, monsters.Imp] * 3
-                elif area == 'Marble':
+                elif a == 'Marble':
                     ms = ms + [monsters.Snake] * 5
                     
                 # Deal with chosen monster

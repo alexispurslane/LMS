@@ -1,6 +1,6 @@
 import tdl
 import random, math
-import monsters, colors, consts, utils, items, dungeons, forests, draw
+import monsters, colors, consts, utils, items, dungeons, forests, draw, area
 
 # TODO: Add comments
 # TODO: Refactor for less mutation
@@ -163,14 +163,14 @@ class TerrainMap:
     def generate_areas(self):
         areas = []
         while len(areas) < 6:
-            area = utils.Area(random.randint(0, self.width-1),
-                              random.randint(0, self.height-1),
-                              random.randint(5, math.floor(self.width/4)),
-                              random.randint(5, math.floor(self.height/4)))
+            a = area.Area(random.randint(0, self.width-1),
+                          random.randint(0, self.height-1),
+                          random.randint(12, math.floor(self.width/4)),
+                          random.randint(12, math.floor(self.height/4)))
             
-            if area.pos2 < (self.width-1, self.height-1) and area.pos1 > (0, 0):
-                areas.append(area)
-            
+            if a.pos2 < (self.width-1, self.height-1) and a.pos1 > (0, 0):
+                areas.append(a)
+                
         return areas
     
     # Generates the new map, forest or dungeon, appropriately by level number.

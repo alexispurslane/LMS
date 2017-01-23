@@ -89,8 +89,6 @@ def draw_hud_screen(GS, edge_pos):
         c = int((i + 1) * (255 / len(GS['messages'])))
         c = max(0, min(c, 255))
         
-        if GS['turns'] == 0:
-            c = 255
         if len(m) > consts.WIDTH-1:
             m = m[:consts.WIDTH-1]
         GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
@@ -185,6 +183,18 @@ def draw_intro_screen(GS, frame):
 
     console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
                     fg=colors.darken(colors.grey))
+
+    story = [
+        'Long ago, the manifestation of the evil Outer Rim crept silently to',
+        'earth, bringing with it its hoard of dark and evil creatures.',
+        'After a centuries-long battle, humanity finally overcame this god, Kor,',
+        'and cast him out. Yet his vast underground realm still existed.',
+        'Now, years later, a new creature has taken over Kor\'s old abodes.',
+        'Your job is to assasinate him, single-handedly.'
+    ]
+
+    for (i, line) in enumerate(story):
+        console.drawStr(int(consts.WIDTH/2)-30, 20+i, line, fg=colors.grey)
 
     draw_static(console, frame)
 
