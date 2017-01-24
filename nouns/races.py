@@ -54,7 +54,7 @@ RANGER = Race({
         items.LIGHT_BOW,
         items.ELVEN_HELM,
         items.TORCH
-    ]+[items.MAHOGENY_ARROW]*7+[items.REGULAR_ARROW]*20,
+    ]+[items.REGULAR_ARROW]*21,
     'skills': {
         'weapon': 0.98,
         'spell': 1,

@@ -1,0 +1,134 @@
+weapons:
+- Broad Sword:
+    char: '|'
+    weight: 10
+    attack: 21
+    probability: 5
+
+- Fencing Foil:
+    char: '!'
+    weight: 1
+    attack: 12
+    probability: 10
+
+- Thrusting Sword:
+    char: '/'
+    weight: 5
+    attack: 16
+    probability: 8
+
+- Short Sword:
+    char: '('
+    attack: 12
+    weight: 4
+    probability: 12
+
+armor:
+- Breastplate:
+    char: '['
+    weight: 3
+    probability: 18
+
+- Chain Mail:
+    char: '['
+    weight: 5
+    probability: 13
+
+- Mythril Mail:
+    char: ']'
+    weight: 0
+    defence: 11
+    probability: 3
+
+- Plate Armor:
+    char: '&'
+    weight: 10
+    probability: 10
+
+- Full Body Armor:
+    char: '&'
+    weight: 20
+    defence: 25
+    probability: 8
+
+- Sheild:
+    char: ']'
+    weight: 2
+    probability: 20
+
+- Wood Buckler:
+    char: '}'
+    weight: 3
+    probability: 15
+
+- Iron Buckler:
+    char: '{'
+    weight: 6
+    probability: 15
+
+- Elven Helm:
+    char: '*'
+    weight: 1
+    probability: 5
+
+- Viking Helm:
+    char: '*'
+    weight: 3
+    probability: 8
+
+ranged weapons:
+- Light Bow:
+    weight: 1
+    probability: 20
+    range: 10
+    char: ')'
+    
+- Crossbow:
+    weight: 3
+    probability: 10
+    range: 20
+    char: '^'
+
+missles:
+- Iron Bolt:
+    weight: 2
+    hit: 10
+    char: '_'
+    probability: 10
+    
+- Regular Arrow:
+    weight: 1
+    hit: 5
+    char: '-'
+    probability: 15
+
+lights:
+- Lamp:
+    char: '#'
+    weight: 2
+    radius: 20
+    lasts: 200
+    probability: 20
+
+- Torch:
+    char: ','
+    weight: 1
+    radius: 10
+    lasts: 500
+    probability: 25
+
+food:
+- Food Ration:
+    char: '%'
+    nutrition: 12
+    probability: 8
+
+- Bread:
+    char: '='
+    nutrition: 15
+    probability: 8
+
+- Hunk of Meat:
+    char: 'm'
+    nutrition: 20
+    probability: 7

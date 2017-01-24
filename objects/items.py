@@ -1,4 +1,4 @@
-import colors, consts
+import colors, consts, yaml
 
 class Item:
     def __init__(self, name='Unknown item', weight=1, probability=50, char='*'):
@@ -16,7 +16,7 @@ class Item:
         pass
 
 class Armor(Item):
-    def __init__(self, name='Unknown armor', weight=3, probability=40, char=']', defence=None):
+    def __init__(self, name='Unknown armor', weight=3, probability=40, char=']', defence=1):
         super().__init__(name=name, weight=weight, probability=probability, char=char)
         self.equipped = False
         self.defence = defence
@@ -24,14 +24,14 @@ class Armor(Item):
     def equip(self, player):
         if not self.equipped:
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
-            player.defence += self.defence or self.weight
+            player.defence += self.defence
             player.max_defence = player.defence
             self.equipped = True
 
     def dequip(self, player):
         if self.equipped:
             if consts.DEBUG: print('dequip '+self.name+' ('+str(self.equipped)+')')
-            player.defence -= self.weight
+            player.defence -= self.defence
             player.max_defence = player.defence
             self.equipped = False
     
@@ -110,32 +110,61 @@ class Missle(Item):
                 player.missles.remove(self)
             self.equipped = False
 
-ITEMS = [
-    Weapon('Broad sword', weight=10, attack=20, probability=5, char='|'),
-    Weapon('Fencing foil', weight=1, attack=12, probability=10, char='`'),
-    Weapon('Thrusting sword', weight=5, attack=15, char='/', probability=8),
-    Weapon('Short sword', attack=12, weight=2, char='(', probability=12),
-    Armor('Breastplate', probability=18, char='['),
-    Armor('Chain Mail', probability=13, char='['),
-    Armor('Mythril Mail', weight=0, probability=3, char=']', defence=11),
-    Armor('Plate Armor', weight=10, probability=10, char='&'),
-    Armor('Full Body Armor', weight=20, defence=25, probability=8, char='&'),
-    Armor('Sheild', weight=2, probability=20),
-    Armor('Wood Buckler', weight=3, probability=15, char='}'),
-    Armor('Iron Buckler', weight=6, probability=15, char='{'),
-    Armor('Elven Helm', weight=1, probability=5, char='*'),
-    Armor('Viking Helm', weight=3, probability=8, char='*'),
-    RangedWeapon('Light Bow', weight=1, probability=20, range=10),
-    RangedWeapon('Heavy Bow', weight=3, probability=10, range=20),
-    Missle('Mahogeny Arrow', hit=18, char='_', probability=12),
-    Missle('Iron Arrow', hit=24, char='-', probability=10),
-    Missle(),
-    Light(probability=30),
-    Light('Lamp', weight=2, radius=20, lasts=200, probability=20, char='#'),
-    Food(),
-    Food('Raw Meat', nutrition=20, char='='),
-    Food('Bread', nutrition=15, char='m'),
-]
+yaml_items = {}
+ITEMS = []
+with open("./objects/conf/items.yaml", 'r') as stream:
+    yaml_items = yaml.load(stream)
+
+for w in yaml_items['weapons']:
+    name, props = list(w.items())[0]
+    ITEMS.append(Weapon(name,
+                        weight=props['weight'],
+                        attack=props['attack'],
+                        probability=props['probability'],
+                        char=props['char']))
+    
+for a in yaml_items['armor']:
+    name, props = list(a.items())[0]
+    d = props['weight']
+    if 'defence' in a:
+        d = a['defence']
+    ITEMS.append(Armor(name,
+                       weight=props['weight'],
+                       defence=d,
+                       probability=props['probability'],
+                       char=props['char']))
+
+for r in yaml_items['ranged weapons']:
+    name, props = list(r.items())[0]
+    ITEMS.append(RangedWeapon(name,
+                              weight=props['weight'],
+                              range=props['range'],
+                              probability=props['probability'],
+                              char=props['char']))
+
+for m in yaml_items['missles']:
+    name, props = list(m.items())[0]
+    ITEMS.append(Missle(name,
+                        weight=props['weight'],
+                        hit=props['hit'],
+                        probability=props['probability'],
+                        char=props['char']))
+
+for f in yaml_items['food']:
+    name, props = list(f.items())[0]
+    ITEMS.append(Food(name,
+                        nutrition=props['nutrition'],
+                        probability=props['probability'],
+                        char=props['char']))
+
+for l in yaml_items['lights']:
+    name, props = list(l.items())[0]
+    ITEMS.append(Light(name,
+                       radius=props['radius'],
+                       probability=props['probability'],
+                       weight=props['weight'],
+                       lasts=props['lasts'],
+                       char=props['char']))
 
 for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
 
