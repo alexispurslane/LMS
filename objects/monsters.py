@@ -73,10 +73,10 @@ class Monster:
         choices = self.get_movement_choices(GS['terrain_map'], adj)
 
         if GS['player'].pos in adj:
-            GS['messages'].insert(0, 'The '+self.name+' attacks you suddenly!')
+            GS['messages'].insert(0, 'red: The '+self.name+' attacks you suddenly!')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
-                GS['messages'].insert(0, 'You destroy the sneaky '+self.name)
+                GS['messages'].insert(0, 'yellow: You destroy the sneaky '+self.name)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
@@ -129,27 +129,29 @@ def filtch(self, GS, player):
     
     if len(valid) > 0:
         pos = random.choice(valid)
-        item = random.randint(0, len(player.inventory)-1)
-        iitem = player.inventory[item]
-        player.remove_inventory_item(item)
+        items = list(filter(lambda x: x.weight < 4, player.inventory))
+
+        if len(items) > 0:
+            item = random.choice(items)
+            player.remove_inventory_item(player.inventory.index(item))
         
-        GS['messages'].insert(0, 'The Imp steals your ' + iitem.name + ' and throws it.')
-        GS['terrain_map'].dungeon['items'][pos].append(iitem)
+            GS['messages'].insert(0, 'light_blue: The Imp steals your ' + item.name + ' and throws it.')
+            GS['terrain_map'].dungeon['items'][pos].append(item)
     
 def poison(self, GS, player):
     if player.defence <= 5:
         if player.poisoned <= 0 and random.randint(1, 100) < 80:
             player.poisoned = self.health
-            GS['messages'].insert(0, 'You have been poisoned!')
+            GS['messages'].insert(0, 'green: You have been poisoned!')
     else:
-        GS['messages'].insert(0, 'You\'re armor protects you from bite.')
+        GS['messages'].insert(0, 'grey: You\'re armor protects you from bite.')
  
 def create_monster(name, mon):
     color = None
     try:
         color = getattr(colors, mon['color'])
     except:
-        color = exec(mon['color'])
+        color = eval(mon['color'])
         
     globals()[name] = Monster(name,
                               mon['char'],

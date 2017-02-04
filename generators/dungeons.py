@@ -89,7 +89,8 @@ def generate_new_standard_dungeon_map(self):
                     y_i += 1
 
                 m.pos = utils.tuple_add(m.pos, offset)
-                if m and self.is_walkable(m.pos) and self.get_type(m.pos) == 'FLOOR':
+                if m and self.is_walkable(m.pos) and self.get_type(m.pos) == 'FLOOR'\
+                   and room != self.dungeon['rooms'][1]:
                     proweling_monsters.append(m)
                     
             self.dungeon['monsters'] = proweling_monsters

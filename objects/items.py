@@ -115,56 +115,29 @@ ITEMS = []
 with open("./objects/conf/items.yaml", 'r') as stream:
     yaml_items = yaml.load(stream)
 
-for w in yaml_items['weapons']:
-    name, props = list(w.items())[0]
-    ITEMS.append(Weapon(name,
-                        weight=props['weight'],
-                        attack=props['attack'],
-                        probability=props['probability'],
-                        char=props['char']))
-    
-for a in yaml_items['armor']:
-    name, props = list(a.items())[0]
-    d = props['weight']
-    if 'defence' in a:
-        d = a['defence']
-    ITEMS.append(Armor(name,
-                       weight=props['weight'],
-                       defence=d,
-                       probability=props['probability'],
-                       char=props['char']))
+def create_items(tipe):
+    for i in yaml_items[tipe]:
+        name, props = list(i.items())[0]
+        klass = ''.join(x for x in tipe.title() if not x.isspace()).rstrip('s')
+        code = klass+'("'+name+'",'
+        for k, v in props.items():
+            if k == 'color':
+                v = getattr(colors, v)
 
-for r in yaml_items['ranged weapons']:
-    name, props = list(r.items())[0]
-    ITEMS.append(RangedWeapon(name,
-                              weight=props['weight'],
-                              range=props['range'],
-                              probability=props['probability'],
-                              char=props['char']))
+            if isinstance(v,str):
+                code += k+'="'+v+'",'
+            else:
+                code += k+'='+str(v)+','
 
-for m in yaml_items['missles']:
-    name, props = list(m.items())[0]
-    ITEMS.append(Missle(name,
-                        weight=props['weight'],
-                        hit=props['hit'],
-                        probability=props['probability'],
-                        char=props['char']))
+        code = code.rstrip(',')+')'
+        ITEMS.append(eval(code))
 
-for f in yaml_items['food']:
-    name, props = list(f.items())[0]
-    ITEMS.append(Food(name,
-                        nutrition=props['nutrition'],
-                        probability=props['probability'],
-                        char=props['char']))
-
-for l in yaml_items['lights']:
-    name, props = list(l.items())[0]
-    ITEMS.append(Light(name,
-                       radius=props['radius'],
-                       probability=props['probability'],
-                       weight=props['weight'],
-                       lasts=props['lasts'],
-                       char=props['char']))
+create_items('weapons')
+create_items('armor')
+create_items('ranged weapons')
+create_items('missles')
+create_items('food')
+create_items('lights')
 
 for i in ITEMS: globals()[i.name.replace(' ', '_').upper()] = i
 

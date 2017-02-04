@@ -31,13 +31,13 @@ class Player:
         self.inventory = self.inventory+[items.FOOD_RATION]*8
         self.dequips = []
         
-        for item in self.inventory:
-            item.equip(self)
-        
         # Book-keeping
         self.ranged_weapon = None
         self.missles = []
-
+ 
+        for item in self.inventory:
+            item.equip(self)
+       
     # Calculate the player's overall score.
     def score(self, GS):
         return math.floor(GS['turns']/10) +\
@@ -64,7 +64,7 @@ class Player:
         prevlev = self.level
         self.level = s
         if self.level > prevlev:
-            GS['messages'].insert(0, 'YOU HAVE LEVELED UP TO LEVEL '+str(self.level))
+            GS['messages'].insert(0, 'green: You have leveled up to level '+str(self.level))
             
         ratio = self.health/self.max_health
         self.max_health = (self.level+1)*self.race.level_up_bonus
@@ -161,7 +161,7 @@ class Player:
             item.lasts -= 1
             if item.lasts <= 0:
                 item.dequip(self)
-                GS['messages'].insert(0, 'Your '+item.name+' flickers out.')
+                GS['messages'].insert(0, 'yellow: Your '+item.name+' flickers out.')
                 self.dequips.remove(item)
                 
         if self.health < self.max_health and GS['turns'] % 3 == 0:
@@ -171,7 +171,7 @@ class Player:
             self.hunger += 1
 
         if self.hunger > 20 and GS['turns'] % 3 == 0:
-            GS['messages'].insert(0, 'You feel hungry.')
+            GS['messages'].insert(0, 'red: You feel hungry.')
             self.health -= 1
 
         delta = consts.GAME_KEYS['M'][event.keychar]
@@ -181,14 +181,14 @@ class Player:
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
            GS['terrain_map'].is_dungeons():
            
-            GS['messages'].insert(0, "You decend.")
+            GS['messages'].insert(0, "blue: You decend.")
             self.pos = GS['terrain_map'].generate_new_map()
 
         if new_pos == GS['terrain_map'].dungeon['up_stairs'] and\
            len(GS['terrain_map'].dungeons) > 0:
             
             if GS['terrain_map'].restore_dungeon(GS['terrain_map'].dungeon_level-1):
-                GS['messages'].insert(0, "You ascend.")
+                GS['messages'].insert(0, "blue: You ascend.")
                 self.pos = GS['terrain_map'].dungeon['player_starting_pos']
                 
         if new_pos in GS['terrain_map'].dungeon['doors'] and\
@@ -206,12 +206,12 @@ class Player:
             self.prev_pos = self.pos
             self.pos = new_pos
             if new_pos in GS['terrain_map'].dungeon['water']:
-                GS['messages'].insert(0, "You slosh through the cold water.")
+                GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:
             if GS['terrain_map'].in_area(new_pos) == 'Cave':
                 GS['terrain_map'].place_cell(new_pos)
             else:
-                GS['messages'].insert(0, "You hit a wall. Stoppit.")
+                GS['messages'].insert(0, "grey: You hit a wall. Stoppit.")
                 new_pos = self.pos
                 n_x, n_y = new_pos
             
@@ -223,20 +223,18 @@ class Player:
             
         if m != None:
             (self_dead, monster_dead) = self.attack_monster(GS, m)
-            GS['messages'].insert(0, "You attack the "+m.name)
+            GS['messages'].insert(0, "green: You attack the "+m.name)
             
             if not monster_dead:
-                GS['messages'].insert(0, "The "+m.name+" attacks you")
-                GS['messages'].insert(0, "It's health is now "+str(m.health))
+                GS['messages'].insert(0, "red: The "+m.name+" attacks you")
+                GS['messages'].insert(0, "red: It's health is now "+str(m.health))
             else:
-                GS['messages'].insert(0, "You vanquish the "+m.name)
+                GS['messages'].insert(0, "green: You vanquish the "+m.name)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
                 
-            if self_dead:
-                GS['messages'].insert(0, "You have died.")
-                GS['screen'] = 'DEATH'
+            if self_dead: GS['screen'] = 'DEATH'
                 
             self.speed = speed
 

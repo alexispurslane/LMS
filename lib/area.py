@@ -13,6 +13,10 @@ class Area:
                                         'Planted', 'Planted', 'Planted'])
         if at: self.area_type = at
         
+    # Check equality
+    def __eq__(self, other):
+        return other != None and self.__dict__ == other.__dict__
+    
     def inside(self, pos):
         x1, y1 = self.pos1
         x2, y2 = self.pos2
@@ -97,7 +101,7 @@ class Room(Area):
             else:
                 tmap.dungeon['items'][pos] = []
                 
- 
+
     # Draws the room into the supplied terrain map.
     def draw_into_map(self, i, tmap):
         spacing = random.randint(4, 31)

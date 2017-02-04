@@ -15,7 +15,7 @@ MAX_ROOMS        = 70
 ITEMS_PER_ROOM   = 2
 DUNGEON_LEVELS   = 20
 DEBUG            = True
-DIFFICULTY       = 15
+DIFFICULTY       = 13
 
 MIN_ROOM_WIDTH = 8
 MIN_ROOM_HEIGHT = 4
@@ -68,9 +68,9 @@ def pickup(GS, p):
 def auto_rest(GS, p):
     while p.health < p.max_health:
         p.rest()
-        if self.poisoned > 0 and GS['turns'] % 4:
-            self.poisoned -= 2
-            self.health -= 1
+        if p.poisoned > 0 and GS['turns'] % 4:
+            p.poisoned -= 2
+            p.health -= 1
         if GS['turns'] % 6 == 0:
             p.hunger += 1
         utils.monster_turn(GS)

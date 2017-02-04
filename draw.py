@@ -8,12 +8,8 @@ def display_stat(name, obj):
     b = getattr(obj, name)
     return '%d/%d' % (b, a)
 
-def draw_hud_screen(GS, edge_pos):
+def draw_stats(GS, edge_pos):
     console = GS['console']
-    if not GS['messages']:
-        GS['messages'] = []
-        
-    #################### DRAW HEADS-UP DISPLAY ####################
     player = GS['player']
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: '+display_stat('health', player))
@@ -80,20 +76,30 @@ def draw_hud_screen(GS, edge_pos):
     # Game State
     console.drawStr(base, start+11, 'Turn '+str(GS['turns']))
     console.drawStr(base+bounds+4, start+11, 'Score: '+str(player.score(GS)))
-    
-    #################### DRAW MESSAGES ####################
+
+def draw_messages(GS, edge_pos):
+    console = GS['console']
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
         GS['messages'] = [GS['messages'][0]]
         
     for (i, m) in enumerate(reversed(GS['messages'])):
-        c = int((i + 1) * (255 / len(GS['messages'])))
-        c = max(0, min(c, 255))
-        
-        if len(m) > consts.WIDTH-1:
-            m = m[:consts.WIDTH-1]
-        GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, m, fg=(c, c, c))
+        color = colors.white
+        message = m
+        if len(m.split(': ')) > 1:
+            color = eval("colors." + m.split(': ')[0])
+            message = m.split(': ')[1]
+            
+        GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, message, fg=color)
 
     return GS['messages']
+    
+def draw_hud_screen(GS, edge_pos):
+    console = GS['console']
+    if not GS['messages']:
+        GS['messages'] = []
+        
+    draw_stats(GS, edge_pos)
+    return draw_messages(GS, edge_pos)
 
 def draw_inventory_screen(GS, edge_pos):
     console = GS['console']
@@ -242,8 +248,12 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         console.drawChar(x, y, '<', fg=colors.grey, bg=colors.blue)
     elif pos in terrain_map.dungeon['items'] and terrain_map.dungeon['items'][pos] != []:
         items = terrain_map.dungeon['items'][pos]
+        back = (12,12,12)
+        if len(items) > 1:
+            back = colors.white
         console.drawChar(x, y, items[-1].char,
-                            fg=colors.tint(items[-1].fg, tint))
+                         fg=colors.tint(items[-1].fg, tint),
+                         bg=back)
     elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
         decor = terrain_map.dungeon['decor']
         if decor[pos] == 'FM':

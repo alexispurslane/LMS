@@ -153,6 +153,7 @@ class TerrainMap:
     # Generates a new dungeon map (ridirected to dungeons.py)
     # and saves it to the level list.
     def generate_new_dungeon_map(self):
+        self.dungeon_level += 1
         return dungeons.generate_new_dungeon_map(self)
 
     # Generates the final level.
