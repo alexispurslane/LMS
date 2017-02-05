@@ -26,53 +26,63 @@ weapons:
 armor:
 - Breastplate:
     char: '['
+    color: brown
     weight: 3
     probability: 18
 
 - Chain Mail:
     char: '['
     weight: 5
+    color: grey
     probability: 13
 
 - Mythril Mail:
-    char: ']'
+    char: '['
     weight: 0
+    color: white
     defence: 11
     probability: 3
 
 - Plate Armor:
     char: '&'
+    color: grey
     weight: 10
     probability: 10
 
 - Full Body Armor:
     char: '&'
+    color: dark_grey
     weight: 20
     defence: 25
     probability: 8
 
 - Sheild:
-    char: ']'
+    char: '}'
+    color: grey
     weight: 2
     probability: 20
 
 - Wood Buckler:
     char: '}'
+    color: brown
     weight: 3
     probability: 15
 
 - Iron Buckler:
-    char: '{'
+    char: '}'
+    color: dark_grey
     weight: 6
     probability: 15
 
 - Elven Helm:
     char: '*'
+    color: grey
     weight: 1
     probability: 5
 
 - Viking Helm:
     char: '*'
+    color: brown
     weight: 3
     probability: 8
 

@@ -34,10 +34,15 @@ class Player:
         # Book-keeping
         self.ranged_weapon = None
         self.missles = []
- 
+
         for item in self.inventory:
             item.equip(self)
-       
+
+    def has(self, x):
+        return len([y for y in self.inventory
+                    if y.equipped and
+                    (x.name == y.name or y.char == x.char)]) > 0
+            
     # Calculate the player's overall score.
     def score(self, GS):
         return math.floor(GS['turns']/10) +\
@@ -181,14 +186,14 @@ class Player:
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
            GS['terrain_map'].is_dungeons():
            
-            GS['messages'].insert(0, "blue: You decend.")
+            GS['messages'].insert(0, "light_blue: You decend.")
             self.pos = GS['terrain_map'].generate_new_map()
 
         if new_pos == GS['terrain_map'].dungeon['up_stairs'] and\
            len(GS['terrain_map'].dungeons) > 0:
             
             if GS['terrain_map'].restore_dungeon(GS['terrain_map'].dungeon_level-1):
-                GS['messages'].insert(0, "blue: You ascend.")
+                GS['messages'].insert(0, "light_blue: You ascend.")
                 self.pos = GS['terrain_map'].dungeon['player_starting_pos']
                 
         if new_pos in GS['terrain_map'].dungeon['doors'] and\
@@ -205,6 +210,9 @@ class Player:
            new_pos >= (0,0):
             self.prev_pos = self.pos
             self.pos = new_pos
+            items = GS['terrain_map'].dungeon['items'][self.pos]
+            for e in items:
+                GS['messages'].insert(0, "You find a " + e.name + ".")
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:

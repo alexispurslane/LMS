@@ -81,25 +81,21 @@ def auto_rest(GS, p):
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
     if p.ranged_weapon != None:
-        click = tdl.event.wait(timeout=1000, flush=True)
-        if click and click.type == 'MOUSEDOWN' and click.button == 'LEFT':
+        click = tdl.event.wait(timeout=None, flush=True)
+        print(click.__dict__)
+        if click and click.type == 'MOUSEUP' and click.button == 'LEFT':
             target = GS['terrain_map'].monster_at(click.cell)
             if target:
                 missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
                 target.health -= missle.hit
                 p.missles.remove(missle)
-                adj = [
-                    (-1, 0),
-                    (1, 0),
-                    (0, -1),
-                    (0, 1)
-                ]
+                adj = [(-1, 0), (1, 0), (0, -1), (0, 1)]
                 for a in adj:
                     pos = utils.tuple_add(target.pos, adj)
                     if GS['terrain_map'].get_type(x, y) != 'STONE':
                         GS['terrain_map'].dungeon['items'][pos] = missle
         else:
-            GS['messages'].insert(0, 'Nevermind.')
+            GS['messages'].insert(0, 'green: Nevermind.')
 
 # Switches between inventory and HUD screens.
 def inventory(GS, p):

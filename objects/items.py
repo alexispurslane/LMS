@@ -1,12 +1,13 @@
 import colors, consts, yaml
 
 class Item:
-    def __init__(self, name='Unknown item', weight=1, probability=50, char='*'):
+    def __init__(self, name='Unknown item', weight=1,
+                         probability=50, char='*', color=colors.grey):
         self.name = name
         self.weight = weight
         self.probability = probability
         self.char = char
-        self.fg = colors.grey
+        self.fg = color
         self.equipped = False
 
     def __eq__(self, other):
@@ -16,13 +17,15 @@ class Item:
         pass
 
 class Armor(Item):
-    def __init__(self, name='Unknown armor', weight=3, probability=40, char=']', defence=1):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Unknown armor', weight=3,
+                         probability=40, char=']', defence=1, color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.equipped = False
         self.defence = defence
 
     def equip(self, player):
-        if not self.equipped:
+        if not self.equipped and not player.has(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.defence += self.defence
             player.max_defence = player.defence
@@ -36,13 +39,15 @@ class Armor(Item):
             self.equipped = False
     
 class Weapon(Item):
-    def __init__(self, name='Unknown weapon', weight=2, attack=5, probability=20, char='|'):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Unknown weapon', weight=2, attack=5,
+                         probability=20, char='|', color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.attack = attack
         self.equipped = False
         
     def equip(self, player):
-        if not self.equipped:
+        if not self.equipped and not player.has(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = self.attack
             self.equipped = True
@@ -54,8 +59,10 @@ class Weapon(Item):
             self.equipped = False
 
 class Light(Item):
-    def __init__(self, name='Torch', weight=1, radius=10, lasts=500, probability=55, char='\\'):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Torch', weight=1, radius=10, lasts=500,
+                         probability=55, char='\\', color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.radius = radius
         self.lasts = lasts
 
@@ -68,8 +75,10 @@ class Light(Item):
         p.light_source_radius = 1
 
 class Food(Item):
-    def __init__(self, name='Food Ration', weight=0, nutrition=10, probability=55, char='%'):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Food Ration', weight=0, nutrition=10,
+                         probability=55, char='%', color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.nutrition = nutrition
 
     def equip(self, p):
@@ -81,26 +90,34 @@ class Food(Item):
         pass
 
 class RangedWeapon(Item):
-    def __init__(self, name='Unknown ranged weapon', weight=2, probability=20, char=')',
-                 missle_type='Arrow', range=8):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Unknown ranged weapon', weight=2,
+                         probability=20, char=')',
+                 missle_type='Arrow', range=8, color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.missle_type = missle_type
         self.range = range
 
     def equip(self, player):
-        player.ranged_weapon = self
+        if not self.equipped:
+            player.ranged_weapon = self
+            self.equipped = True
 
     def dequip(self, player):
-        player.ranged_weapon = None
+        if self.equipped:
+            player.ranged_weapon = None
+            self.equipped = false
 
 class Missle(Item):
-    def __init__(self, name='Regular Arrow', weight=0, probability=45, char='-', hit=15):
-        super().__init__(name=name, weight=weight, probability=probability, char=char)
+    def __init__(self, name='Regular Arrow', weight=0,
+                         probability=45, char='-', hit=15, color=colors.grey):
+        super().__init__(name=name, weight=weight,
+                         probability=probability, char=char, color=color)
         self.missle_type = name.split()[1]
         self.hit = hit
 
     def equip(self, player):
-        if not self.equipped:
+        if not self.equipped and not player.has(self):
             player.missles.append(self)
             self.equipped = True
 
