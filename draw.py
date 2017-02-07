@@ -15,7 +15,7 @@ def draw_stats(GS):
     bounds = len('Health: ')+3
     start = consts.MESSAGE_NUMBER
 
-    console.drawStr(base, start-1, '-'*(base-1))
+    console.drawStr(base, start-1, chr(196)*(base-1))
 
     # Description
     console.drawStr(base, start, player.race.name + ' ('+player.attributes()+')')
@@ -151,15 +151,15 @@ def draw_man_screen(GS):
 def draw_hud(GS):
     consts.EDGE_POS = math.ceil(consts.WIDTH/2)+2
     for i in range(0, consts.HEIGHT):
-        GS['console'].drawChar(consts.EDGE_POS-2, i, '|')
+        GS['console'].drawChar(consts.EDGE_POS-2, i, chr(179))
         
     return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS)
 
 frame = 0
 def draw_screen(GS):
+    console = GS['console']
     global frame
     
-    console = GS['console']
     console.clear()
 
     globals()['draw_'+GS['screen'].lower()+'_screen'](GS, frame)
@@ -303,15 +303,15 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
     elif terrain_map.get_type(pos) == 'STONE':
         area = terrain_map.in_area(pos)
         color = colors.tint(colors.darkmed_grey, tint)
+        char = chr(consts.TCOD_CHAR_BLOCK2)
         if area == 'Marble':
             color = colors.tint(colors.white, tint)
+            char = chr(consts.TCOD_CHAR_BLOCK3)
         elif area == 'Cave':
             color = colors.tint(colors.brown, tint)
+            char = chr(consts.TCOD_CHAR_BLOCK1)
         
-        console.drawChar(x, y, ' ', bg=color) 
-    if pos in terrain_map.dungeon['numbers']:
-        n = terrain_map.dungeon['numbers'][pos]
-        console.drawStr(x, y, str(n), fg=colors.extreme_lighten((n, n, n)))
+        console.drawChar(x, y, char, bg=color) 
 
 def draw_forest_tile(terrain_map, console, pos, tint):
     (x, y) = pos
@@ -338,11 +338,25 @@ def draw_forest_tile(terrain_map, console, pos, tint):
 def draw_line(GS, a, b, char, start_char=None, end_char=None):
     console = GS['console']
 
-    line(console, a[0], a[1], b[0], b[1], char)
+    going_right = a[0] > b[0]
+    vertical_up =  a[0] == b[0] and a[1] > b[1]
+    vertical_down =  a[0] == b[0] and a[1] <= b[1]
+    if vertical_up:
+        char = chr(consts.TCOD_CHAR_ARROW_N)
+    elif vertical_down:
+        char = chr(consts.TCOD_CHAR_ARROW_S)
+    elif going_right:
+        char = chr(consts.TCOD_CHAR_ARROW_W)
+    elif not going_right:
+        char = chr(consts.TCOD_CHAR_ARROW_E)
+        
+    result = line(console, a[0], a[1], b[0], b[1], char)
+    
     if start_char:
         console.drawChar(a[0], a[1], start_char, fg=colors.white, bg=colors.black)
     if end_char:
         console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
+    return result
 
 def line(console, x0, y0, x1, y1, char):
     "Bresenham's line algorithm"
@@ -354,18 +368,24 @@ def line(console, x0, y0, x1, y1, char):
     if dx > dy:
         err = dx / 2.0
         while x != x1:
+            c = console.get_char(x, y)[0]
+            if c >= 176 and c <= 178: return False
             console.drawChar(x, y, char, fg=colors.light_blue)
             err -= dy
             if err < 0:
                 y += sy
                 err += dx
             x += sx
+        return True
     else:
         err = dy / 2.0
         while y != y1:
+            c = console.get_char(x, y)[0]
+            if c >= 176 and c <= 178: return False
             console.drawChar(x, y, char, fg=colors.light_blue)
             err -= dx
             if err < 0:
                 x += sx
                 err += dy
             y += sy
+        return True
