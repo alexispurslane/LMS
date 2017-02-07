@@ -2,7 +2,7 @@ import random, math, yaml, copy, os
 import colors, utils, consts, items
 
 class Monster:
-    def __init__(self, name, char, fg, speed=0, health=0, attack=0, special_action=lambda self, GS, p: -1):
+    def __init__(self, name, char, fg, speed=0, health=0, attack=0, special_action=lambda self, GS, p: -1, agressive=False):
         self.char = char
         self.name = name
         self.pos = (0, 0)
@@ -11,6 +11,7 @@ class Monster:
         self.health = health
         self.attack = attack
         self.special_action = special_action
+        self.agressive = agressive
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
         if self.health >= 20:
             self.drops.append(items.ITEMS)
@@ -23,13 +24,15 @@ class Monster:
 
     # Decide wether to approach the player or not.
     def choose(self, player, lst, key):
-        if self.speed > player.speed:
+        if self.agressive:
+            return min(lst, key=key)
+        elif self.speed > player.speed:
             if self.health > player.health:
                 return min(lst, key=key)
             else:
                 return max(lst, key=key)
         else:
-            if math.floor(player.health/self.attack) <= 2:
+            if player.attack < self.attack:
                 return min(lst, key=key)
             elif self.health > player.health:
                 return min(lst, key=key)
@@ -60,12 +63,8 @@ class Monster:
     # Move monster according to choose() and deal with movement effects.
     def move(self, GS):
         x, y = self.pos
-        adj = [
-            (x+1, y),
-            (x-1, y),
-            (x, y+1),
-            (x, y-1)
-        ]
+        adj = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
+        
         sight = int(self.speed/2)
         if sight < 8: sight = 8
         if GS['player'].light(): sight = 3
@@ -84,15 +83,14 @@ class Monster:
                 else:
                     GS['terrain_map'].dungeon['items'][self.pos] = [random.choice(self.drops)]
         elif utils.dist(self.pos, GS['player'].pos) <= sight:
-            if random.randint(0, 20) <= self.speed: # Monster moves in proactive direction.
-                if len(choices) > 0:
-                    self.pos = self.choose(
-                        GS['player'],
-                        choices,
-                        lambda p: utils.dist(p, GS['player'].pos))
-            else:                            # Monster moves in random direction.
-                if len(choices) >= 2:
-                    self.pos = random.choice(choices)
+            if len(choices) > 0:
+                self.pos = self.choose(
+                    GS['player'],
+                    choices,
+                    lambda p: utils.dist(p, GS['player'].pos))
+        else:                            # Monster moves in random direction.
+            if len(choices) >= 2:
+                self.pos = random.choice(choices)
 
 
 ############################ MONSTER ACTIONS ############################ 

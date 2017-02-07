@@ -203,19 +203,21 @@ class TerrainMap:
 
     # Calculates the player's visited map and current FoV, then draws the visited
     # map while brightening the player's FoV.
-    def draw_map(self, GS, console, player):
+    def draw_map(self, GS, console, player, frame):
         if consts.FOV:
             rad = player.light_source_radius
 
             x, y = player.pos
             fov = self.dungeon['visited'].compute_fov(
                 x, y,
+                fov='DIAMOND',
                 cumulative=consts.CUMULATE_FOV,
                 radius=rad,
                 sphere=True)
             
             fov2 = self.dungeon['lighted'].compute_fov(
                 x, y,
+                fov='DIAMOND',
                 radius=rad,
                 sphere=True)
             fov2 = [(f[0], f[1]) for f in fov2]
@@ -232,7 +234,7 @@ class TerrainMap:
         for x, y in fov:
             tint = (-80, -80, -80)
             if (x, y) in fov2:
-                tint = (0, 0, 0)
+                tint = (0,0,0)
                 
             if self.is_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)

@@ -116,14 +116,14 @@ lights:
 - Lamp:
     char: '#'
     weight: 2
-    radius: 20
+    radius: 10
     lasts: 200
     probability: 20
 
 - Torch:
     char: ','
     weight: 1
-    radius: 10
+    radius: 5
     lasts: 500
     probability: 25
 

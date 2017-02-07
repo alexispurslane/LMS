@@ -210,9 +210,15 @@ class Player:
            new_pos >= (0,0):
             self.prev_pos = self.pos
             self.pos = new_pos
-            items = GS['terrain_map'].dungeon['items'][self.pos]
-            for e in items:
-                GS['messages'].insert(0, "You find a " + e.name + ".")
+            di = GS['terrain_map'].dungeon['items']
+            if self.pos in di:
+                i = di[self.pos]
+                for e in i:
+                    GS['messages'].insert(0, "You find a " + e.name + ".")
+                    if isinstance(e, items.Light) or isinstance(e, items.Food)\
+                       or isinstance(e, items.Missle):
+                        GS['messages'].insert(0, "You pick up a " + e.name + ".")
+                        self.add_inventory_item(e)
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:

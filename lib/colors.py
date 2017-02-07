@@ -1,5 +1,6 @@
 brown = (130, 82, 1)
-dark_brown = (100, 52, 0)
+dark_brown = (90, 42, 0)
+
 black = (0,0,0)
 white = (255,255,255)
 

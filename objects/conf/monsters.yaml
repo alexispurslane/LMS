@@ -5,6 +5,7 @@ monsters:
     speed: 1
     health: 80
     attack: 8
+    agressive: True
 
 - BabyDragon:
     char: d
@@ -19,6 +20,7 @@ monsters:
     health: 300
     speed: 15
     attack: 80
+    agressive: True
 
 - Goblin:
     char: g
@@ -26,6 +28,7 @@ monsters:
     speed: 3
     health: 26
     attack: 12
+    agressive: True
 
 - Giant:
     char: G
@@ -33,6 +36,7 @@ monsters:
     health: 50
     speed: 20
     attack: 25
+    agressive: True
   
 - Slime:
     char: s
@@ -49,6 +53,7 @@ monsters:
     speed: 4
     attack: 7
     action: filtch
+    agressive: True
   
 - Snake:
     char: S
@@ -79,6 +84,7 @@ monsters:
     speed: 10
     health: 80
     attack: 7
+    agressive: True
 
 - FlyingDragon:
     char: F

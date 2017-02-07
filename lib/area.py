@@ -60,11 +60,11 @@ class Room(Area):
             self.center = (math.floor((self.pos1[0] + self.pos2[0]) / 2),
                            math.floor((self.pos1[1] + self.pos2[1]) / 2))
         elif self.room_type == 'Sanctuary':
-            if w < 6:
+            if w < 9:
                 self.room_type = 'Square'
                 
             self.center = utils.tuple_add(self.pos1, (math.ceil(w/2),
-                                                math.ceil(h/2)))
+                                                      math.ceil(h/2)))
         else:
             self.center = utils.tuple_add(self.pos1, (math.ceil(w/2),
                                                 math.ceil(h/2)))

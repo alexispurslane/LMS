@@ -8,11 +8,11 @@ def display_stat(name, obj):
     b = getattr(obj, name)
     return '%d/%d' % (b, a)
 
-def draw_stats(GS, edge_pos):
+def draw_stats(GS):
     console = GS['console']
     player = GS['player']
     base = math.ceil(consts.WIDTH/2)+1
-    bounds = len('Health: '+display_stat('health', player))
+    bounds = len('Health: ')+3
     start = consts.MESSAGE_NUMBER
 
     console.drawStr(base, start-1, '-'*(base-1))
@@ -27,13 +27,17 @@ def draw_stats(GS, edge_pos):
         color = colors.green
     elif hp >= 40:
         color = colors.yellow
-        
-    console.drawStr(base, start+1, 'Health: '+display_stat('health', player),
-                    fg=color)
-    
-    if player.poisoned > 0:
-        console.drawStr(base+bounds+4, start+1, '(poisoned)', fg=colors.green)
 
+    ratio = (consts.WIDTH-base - (9+len('Health: ')))/player.max_health
+    bar = " "*math.floor(ratio*player.health)
+    underbar = " "*math.ceil(ratio*(player.max_health - player.health))
+    console.drawStr(base, start+1, 'Health: ', fg=colors.white)
+    console.drawStr(base+bounds, start+1, bar, bg=color)
+    color2 = colors.dark_grey
+    if player.poisoned:
+        color2 = colors.extreme_darken(colors.dark_green)
+    console.drawStr(base+bounds+len(bar), start+1, underbar, bg=color2)
+    
     # Hunger
     if player.hunger >= 40:
         console.drawStr(base+bounds+4, start+2, 'Very Hungry', fg=colors.red)
@@ -77,7 +81,7 @@ def draw_stats(GS, edge_pos):
     console.drawStr(base, start+11, 'Turn '+str(GS['turns']))
     console.drawStr(base+bounds+4, start+11, 'Score: '+str(player.score(GS)))
 
-def draw_messages(GS, edge_pos):
+def draw_messages(GS):
     console = GS['console']
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
         GS['messages'] = [GS['messages'][0]]
@@ -93,15 +97,15 @@ def draw_messages(GS, edge_pos):
 
     return GS['messages']
     
-def draw_hud_screen(GS, edge_pos):
+def draw_hud_screen(GS):
     console = GS['console']
     if not GS['messages']:
         GS['messages'] = []
         
-    draw_stats(GS, edge_pos)
-    return draw_messages(GS, edge_pos)
+    draw_stats(GS)
+    return draw_messages(GS)
 
-def draw_inventory_screen(GS, edge_pos):
+def draw_inventory_screen(GS):
     console = GS['console']
     lst = groupby(GS['player'].inventory)
     for (i, grp) in enumerate(lst):
@@ -130,26 +134,26 @@ def draw_inventory_screen(GS, edge_pos):
         except:
             pass
         
-        console.drawStr(edge_pos+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
+        console.drawStr(consts.EDGE_POS+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
                         bg=color)
 
-def draw_man_screen(GS, edge_pos):
+def draw_man_screen(GS):
     with open('manual.txt', 'r') as myfile:
         manual = myfile.read().split("\n")
         
         for (i, line) in enumerate(manual):
             if line != '' and line[0] == '*':
-                GS['console'].drawStr(edge_pos-1, i, line, fg=colors.red)
+                GS['console'].drawStr(consts.EDGE_POS-1, i, line, fg=colors.red)
             else:
-                GS['console'].drawStr(edge_pos, i, line)
+                GS['console'].drawStr(consts.EDGE_POS, i, line)
     return GS['messages']
         
 def draw_hud(GS):
-    edge_pos = math.ceil(consts.WIDTH/2)+2
+    consts.EDGE_POS = math.ceil(consts.WIDTH/2)+2
     for i in range(0, consts.HEIGHT):
-        GS['console'].drawChar(edge_pos-2, i, '|')
+        GS['console'].drawChar(consts.EDGE_POS-2, i, '|')
         
-    return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS, edge_pos)
+    return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS)
 
 frame = 0
 def draw_screen(GS):
@@ -221,7 +225,7 @@ def draw_death_screen(GS, frame):
 def draw_game_screen(GS, frame):
     console = GS['console']
     GS['messages'] = draw_hud(GS)
-    GS['terrain_map'].draw_map(GS, GS['console'], GS['player'])
+    GS['terrain_map'].draw_map(GS, GS['console'], GS['player'], frame)
     
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
@@ -273,7 +277,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
                 elif area == 'Cave':
                     color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
 
-                console.drawChar(x, y, ' ', bg=color)
+                console.drawChar(x, y, ' ', fg=colors.darkmed_grey, bg=color)
         elif decor[pos] == 'FR':
             console.drawChar(x, y, '^', fg=colors.darken(colors.red),
                              bg=colors.red)
@@ -288,7 +292,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         elif area == 'Cave':
             color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
             
-        console.drawChar(x, y, ' ', bg=color)
+        console.drawChar(x, y, ' ', fg=colors.darkmed_grey, bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
             console.drawChar(x, y, '-', fg=colors.tint(colors.brown, tint),
@@ -330,3 +334,38 @@ def draw_forest_tile(terrain_map, console, pos, tint):
         console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.grey)
     elif terrain_map.get_type(x, y) == 'TREE':
         console.drawChar(x, y, 'T', fg=colors.tint(colors.green, tint))
+
+def draw_line(GS, a, b, char, start_char=None, end_char=None):
+    console = GS['console']
+
+    line(console, a[0], a[1], b[0], b[1], char)
+    if start_char:
+        console.drawChar(a[0], a[1], start_char, fg=colors.white, bg=colors.black)
+    if end_char:
+        console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
+
+def line(console, x0, y0, x1, y1, char):
+    "Bresenham's line algorithm"
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)
+    x, y = x0, y0
+    sx = -1 if x0 > x1 else 1
+    sy = -1 if y0 > y1 else 1
+    if dx > dy:
+        err = dx / 2.0
+        while x != x1:
+            console.drawChar(x, y, char, fg=colors.light_blue)
+            err -= dy
+            if err < 0:
+                y += sy
+                err += dx
+            x += sx
+    else:
+        err = dy / 2.0
+        while y != y1:
+            console.drawChar(x, y, char, fg=colors.light_blue)
+            err -= dx
+            if err < 0:
+                x += sx
+                err += dy
+            y += sy

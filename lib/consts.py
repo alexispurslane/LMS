@@ -11,13 +11,14 @@ FOV              = True
 CUMULATE_FOV     = True
 MESSAGE_NUMBER   = HEIGHT-12
 FOREST_LEVELS    = 0
-MAX_ROOMS        = 70
+MAX_ROOMS        = 85
 ITEMS_PER_ROOM   = 2
-DUNGEON_LEVELS   = 20
-DEBUG            = True
-DIFFICULTY       = 13
+DUNGEON_LEVELS   = 10
+DEBUG            = False
+DIFFICULTY       = 14
+EDGE_POS         = math.ceil(WIDTH/2)+2
 
-MIN_ROOM_WIDTH = 8
+MIN_ROOM_WIDTH = 4
 MIN_ROOM_HEIGHT = 4
 MAX_ROOM_SIZE = math.floor(WIDTH/8.83)
 
@@ -80,22 +81,38 @@ def auto_rest(GS, p):
 # Fire the first available missle using the player's current ranged weapon at
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
-    if p.ranged_weapon != None:
-        click = tdl.event.wait(timeout=None, flush=True)
-        print(click.__dict__)
-        if click and click.type == 'MOUSEUP' and click.button == 'LEFT':
-            target = GS['terrain_map'].monster_at(click.cell)
+    ms = list(filter(lambda m:
+                     utils.dist(m.pos, p.pos) < p.ranged_weapon.range and\
+                     GS['terrain_map'].dungeon['lighted'].fov[m.pos],
+                     GS['terrain_map'].dungeon['monsters']))
+    for i, m in enumerate(ms):
+        draw.draw_line(GS, p.pos, m.pos, '*', '@', str(i))
+
+    if len(ms) > 0:
+        key = tdl.event.wait(timeout=None, flush=True)
+        while not key.keychar.isnumeric() and key.keychar != 'ESCAPE':
+            GS['messages'].insert(0, 'Please type number or ESC.')
+            draw.draw_hud_screen(GS)
+            key = tdl.event.wait(timeout=None, flush=True)
+
+        if key.keychar != 'ESCAPE':
+            target = ms[int(key.keychar)%len(ms)]
             if target:
-                missle = list(filter(lambda m: m.missle_type == p.ranged_weapon.missle_type, p.missles))[0]
+                missle = list(filter(lambda m:
+                                    p.ranged_weapon.missle_type in m.missle_type,
+                                    p.missles))[-1]
                 target.health -= missle.hit
                 p.missles.remove(missle)
-                adj = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                adj = list(map(lambda a: utils.tuple_add(target.pos, a),
+                            [(-1, 0), (1, 0), (0, -1), (0, 1)]))
+                adj.remove(min(adj, key=lambda a: utils.dist(a, p.pos)))
                 for a in adj:
-                    pos = utils.tuple_add(target.pos, adj)
-                    if GS['terrain_map'].get_type(x, y) != 'STONE':
-                        GS['terrain_map'].dungeon['items'][pos] = missle
+                    if GS['terrain_map'].get_type(a) != 'STONE':
+                        GS['terrain_map'].dungeon['items'][a] = missle
         else:
-            GS['messages'].insert(0, 'green: Nevermind.')
+            GS['messages'].insert(0, 'grey: Nevermind.')
+    else:
+        GS['messages'].insert(0, 'red: There are no enemies in range.')
 
 # Switches between inventory and HUD screens.
 def inventory(GS, p):
