@@ -117,7 +117,7 @@ class Missle(Item):
         self.hit = hit
 
     def equip(self, player):
-        if not self.equipped and not player.has(self):
+        if not self.equipped:
             player.missles.append(self)
             self.equipped = True
 

@@ -28,15 +28,20 @@ def draw_stats(GS):
     elif hp >= 40:
         color = colors.yellow
 
-    ratio = (consts.WIDTH-base - (9+len('Health: ')))/player.max_health
+    ratio = 12/player.max_health
     bar = " "*math.floor(ratio*player.health)
     underbar = " "*math.ceil(ratio*(player.max_health - player.health))
-    console.drawStr(base, start+1, 'Health: ', fg=colors.white)
-    console.drawStr(base+bounds, start+1, bar, bg=color)
+    console.drawStr(base+bounds-3, start+1, bar, bg=color)
     color2 = colors.dark_grey
     if player.poisoned:
         color2 = colors.extreme_darken(colors.dark_green)
-    console.drawStr(base+bounds+len(bar), start+1, underbar, bg=color2)
+    console.drawStr(base+bounds-3+len(bar), start+1, underbar, bg=color2)
+
+    s = 'Health: '+display_stat("health", player)
+    for i, c in enumerate(s):
+        console.drawChar(base+i, start+1, c,
+                         fg=colors.extreme_darken(colors.dark_green),
+                         bg=console.get_char(base+i, start+1)[2])
     
     # Hunger
     if player.hunger >= 40:
@@ -67,10 +72,17 @@ def draw_stats(GS):
     console.drawStr(base+bounds+4, start+5, 'Exp: '+str(player.exp))
 
     # Other Stats
-    console.drawStr(base, start+6, 'Strength: '+str(player.strength), fg=(0,100,0))
-    console.drawStr(base, start+7, 'Speed: '+str(player.speed), fg=colors.light_blue)
-    console.drawStr(base, start+8, 'Attack: '+str(player.attack), fg=colors.red)
-    console.drawStr(base, start+9, 'Armor: '+str(player.defence), fg=colors.dark_yellow)
+    l = {
+        'Strength': (player.strength, (0,100,0)),
+        'Speed': (player.speed, colors.light_blue),
+        'Attack': (player.attack, colors.red),
+        'Armor': (player.defence, colors.dark_yellow)
+    }
+    i = 6
+    for k, v in l.items():
+        console.drawStr(base, start+i, k+': ', fg=v[1])
+        console.drawStr(base+len(k)+2, start+i, ' '*math.floor(v[0]), bg=v[1])
+        i += 1
 
     # Ranged Weapon
     if player.ranged_weapon:

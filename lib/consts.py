@@ -82,7 +82,9 @@ def auto_rest(GS, p):
 # the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
     if not p.ranged_weapon:
-        GS['messages'].insert(0, "red: You have no ranged weapon!")
+        GS['messages'].insert(0, 'red: You have no ranged weapon!')
+    elif len(p.missles) <= 0:
+        GS['messages'].insert(0, 'red: You have no missles to shoot with!')
     else:
         ms = list(filter(lambda m:
                         utils.dist(m.pos, p.pos) < p.ranged_weapon.range and\
@@ -104,19 +106,19 @@ def fire(GS, p):
                 key = tdl.event.wait(timeout=None, flush=True)
 
             if key.keychar != 'ESCAPE':
+                GS['messages'].insert(0, 'yellow: You shoot the '+utils.ordinal(key.keychar)+' target!')
                 target = ms[int(key.keychar)%len(ms)]
                 if target:
                     missle = list(filter(lambda m:
                                         p.ranged_weapon.missle_type in m.missle_type,
                                         p.missles))[-1]
                     target.health -= missle.hit
+                    if target.health <= 0:
+                        GS['messages'].insert(0, 'green: Your shot hit home! The '+target.name+' dies.')
+                        GS['terrain_map'].dungeon['monsters'].remove(target)
                     p.missles.remove(missle)
-                    adj = list(map(lambda a: utils.tuple_add(target.pos, a),
-                                [(-1, 0), (1, 0), (0, -1), (0, 1)]))
-                    adj.remove(min(adj, key=lambda a: utils.dist(a, p.pos)))
-                    for a in adj:
-                        if GS['terrain_map'].get_type(a) != 'STONE':
-                            GS['terrain_map'].dungeon['items'][a] = missle
+                    missle.equipped = False
+                    GS['terrain_map'].dungeon['items'][target.pos].append(missle)
             else:
                 GS['messages'].insert(0, 'grey: Nevermind.')
         else:

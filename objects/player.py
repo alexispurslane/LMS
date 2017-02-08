@@ -85,8 +85,11 @@ class Player:
         if monster.speed < self.speed:
             monster.attack_player(self, GS)
             self.health += min(self.max_health - self.health, self.defence)
-            if self.health > 0:
+            if self.health > 0 and random.randint(0, 100) < self.exp:
+                GS['messages'].insert(0, 'yellow: You hit the monster a sound blow.')
                 monster.health -= self.attack
+            else:
+                GS['messages'].insert(0, 'red: You miss the monster.')
         elif monster.speed >= self.speed:
             monster.health -= self.attack
             if monster.health > 0:
@@ -219,6 +222,7 @@ class Player:
                        or isinstance(e, items.Missle):
                         GS['messages'].insert(0, "You pick up a " + e.name + ".")
                         self.add_inventory_item(e)
+                        GS['terrain_map'].dungeon['items'].remove(e)
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:

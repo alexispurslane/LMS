@@ -13,14 +13,44 @@ class Monster:
         self.special_action = special_action
         self.agressive = agressive
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
+        
+        self.sight = int(self.speed/2)
+        if self.sight < 8:
+            self.sight = 8
+        
         if self.health >= 20:
             self.drops.append(items.ITEMS)
 
     # Removes the monster's attack value from the players health, then
     # runs the monster's special action on the player reference.
     def attack_player(self, player, GS):
-        player.health -= self.attack
-        self.special_action(self, GS, player)
+        miss = random.randint(0, 100) - (self.sight+5)*10
+        hit_level = miss_level = ""
+        if miss <= 90:
+            hit_level = "tremendously "
+        elif miss <= 70:
+            hit_level = "head-on "
+        elif miss <= 60:
+            hit_level = "roundly "
+        elif miss <= 30:
+            hit_level = "painfully "
+        elif miss <= 10:
+            hit_level = "weakly "
+        elif miss <= 0:
+            hit_level = "barely "
+        elif miss >= 15:
+            miss_level = "barely "
+        elif miss >= 30:
+            miss_level = "closely "
+        elif miss >= 50:
+            miss_level = "widely "
+            
+        if miss <= 0:
+            GS['messages'].insert(0, "red: The monster hits you "+hit_level+".")
+            player.health -= self.attack
+            self.special_action(self, GS, player)
+        else:
+            GS['messages'].insert(0, "green: The monster "+miss_level+"misses you.")
 
     # Decide wether to approach the player or not.
     def choose(self, player, lst, key):
@@ -65,24 +95,23 @@ class Monster:
         x, y = self.pos
         adj = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
         
-        sight = int(self.speed/2)
-        if sight < 8: sight = 8
-        if GS['player'].light(): sight = 3
-        
         choices = self.get_movement_choices(GS['terrain_map'], adj)
+        sight = self.sight
+        if GS['player'].light():
+            self.sight = 3
 
         if GS['player'].pos in adj:
-            GS['messages'].insert(0, 'red: The '+self.name+' attacks you suddenly!')
+            GS['messages'].insert(0, 'red: The '+self.name+' attacks you.')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
-                GS['messages'].insert(0, 'yellow: You destroy the sneaky '+self.name)
+                GS['messages'].insert(0, 'yellow: You destroy the '+self.name)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
                     GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
                 else:
                     GS['terrain_map'].dungeon['items'][self.pos] = [random.choice(self.drops)]
-        elif utils.dist(self.pos, GS['player'].pos) <= sight:
+        elif utils.dist(self.pos, GS['player'].pos) <= self.sight:
             if len(choices) > 0:
                 self.pos = self.choose(
                     GS['player'],
@@ -91,6 +120,8 @@ class Monster:
         else:                            # Monster moves in random direction.
             if len(choices) >= 2:
                 self.pos = random.choice(choices)
+                
+        self.sight = sight
 
 
 ############################ MONSTER ACTIONS ############################ 
