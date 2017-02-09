@@ -23,8 +23,11 @@ def reset_GS():
         'side_screen': 'HUD',
         'turns': 0,
         'wins': 0,
+        'map_console': None,
         'mouse_pos': (-1,-1)
     }
+    GS['map_console'] = tdl.Console(GS['terrain_map'].width,
+                                    GS['terrain_map'].height)
 
 reset_GS()
     
