@@ -352,11 +352,6 @@ def draw_forest_tile(terrain_map, console, pos, tint):
 def draw_line(GS, a, b, char, start_char=None, end_char=None):
     console = GS['console']
     
-    offset_x = math.floor(consts.WIDTH/4) - GS['player'].pos[0]
-    offset_y = math.floor(consts.HEIGHT/4) - GS['player'].pos[1]
-    a = utils.tuple_add(a, (offset_x, offset_y))
-    b = utils.tuple_add(b, (offset_x, offset_y))
-
     going_right = a[0] > b[0]
     vertical_up =  a[0] == b[0] and a[1] > b[1]
     vertical_down =  a[0] == b[0] and a[1] <= b[1]

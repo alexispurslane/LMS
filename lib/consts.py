@@ -92,11 +92,15 @@ def fire(GS, p):
                         utils.dist(m.pos, p.pos) < p.ranged_weapon.range and\
                         GS['terrain_map'].dungeon['lighted'].fov[m.pos],
                         GS['terrain_map'].dungeon['monsters']))
+        ox = max(0, GS['player'].pos[0]-math.floor(WIDTH/4))
+        oy = max(0, GS['player'].pos[1]-math.floor(HEIGHT/2))
         removed = True
         while removed:
             removed = False
             for i, m in enumerate(ms):
-                if not draw.draw_line(GS, p.pos, m.pos, '*', '@', str(i)):
+                start = (p.pos[0]-ox, p.pos[1]-oy)
+                end = (m.pos[0]-ox, m.pos[1]-oy)
+                if not draw.draw_line(GS, start, end, '*', '@', str(i)):
                     ms.remove(m)
                     removed = True
 
