@@ -85,7 +85,7 @@ class Player:
         if monster.speed < self.speed:
             monster.attack_player(self, GS)
             self.health += min(self.max_health - self.health, self.defence)
-            if self.health > 0 and random.randint(0, 10+self.exp) <= self.exp:
+            if self.health > 0 and random.randint(0, 20+self.exp) <= self.exp+10:
                 monster.health -= self.attack
                 GS['messages'].insert(0, 'yellow: You hit the monster a blow.')
                 GS['messages'].insert(0, 'yellow: The monster\'s health is '\
@@ -256,7 +256,7 @@ class Player:
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
                 
-            if self_dead: GS['screen'] = 'DEATH'
+            if self_dead and not consts.WIZARD_MODE: GS['screen'] = 'DEATH'
                 
             self.speed = speed
 

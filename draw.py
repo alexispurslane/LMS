@@ -237,10 +237,7 @@ def draw_game_screen(GS, frame):
     GS['terrain_map'].draw_map(GS, GS['map_console'], GS['player'], frame)
     ox = max(0, GS['player'].pos[0]-math.floor(consts.WIDTH/4))
     oy = max(0, GS['player'].pos[1]-math.floor(consts.HEIGHT/2))
-    GS['console'].blit(GS['map_console'],
-                       0, 0, # dst x,y
-                       -1, -1, # size w,h
-                       ox, oy) # src x,y
+    GS['console'].blit(GS['map_console'], 0, 0, -1, -1, ox, oy)
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
         if fov[m.pos] or not consts.FOV:

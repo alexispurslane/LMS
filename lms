@@ -131,7 +131,7 @@ class Game(tdl.event.App):
             GS['messages'].insert(0, 'You see ' + obj + ' there.')
             
     def update(self, dt):
-        if GS['player'].health <= 0:
+        if GS['player'].health <= 0 and not consts.WIZARD_MODE:
             GS['screen'] = 'DEATH'
         draw.draw_screen(GS)
             

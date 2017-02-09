@@ -13,6 +13,7 @@ MESSAGE_NUMBER   = HEIGHT-12
 FOREST_LEVELS    = 0
 MAX_ROOMS        = 85
 ITEMS_PER_ROOM   = 2
+WIZARD_MODE      = False
 DUNGEON_LEVELS   = 10
 DEBUG            = False
 DIFFICULTY       = 18
@@ -175,6 +176,7 @@ GAME_ACTION_KEYS = {
     'i': inventory,
     'escape': inventory,
     'q': quit,
+    '+': lambda GS, p: eval('consts.WIZARD_MODE = not consts.WIZARD_MODE'),
 
     # Auto-movement
     'L': auto_move('l'),
