@@ -1,4 +1,4 @@
-import utils, draw, itertools, math, tdl
+import utils, draw, itertools, math, tdl, random
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -15,7 +15,7 @@ MAX_ROOMS        = 85
 ITEMS_PER_ROOM   = 2
 DUNGEON_LEVELS   = 10
 DEBUG            = False
-DIFFICULTY       = 14
+DIFFICULTY       = 18
 EDGE_POS         = math.ceil(WIDTH/2)+2
 
 MIN_ROOM_WIDTH = 4
@@ -108,17 +108,20 @@ def fire(GS, p):
             if key.keychar != 'ESCAPE':
                 GS['messages'].insert(0, 'yellow: You shoot the '+utils.ordinal(key.keychar)+' target!')
                 target = ms[int(key.keychar)%len(ms)]
-                if target:
+                if target and random.randint(0,max(1, 100-p.exp-5)) < target.speed*20+5:
                     missle = list(filter(lambda m:
                                         p.ranged_weapon.missle_type in m.missle_type,
                                         p.missles))[-1]
                     target.health -= missle.hit
+                    GS['messages'].insert(0, 'yellow: You hit the '+target.name+'.')
                     if target.health <= 0:
                         GS['messages'].insert(0, 'green: Your shot hit home! The '+target.name+' dies.')
                         GS['terrain_map'].dungeon['monsters'].remove(target)
                     p.missles.remove(missle)
                     missle.equipped = False
                     GS['terrain_map'].dungeon['items'][target.pos].append(missle)
+                else:
+                    GS['messages'].insert(0, 'red: You miss the enemy.')
             else:
                 GS['messages'].insert(0, 'grey: Nevermind.')
         else:

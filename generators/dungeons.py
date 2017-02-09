@@ -65,16 +65,19 @@ def generate_new_standard_dungeon_map(self):
                 adjoin.connected = True
 
             #################### ADD MONSTERS ####################
-            cal_size = math.floor(room.w*room.h/100)
+            cal_size = math.floor(room.w*room.h/80)
             x_i, y_i = (0, 0)
             for i in range(0, max(self.dungeon_level*2+cal_size, 4)):
                 # Choose monster selection
                 ms = monsters.select_by_difficulty(self.dungeon_level)
                 a = self.in_area(room.center)
                 if a == 'Cave':
-                    ms = ms + [monsters.Rat, monsters.Imp] * 3
+                    ms += [monsters.Rat, monsters.Dwarf] * 3
                 elif a == 'Marble':
-                    ms = ms + [monsters.Snake] * 5
+                    ms += [monsters.Snake, monsters.Adder] * 5
+                else:
+                    ms += [monsters.Slime] * 7
+                    ms += [monsters.Goblin] * 3
                     
                 # Deal with chosen monster
                 m = random.choice(ms)

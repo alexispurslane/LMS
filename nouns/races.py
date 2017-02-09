@@ -1,23 +1,29 @@
-import utils, items
+import utils, items, colors
 
 defaults = {
     'max_health': 25,
-    'strength': 1,
+    'strength': 5,
     'skills': {
         'weapon': 1,
         'spell': 0.8,
         'range': 0.8
     },
     'inventory': [
-        items.SHORT_SWORD,
+        items.SWORD,
+        items.GAMBESON,
+        items.VIKING_HELM,
+        items.ROUND_SHEILD,
+        
         items.TORCH
     ]
 }
 default_settings = {
-    'name': 'Soldier',
-    'bonus': 25,
+    'name': 'Warrior',
+    'bonus': 20,
     'speed': 4,
-    'levels': 8
+    'levels': 8,
+    'color': colors.white,
+    'suggested_difficulty': 16
 }
 
 class Race:
@@ -27,13 +33,18 @@ class Race:
         self.speed = settings['speed']
         self.name = settings['name']
         self.levels = settings['levels']
+        self.color = settings['color']
+        self.suggested_difficulty = settings['suggested_difficulty']
 
-SOLDIER      = Race() # Its raceist!
-HEAVY = Race({
+WARRIOR      = Race() # Its raceist!
+BERSERKER = Race({
     'max_health': 100,
     'strength': 10,
     'inventory': [
-        items.TORCH
+        items.TORCH,
+        items.DANE_AXE,
+        items.VIKING_HELM,
+        items.LEATHER_BREASTPLATE
     ],
     'skills': {
         'weapon': 0.9,
@@ -41,30 +52,35 @@ HEAVY = Race({
         'range': 0
     }
 }, {
-    'name': 'Heavy Soldier',
-    'bonus': 2,
+    'name': 'Berserker',
+    'bonus': 10,
     'speed': 10,
-    'levels': 3
+    'levels': 10,
+    'color': colors.red,
+    'suggested_difficulty': 18
 })
-RANGER = Race({
+BOWMAN = Race({
     'max_health': 18,
     'strength': 2,
     'inventory': [
-        items.FENCING_FOIL,
-        items.LIGHT_BOW,
+        items.DAGGAR,
+        items.ELM_BOW,
         items.ELVEN_HELM,
-        items.TORCH
-    ]+[items.REGULAR_ARROW]*21,
+        items.TORCH,
+        items.ROBE
+    ]+[items.WOOD_ARROW]*21,
     'skills': {
         'weapon': 0.98,
         'spell': 1,
         'range': 1.2
     }
 }, {
-    'name': 'Ranger',
-    'bonus': 30,
+    'name': 'Bowman',
+    'bonus': 25,
     'speed': 2,
-    'levels': 13
+    'levels': 13,
+    'color': colors.light_blue,
+    'suggested_difficulty': 14
 })
 
-RACES = [SOLDIER, HEAVY, RANGER]
+RACES = [WARRIOR, BERSERKER, BOWMAN]

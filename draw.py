@@ -15,7 +15,8 @@ def draw_stats(GS):
     bounds = len('Health: ')+3
     start = consts.MESSAGE_NUMBER
 
-    console.drawStr(base, start-1, chr(196)*(base-1))
+    console.drawStr(base-1, start-1, chr(consts.TCOD_CHAR_TEEE))
+    console.drawStr(base, start-1, chr(consts.TCOD_CHAR_HLINE)*(base-1))
 
     # Description
     console.drawStr(base, start, player.race.name + ' ('+player.attributes()+')')
@@ -111,9 +112,6 @@ def draw_messages(GS):
     
 def draw_hud_screen(GS):
     console = GS['console']
-    if not GS['messages']:
-        GS['messages'] = []
-        
     draw_stats(GS)
     return draw_messages(GS)
 
@@ -165,7 +163,7 @@ def draw_hud(GS):
     for i in range(0, consts.HEIGHT):
         GS['console'].drawChar(consts.EDGE_POS-2, i, chr(179))
         
-    return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS)
+    return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS) or GS['messages']
 
 frame = 0
 def draw_screen(GS):
@@ -206,14 +204,14 @@ def draw_intro_screen(GS, frame):
     console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
                     fg=colors.darken(colors.grey))
 
-    story = [
-        'Long ago, the manifestation of the evil Outer Rim crept silently to',
-        'earth, bringing with it its hoard of dark and evil creatures.',
-        'After a centuries-long battle, humanity finally overcame this god, Kor,',
-        'and cast him out. Yet his vast underground realm still existed.',
-        'Now, years later, a new creature has taken over Kor\'s old abodes.',
-        'Your job is to assasinate him, single-handedly.'
-    ]
+    story = """
+    Ragnorak has come and gone, and left the gods and their mortal enemies,
+    the ice giants, extinct races, the hollow echos of their great exploits
+    the only remnant of their passing in the world. Fate decreed it so.....
+    And Fate decrees also that a warrior of Norse stock, brave and worthy, 
+    undertake to destroy, in revenge for the gods' fall, the ice giant's 
+    last remaining kin and minions.
+    """.split('\n')
 
     for (i, line) in enumerate(story):
         console.drawStr(int(consts.WIDTH/2)-30, 20+i, line, fg=colors.grey)
@@ -224,19 +222,18 @@ def draw_death_screen(GS, frame):
     console = GS['console']
     player = GS['player']
     
-    console.drawStr(0, 1, 'Game Stats')
-    console.drawStr(0, 2, '----------')
-    console.drawStr(4, 3, 'Turns: ' + str(GS['turns']))
-    console.drawStr(4, 4, 'Score: ' + str(player.score(GS)))
-    console.drawStr(4, 5, 'Kills: ' + str(player.killed_monsters))
-    console.drawStr(4, 6, 'Exp:   ' + str(player.exp))
-    console.drawStr(4, 7, 'Inventory: ')
+    console.drawStr(consts.WIDTH/2-11, 0, 'Game Stats')
+    console.drawStr(0, 1, chr(consts.TCOD_CHAR_DHLINE)*consts.WIDTH)
+    console.drawStr(consts.WIDTH/2-11, 3, 'Turns: ' + str(GS['turns']), fg=colors.yellow)
+    console.drawStr(consts.WIDTH/2-11, 4, 'Score: ' + str(player.score(GS)), fg=colors.green)
+    console.drawStr(consts.WIDTH/2-11, 5, 'Kills: ' + str(player.killed_monsters), fg=colors.red)
+    console.drawStr(consts.WIDTH/2-11, 6, 'Exp:   ' + str(player.exp), fg=colors.light_blue)
+    console.drawStr(consts.WIDTH/2-11, 7, 'Inventory: ')
     for i, g in enumerate(groupby(player.inventory)):
-        console.drawStr(8, 8+i, g[0].name + ' x'+str(len(list(g[1]))))
+        console.drawStr(consts.WIDTH/2-7, 8+i, g[0].name + ' x'+str(len(list(g[1]))))
 
 def draw_game_screen(GS, frame):
     console = GS['console']
-    GS['messages'] = draw_hud(GS)
     GS['terrain_map'].draw_map(GS, GS['console'], GS['player'], frame)
     
     for m in GS['terrain_map'].dungeon['monsters']:
@@ -252,21 +249,26 @@ def draw_game_screen(GS, frame):
     if GS['player'].pos in GS['terrain_map'].dungeon['water']:
         color = colors.blue
         
-    console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color)
+    console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color,
+                     fg=GS['player'].race.color)
+    scroll_screen(GS)
+    GS['messages'] = draw_hud(GS)
 
 
 # Refactor to use self.dungeon
 def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
     x, y = pos
     if pos == terrain_map.dungeon['down_stairs']:
-        console.drawChar(x, y, '>', fg=colors.grey, bg=colors.red)
+        console.drawChar(x, y, chr(consts.TCOD_CHAR_ARROW2_S), fg=colors.grey, bg=colors.red)
     elif pos == terrain_map.dungeon['up_stairs']:
-        console.drawChar(x, y, '<', fg=colors.grey, bg=colors.blue)
+        console.drawChar(x, y, chr(consts.TCOD_CHAR_ARROW2_N), fg=colors.grey, bg=colors.blue)
     elif pos in terrain_map.dungeon['items'] and terrain_map.dungeon['items'][pos] != []:
         items = terrain_map.dungeon['items'][pos]
         back = (12,12,12)
         if len(items) > 1:
             back = colors.white
+        if isinstance(items[-1], list):
+            print(items[-1])
         console.drawChar(x, y, items[-1].char,
                          fg=colors.tint(items[-1].fg, tint),
                          bg=back)
@@ -280,7 +282,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         
         if decor[pos] == 'FM':
             if terrain_map.in_area(pos) == 'Planted':
-                console.drawChar(x, y, '`', fg=colors.tint(colors.green, tint))
+                console.drawChar(x, y, chr(consts.TCOD_CHAR_SPADE), fg=colors.tint(colors.green, tint))
             else:
                 area = terrain_map.in_area(pos)
                 color = colors.tint((12, 12, 12), tint)
@@ -289,7 +291,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
                 elif area == 'Cave':
                     color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
 
-                console.drawChar(x, y, ' ', fg=colors.darkmed_grey, bg=color)
+                console.drawChar(x, y, ' ', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
         elif decor[pos] == 'FR':
             console.drawChar(x, y, '^', fg=colors.darken(colors.red),
                              bg=colors.red)
@@ -304,26 +306,31 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         elif area == 'Cave':
             color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
             
-        console.drawChar(x, y, ' ', fg=colors.darkmed_grey, bg=color)
+        console.drawChar(x, y, ' ', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
-            console.drawChar(x, y, '-', fg=colors.tint(colors.brown, tint),
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_CHECKBOX_SET),
+                             fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.extreme_darken(colors.brown), tint))
         else:
-            console.drawChar(x, y, '\\', fg=colors.tint(colors.brown, tint),
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_CHECKBOX_UNSET),
+                             fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.black, tint))
     elif terrain_map.get_type(pos) == 'STONE':
         area = terrain_map.in_area(pos)
         color = colors.tint(colors.darkmed_grey, tint)
+        fg = colors.tint(colors.darken(colors.brown), tint)
         char = chr(consts.TCOD_CHAR_BLOCK2)
         if area == 'Marble':
             color = colors.tint(colors.white, tint)
+            fg = colors.tint(colors.darken(colors.white), tint)
             char = chr(consts.TCOD_CHAR_BLOCK3)
         elif area == 'Cave':
             color = colors.tint(colors.brown, tint)
+            fg = colors.tint(colors.black, tint)
             char = chr(consts.TCOD_CHAR_BLOCK1)
         
-        console.drawChar(x, y, char, bg=color) 
+        console.drawChar(x, y, char, bg=color, fg=fg)
 
 def draw_forest_tile(terrain_map, console, pos, tint):
     (x, y) = pos
@@ -341,7 +348,7 @@ def draw_forest_tile(terrain_map, console, pos, tint):
         console.drawChar(x, y, terrain_map.spawned_items[x, y].char,
                             fg=colors.tint(terrain_map.spawned_items[x, y].fg, tint))
     elif terrain_map.get_type(x, y) == 'FLOOR':
-        console.drawChar(x, y, '.')
+        console.drawChar(x, y, ' ')
     elif terrain_map.get_type(x, y) == 'STONE':
         console.drawChar(x, y, '#', fg=colors.dark_grey, bg=colors.grey)
     elif terrain_map.get_type(x, y) == 'TREE':
@@ -349,6 +356,11 @@ def draw_forest_tile(terrain_map, console, pos, tint):
 
 def draw_line(GS, a, b, char, start_char=None, end_char=None):
     console = GS['console']
+    
+    offset_x = math.floor(consts.WIDTH/4) - GS['player'].pos[0]
+    offset_y = math.floor(consts.HEIGHT/4) - GS['player'].pos[1]
+    a = utils.tuple_add(a, (offset_x, offset_y))
+    b = utils.tuple_add(b, (offset_x, offset_y))
 
     going_right = a[0] > b[0]
     vertical_up =  a[0] == b[0] and a[1] > b[1]
@@ -401,3 +413,8 @@ def line(console, x0, y0, x1, y1, char):
                 err += dy
             y += sy
         return True
+
+def scroll_screen(GS):
+    offset_x = math.floor(consts.WIDTH/4) - GS['player'].pos[0]
+    offset_y = math.floor(consts.HEIGHT/4) - GS['player'].pos[1]
+    GS['console'].scroll(offset_x, offset_y)

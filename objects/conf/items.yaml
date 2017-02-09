@@ -1,62 +1,75 @@
 weapons:
+- Dane Axe:
+    char: '>'
+    weight: 20
+    attack: 30
+    probability: 5
+    
 - Broad Sword:
     char: '|'
     weight: 10
     attack: 21
     probability: 5
 
-- Fencing Foil:
+- Daggar:
     char: '!'
     weight: 1
     attack: 12
     probability: 10
 
-- Thrusting Sword:
+- Well Made Sword:
     char: '/'
     weight: 5
     attack: 16
     probability: 8
 
-- Short Sword:
+- Sword:
     char: '('
     attack: 12
     weight: 4
     probability: 12
 
 armor:
-- Breastplate:
-    char: '['
+- Robe:
+    char: '^'
     color: brown
+    weight: 0
+    defence: 1
+    probability: 20
+    
+- Gambeson:
+    char: '['
+    color: blue
     weight: 3
     probability: 18
 
-- Chain Mail:
+- Leather Breastplate:
     char: '['
     weight: 5
-    color: grey
+    color: brown
     probability: 13
 
-- Mythril Mail:
+- Steel Mail:
     char: '['
     weight: 0
     color: white
     defence: 11
     probability: 3
 
-- Plate Armor:
+- Lamellar Armor:
     char: '&'
     color: grey
     weight: 10
     probability: 10
 
-- Full Body Armor:
+- Knightly Armor:
     char: '&'
     color: dark_grey
     weight: 20
     defence: 25
     probability: 8
 
-- Sheild:
+- Round Sheild:
     char: '}'
     color: grey
     weight: 2
@@ -68,7 +81,7 @@ armor:
     weight: 3
     probability: 15
 
-- Iron Buckler:
+- Kite Sheild:
     char: '}'
     color: dark_grey
     weight: 6
@@ -87,16 +100,31 @@ armor:
     probability: 8
 
 ranged weapons:
-- Light Bow:
-    weight: 1
+- Yew Bow:
+    weight: 3
     probability: 20
     range: 10
     char: ')'
     
+- Ash Bow:
+    weight: 2
+    probability: 15
+    color: red
+    range: 12
+    char: ')'
+
+- Elm Bow:
+    weight: 1
+    probability: 13
+    color: green
+    range: 13
+    char: ')'
+    
 - Crossbow:
-    weight: 3
+    weight: 5
     probability: 10
-    range: 20
+    range: 30
+    missle_type: 'Bolt'
     char: '^'
 
 missles:
@@ -106,14 +134,14 @@ missles:
     char: '_'
     probability: 10
     
-- Regular Arrow:
+- Wood Arrow:
     weight: 1
     hit: 5
     char: '-'
     probability: 15
 
 lights:
-- Lamp:
+- Fat Lamp:
     char: '#'
     weight: 2
     radius: 10

@@ -8,13 +8,13 @@ sys.path.append('objects/')
 
 import maps, monsters, consts, colors, utils, races, player, draw
 
-tdl.setFont('font/terminal10x10_gs_tc.png', greyscale=True, altLayout=True)
+tdl.setFont('font/terminal20x20_gs_ro.png', greyscale=True)
 tdl.event.set_key_repeat(delay=40, interval=0)
 GS = {
     'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
     'screen': 'INTRO',
-    'player': player.Player(races.SOLDIER),
-    'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
+    'player': player.Player(races.WARRIOR),
+    'terrain_map': maps.TerrainMap(consts.WIDTH, consts.HEIGHT),
     'messages': [],
     'selection': 0,
     'side_screen': 'HUD',
@@ -62,8 +62,8 @@ class Game(tdl.event.App):
                 GS = {
                     'console': GS['console'],
                     'screen': 'INTRO',
-                    'player': player.Player(races.SOLDIER),
-                    'terrain_map': maps.TerrainMap(math.floor(consts.WIDTH/2), consts.HEIGHT),
+                    'player': player.Player(races.WARRIOR),
+                    'terrain_map': maps.TerrainMap(consts.WIDTH, consts.HEIGHT),
                     'messages': [],
                     'selection': 0,
                     'side_screen': 'HUD',
@@ -80,6 +80,7 @@ class Game(tdl.event.App):
                 if racen < len(races.RACES):
                     selected_race = races.RACES[racen]
                     GS['player'] = player.Player(selected_race)
+                    consts.DIFFICULTY = selected_race.suggested_difficulty
 
                     GS['player'].pos = GS['terrain_map'].generate_new_map()
 
@@ -97,7 +98,7 @@ class Game(tdl.event.App):
             elif event.keychar == '?' and GS['side_screen'] == 'MAN':
                 GS['side_screen'] = 'HUD'
 
-        if len(event.keychar) == 1:
+        if len(event.keychar) == 1 and not GS['screen'] == 'DEATH':
             utils.monster_turn(GS)
             GS['turns'] += 1
 

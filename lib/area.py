@@ -52,7 +52,8 @@ class Room(Area):
         self.room_type = random.choice([
             'Square', 'Square',
             'Square', 'Round',
-            'Sanctuary'
+            'Round', 'Sanctuary',
+            'Square', 'Sancutary'
         ])
 
         # Room center.

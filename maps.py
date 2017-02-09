@@ -98,7 +98,7 @@ class TerrainMap:
 
     # Checks if a point is on the map.
     def on_map(self, p):
-        return p >= (0, 0) and p < (self.width, self.height)
+        return p[0] > 0 and p[1] > 0 and p[0] < self.width and p[1] < self.height
 
     # Returns a monster at the given point.
     def monster_at(self, p):
@@ -215,12 +215,12 @@ class TerrainMap:
                 radius=rad,
                 sphere=True)
             
-            fov2 = self.dungeon['lighted'].compute_fov(
-                x, y,
-                fov='DIAMOND',
-                radius=rad,
-                sphere=True)
-            fov2 = [(f[0], f[1]) for f in fov2]
+            fov2 = [(f[0], f[1]) for f in
+                    self.dungeon['lighted'].compute_fov(
+                        x, y,
+                        fov='DIAMOND',
+                        radius=rad,
+                        sphere=True)]
         else:
             fov2 = fov = self.dungeon['visited']
 
@@ -232,9 +232,9 @@ class TerrainMap:
 
         # Draw map
         for x, y in fov:
-            tint = (-80, -80, -80)
+            tint = (-90, -90, -90)
             if (x, y) in fov2:
-                tint = (0,0,0)
+                tint = (0, 0, 0)
                 
             if self.is_forests():
                 draw.draw_forest_tile(self, console, (x, y), tint)

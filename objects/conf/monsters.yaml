@@ -4,22 +4,22 @@ monsters:
     color: yellow
     speed: 1
     health: 80
-    attack: 8
+    attack: 18
     agressive: True
 
-- BabyDragon:
-    char: d
-    color: red
+- Wolf:
+    char: w
+    color: blue
     speed: 4
     health: 30
-    attack: 15
+    attack: 25
 
 - Dragon:
     char: D
     color: dark_red
     health: 300
     speed: 15
-    attack: 80
+    attack: 90
     agressive: True
 
 - Goblin:
@@ -27,15 +27,15 @@ monsters:
     color: green
     speed: 3
     health: 26
-    attack: 12
+    attack: 22
     agressive: True
 
-- Giant:
+- Lesser Ice Giant:
     char: G
     color: dark_green
     health: 50
     speed: 20
-    attack: 25
+    attack: 35
     agressive: True
   
 - Slime:
@@ -43,15 +43,15 @@ monsters:
     color: (27, 226, 21)
     health: 13
     speed: 8
-    attack: 1
+    attack: 11
     action: breed
   
-- Imp:
+- Dwarf:
     char: i
     color: light_blue
     health: 13
     speed: 4
-    attack: 7
+    attack: 17
     action: filtch
     agressive: True
   
@@ -60,7 +60,7 @@ monsters:
     color: green
     health: 12
     speed: 2
-    attack: 4
+    attack: 14
     action: poison
 
 - Adder:
@@ -68,7 +68,7 @@ monsters:
     color: dark_red
     health: 25
     speed: 1
-    attack: 12
+    attack: 22
     action: poison
 
 - Rat:
@@ -76,14 +76,14 @@ monsters:
     color: brown
     health: 12
     speed: 4
-    attack: 5
+    attack: 15
 
 - Wyvern:
     char: W
     color: grey
     speed: 10
     health: 80
-    attack: 7
+    attack: 17
     agressive: True
 
 - FlyingDragon:
@@ -91,4 +91,4 @@ monsters:
     color: dark_yellow
     speed: 6
     health: 200
-    attack: 70
+    attack: 80

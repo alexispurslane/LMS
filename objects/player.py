@@ -53,7 +53,7 @@ class Player:
     # calls level_up with the current level calculated via the exp.
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
-        s = math.floor(self.exp/(40+self.level*5))
+        s = math.floor(self.exp/(30+self.level*5))
         
         if s >= 1 and s <= self.race.levels:
             self.level_up(GS, s)
@@ -85,9 +85,11 @@ class Player:
         if monster.speed < self.speed:
             monster.attack_player(self, GS)
             self.health += min(self.max_health - self.health, self.defence)
-            if self.health > 0 and random.randint(0, 100) < self.exp:
-                GS['messages'].insert(0, 'yellow: You hit the monster a sound blow.')
+            if self.health > 0 and random.randint(0, 10+self.exp) <= self.exp:
                 monster.health -= self.attack
+                GS['messages'].insert(0, 'yellow: You hit the monster a blow.')
+                GS['messages'].insert(0, 'yellow: The monster\'s health is '\
+                                      +str(monster.health)+'.')
             else:
                 GS['messages'].insert(0, 'red: You miss the monster.')
         elif monster.speed >= self.speed:
@@ -139,11 +141,11 @@ class Player:
         num_armor = len(list(filter(lambda a: isinstance(a, items.Armor), self.inventory)))
         num_weapon = len(list(filter(lambda a: isinstance(a, items.Weapon), self.inventory)))
 
-        if self.race.name == 'Ranger':
-            if num_armor <= 2 and num_weapon <= 3:
+        if self.race.name == 'Bowman':
+            if num_armor <= 4 and num_weapon <= 3:
                 return 'light'
         else:
-            if num_armor < 2 and num_weapon <= 3:
+            if num_armor <= 3 and num_weapon <= 3:
                 return 'light'
 
     def fast(self):
@@ -222,7 +224,9 @@ class Player:
                        or isinstance(e, items.Missle):
                         GS['messages'].insert(0, "You pick up a " + e.name + ".")
                         self.add_inventory_item(e)
-                        GS['terrain_map'].dungeon['items'].remove(e)
+                        for k, v in GS['terrain_map'].dungeon['items'].items():
+                            if e in v:
+                                GS['terrain_map'].dungeon['items'][k].remove(e)
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:
