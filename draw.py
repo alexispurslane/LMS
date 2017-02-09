@@ -234,8 +234,15 @@ def draw_death_screen(GS, frame):
 
 def draw_game_screen(GS, frame):
     console = GS['console']
-    GS['terrain_map'].draw_map(GS, GS['console'], GS['player'], frame)
-    
+    special_console = tdl.Console(GS['terrain_map'].width,
+                                  GS['terrain_map'].height)
+    GS['terrain_map'].draw_map(GS, special_console, GS['player'], frame)
+    ox = max(0, GS['player'].pos[0]-math.floor(consts.WIDTH/4))
+    oy = max(0, GS['player'].pos[1]-math.floor(consts.HEIGHT/2))
+    GS['console'].blit(special_console,
+                       0, 0, # dst x,y
+                       -1, -1, # size w,h
+                       ox, oy) # src x,y
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
         if fov[m.pos] or not consts.FOV:
@@ -243,15 +250,14 @@ def draw_game_screen(GS, frame):
             if m.pos in GS['terrain_map'].dungeon['water']:
                 color = colors.blue
                 
-            GS['console'].drawChar(m.pos[0], m.pos[1], m.char, fg=m.fg, bg=color)
+            GS['console'].drawChar(m.pos[0]-ox, m.pos[1]-oy, m.char, fg=m.fg, bg=color)
 
     color = (0,0,0)
     if GS['player'].pos in GS['terrain_map'].dungeon['water']:
         color = colors.blue
         
-    console.drawChar(GS['player'].pos[0], GS['player'].pos[1], '@', bg=color,
+    console.drawChar(GS['player'].pos[0]-ox, GS['player'].pos[1]-oy, '@', bg=color,
                      fg=GS['player'].race.color)
-    scroll_screen(GS)
     GS['messages'] = draw_hud(GS)
 
 

@@ -10,19 +10,24 @@ import maps, monsters, consts, colors, utils, races, player, draw
 
 tdl.setFont('font/terminal20x20_gs_ro.png', greyscale=True)
 tdl.event.set_key_repeat(delay=40, interval=0)
-GS = {
-    'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
-    'screen': 'INTRO',
-    'player': player.Player(races.WARRIOR),
-    'terrain_map': maps.TerrainMap(consts.WIDTH, consts.HEIGHT),
-    'messages': [],
-    'selection': 0,
-    'side_screen': 'HUD',
-    'turns': 0,
-    'wins': 0,
-    'mouse_pos': (-1,-1)
-}
+GS = {}
+def reset_GS():
+    global GS
+    GS = {
+        'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
+        'screen': 'INTRO',
+        'player': player.Player(races.WARRIOR),
+        'terrain_map': maps.TerrainMap(consts.MAP_WIDTH, consts.MAP_HEIGHT),
+        'messages': [],
+        'selection': 0,
+        'side_screen': 'HUD',
+        'turns': 0,
+        'wins': 0,
+        'mouse_pos': (-1,-1)
+    }
 
+reset_GS()
+    
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')
     consts.quit(GS, GS['player'])
@@ -59,18 +64,7 @@ class Game(tdl.event.App):
                 GS['selection'] = int(event.keychar)
         elif GS['screen'] == 'DEATH':
             if event.keychar.upper() == 'R':
-                GS = {
-                    'console': GS['console'],
-                    'screen': 'INTRO',
-                    'player': player.Player(races.WARRIOR),
-                    'terrain_map': maps.TerrainMap(consts.WIDTH, consts.HEIGHT),
-                    'messages': [],
-                    'selection': 0,
-                    'side_screen': 'HUD',
-                    'turns': 0,
-                    'wins': 0,
-                    'mouse_pos': (-1,-1)
-                }               
+                reset_GS()
         elif GS['screen'] == 'INTRO' and len(event.keychar) == 1 or\
                 event.keychar.upper() == 'SPACE':
             GS['screen'] = 'CHARSEL'
