@@ -13,10 +13,7 @@ def connect_rooms(self, r1, r2):
     r1.connected = True
     r2.connected = True
 
-MAP_TYPES = [
-    'standard',
-    # 'labrynth', <- Special algorithm for variety
-]
+MAP_TYPES = ['standard']
 def generate_new_dungeon_map(self):
     rtype = random.choice(MAP_TYPES)
     return globals()['generate_new_'+rtype+'_dungeon_map'](self)
