@@ -20,6 +20,7 @@ class Monster:
         self.health = health
         self.attack = attack
         self.special_action = special_action
+        self.path = []
         self.agressive = agressive
         self.ranged = ranged
         self.drops = [items.FOOD_RATION]*8 + [items.TORCH, items.SWORD, items.GAMBESON]
@@ -64,25 +65,6 @@ class Monster:
         else:
             GS['messages'].insert(0, "green: The monster "+miss_level+"misses you.")
 
-    # Decide wether to approach the player or not.
-    def choose(self, player, lst, key):
-        if self.agressive:
-            return min(lst, key=key)
-        elif self.ranged:
-            return max(lst, key=key)
-        elif self.speed > player.speed:
-            if self.health > player.health:
-                return min(lst, key=key)
-            else:
-                return max(lst, key=key)
-        else:
-            if player.attack < self.attack:
-                return min(lst, key=key)
-            elif self.health > player.health:
-                return min(lst, key=key)
-            else:
-                return max(lst, key=key)
-
     # Check equality
     def __eq__(self, other):
         return other != None and self.__dict__ == other.__dict__
@@ -106,15 +88,11 @@ class Monster:
 
     # Move monster according to choose() and deal with movement effects.
     def move(self, GS):
-        x, y = self.pos
-        adj = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
-        
-        choices = self.get_movement_choices(GS['terrain_map'], adj)
         sight = self.sight
         if GS['player'].light():
             self.sight = 3
 
-        if GS['player'].pos in adj:
+        if utils.dist(GS['player'].pos, self.pos) == 1:
             GS['messages'].insert(0, 'red: The '+self.name+' attacks you.')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
@@ -140,16 +118,24 @@ class Monster:
                                start_char=self.char, end_char='@')
                 time.sleep(0.3)
                 p.health -= self.speed
-                
-            elif len(choices) > 0:
-                self.pos = self.choose(
-                    GS['player'],
-                    choices,
-                    lambda p: utils.dist(p, GS['player'].pos))
-        else:                            # Monster moves in random direction.
-            if len(choices) > 0:
-                self.pos = random.choice(choices)
-                
+            else:
+                if len(self.path) == 0 or self.path[-1] != GS['player'].pos:
+                    # Reset the path (A* algorithm)
+                    self.path = GS['terrain_map'].dungeon['visited'].compute_path(
+                        self.pos[0],
+                        self.pos[1],
+                        GS['player'].pos[0],
+                        GS['player'].pos[1],
+                        diagonal_cost=0)
+                if len(self.path) > 0:
+                    npos = self.path.pop()
+                    if GS['terrain_map'].is_walkable(npos):
+                        self.pos = npos
+        else:
+            npos = utils.tuple_add(self.pos, (random.randint(-1, 1),
+                                              random.randint(-1, 1)))
+            if GS['terrain_map'].is_walkable(npos):
+                self.pos = npos
         self.sight = sight
 
 

@@ -33,6 +33,7 @@ reset_GS()
     
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')
+    exit()
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -43,7 +44,7 @@ class Game(tdl.event.App):
     def ev_KEYDOWN(self, event):
         global GS
         if event.keychar.upper() == 'Q':
-            pass
+            exit()
         elif GS['side_screen'] == 'INVENTORY':
             if event.keychar.upper() == 'UP':
                 GS['selection'] -= 1
@@ -53,9 +54,9 @@ class Game(tdl.event.App):
                 GS['selection'] %= len(GS['player'].inventory)
             elif event.keychar.upper() == 'D':
                 pos = GS['player'].pos
-                GS['terrain_map'].dungeon['items'][pos].append(
-                    GS['player'].inventory[GS['selection']])
-                GS['player'].remove_inventory_item(GS['selection'])
+                item = GS['player'].inventory[GS['selection']][0]
+                GS['terrain_map'].dungeon['items'][pos].append(item)
+                GS['player'].remove_inventory_item(item)
             elif event.keychar.upper() == 'W':
                 GS['player'].inventory[GS['selection']][0].equip(GS['player'])
             elif event.keychar.upper() == 'T':
@@ -108,7 +109,7 @@ class Game(tdl.event.App):
             GS['turns'] += 1
 
     def ev_QUIT(self, event):
-        pass
+        exit()
 
     def ev_MOUSEDOWN(self, event):
         if event.button == 'RIGHT':

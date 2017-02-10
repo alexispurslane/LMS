@@ -42,6 +42,7 @@ class Player:
             item.equip(self)
 
     def update_inventory(self):
+        self.lin_inventory.sort(key = lambda x: x.weight)
         self.inventory = [(k, len(list(g))) for k, g in groupby(self.lin_inventory)]
         
     def has(self, x):
@@ -91,7 +92,7 @@ class Player:
         if monster.speed < self.speed:
             monster.attack_player(self, GS)
             self.health += min(self.max_health - self.health, self.defence)
-            skill = self.race.skill['weapon']
+            skill = self.race.skills['weapon']
             if self.health > 0 and random.randint(0, 20+self.exp) <= self.exp*skill+10:
                 monster.health -= self.attack
                 GS['messages'].insert(0, 'yellow: You hit the monster a blow.')
@@ -117,7 +118,6 @@ class Player:
     # combined inventory.
     def add_inventory_item(self, item):
         self.lin_inventory.append(copy.copy(item))
-        self.lin_inventory.sort(key = lambda x: x.weight)
         self.update_inventory()
         self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
         
@@ -125,13 +125,10 @@ class Player:
             item.equip(self)
 
     # Removes the i-th item from the inventory, dequips it, and resorts the inventory.
-    def remove_inventory_item(self, i):
-        item = self.inventory[i][0]
+    def remove_inventory_item(self, item):
         item.dequip(self)
         self.lin_inventory.remove(item)
         self.update_inventory()
-        
-        self.inventory.sort(key = lambda x: x.weight)
 
     # Calculates the total weight of the player's entire inventory.
     def total_weight(self):

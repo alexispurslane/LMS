@@ -23,6 +23,14 @@ default_settings = {
     'speed': 4,
     'levels': 8,
     'color': colors.white,
+    'description': """
+    A jack of all trades, but master of none, the
+    Warrior is handy with any blade and resiliant but
+    lacks skill in ranged weapons and spellcasting. He
+    learns quickly and well but can't progress very
+    far. He is naturally fairly slow, and weighed down
+    by his substantial, well-rounded starting gear.
+    """,
     'suggested_difficulty': 16
 }
 
@@ -35,6 +43,7 @@ class Race:
         self.skills = first_level['skills']
         self.levels = settings['levels']
         self.color = settings['color']
+        self.description = settings['description']
         self.suggested_difficulty = settings['suggested_difficulty']
 
 WARRIOR      = Race() # Its raceist!
@@ -58,6 +67,16 @@ BERSERKER = Race({
     'speed': 10,
     'levels': 10,
     'color': colors.red,
+    'description': """
+    A close range fighter, the Berserker is slow but
+    immensly strong and extremely resiliant.  He has
+    two more levels than the Warrior, but learns at a
+    third of the pace, forcing him to rely heavily on
+    artifacts and weapons to progress. He starts out
+    with excellent (if spartan) equipment, and while
+    he is extremely skilled with weapons, and can use
+    some spells, he doesn't have ranged combat skills.
+    """,
     'suggested_difficulty': 18
 })
 BOWMAN = Race({
@@ -79,7 +98,15 @@ BOWMAN = Race({
     'name': 'Bowman',
     'bonus': 25,
     'speed': 2,
-    'levels': 13,
+    'levels': 16,
+    'description': """
+    Light and fast, the Bowman is fragile to start
+    with but can progress quickly and far. He is
+    compitent with close range combat but excells at
+    spellcasting and ranged combat. He starts out with
+    light but excellent quality gear that should last
+    him succesfully throughout the game.
+    """,
     'color': colors.light_blue,
     'suggested_difficulty': 14
 })

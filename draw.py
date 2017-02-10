@@ -13,13 +13,10 @@ def draw_stats(GS):
     player = GS['player']
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: ')+3
-    start = consts.MESSAGE_NUMBER
-
-    console.drawStr(base-1, start-1, chr(consts.TCOD_CHAR_TEEE))
-    console.drawStr(base, start-1, chr(consts.TCOD_CHAR_HLINE)*(base-2))
-
-    # Description
-    console.drawStr(base, start, player.race.name + ' ('+player.attributes()+')')
+    start = consts.MESSAGE_NUMBER+1
+    draw_square(console, base, start, consts.WIDTH-base-2, 11,
+                text=(player.race.name + ' ('+player.attributes()+')').upper())
+    base += 1
     
     # Health
     hp = math.floor(player.health/player.max_health*100)
@@ -46,31 +43,31 @@ def draw_stats(GS):
     
     # Hunger
     if player.hunger >= 40:
-        console.drawStr(base+bounds+4, start+2, 'Very Hungry', fg=colors.red)
+        console.drawStr(base+bounds+13, start+1, 'Very Hungry', fg=colors.red)
     elif player.hunger >= 20:
-        console.drawStr(base+bounds+4, start+2, 'Hungry', fg=colors.yellow)
+        console.drawStr(base+bounds+13, start+1, 'Hungry', fg=colors.yellow)
     elif player.hunger >= 15:
-        console.drawStr(base+bounds+4, start+2, 'Getting Hungry', fg=colors.green)
+        console.drawStr(base+bounds+13, start+1, 'Getting Hungry', fg=colors.green)
 
     # Light Source Radius
     nm = len(GS['terrain_map'].dungeon['monsters'])
-    console.drawStr(base, start+3, 'LoS dist: ' + str(player.light_source_radius))
-    console.drawStr(base+bounds+4, start+3, 'Dungeon '+str(GS['terrain_map'].dungeon_level))
+    console.drawStr(base, start+2, 'LoS dist: ' + str(player.light_source_radius))
+    console.drawStr(base+bounds+4, start+2, 'Dungeon '+str(GS['terrain_map'].dungeon_level))
 
     # Kills
-    console.drawStr(base, start+4, 'Monsters: ' + str(nm))
-    console.drawStr(base+bounds+4, start+4, 'Kills: ' + str(player.killed_monsters))
+    console.drawStr(base, start+3, 'Monsters: ' + str(nm))
+    console.drawStr(base+bounds+4, start+3, 'Kills: ' + str(player.killed_monsters))
 
     # Level
     lvl = math.floor(player.level/player.race.levels)
     color = colors.light_blue
     if lvl <= 50:
         color = colors.dark_yellow
-    console.drawStr(base, start+5,
+    console.drawStr(base, start+4,
                     'Level: '+str(player.level)+'/'+str(player.race.levels),
                     fg=color)
 
-    console.drawStr(base+bounds+4, start+5, 'Exp: '+str(player.exp))
+    console.drawStr(base+bounds+4, start+4, 'Exp: '+str(player.exp))
 
     # Other Stats
     l = {
@@ -79,7 +76,7 @@ def draw_stats(GS):
         'Attack': (player.attack, colors.red),
         'Armor': (player.defence, colors.dark_yellow)
     }
-    i = 6
+    i = 5
     for k, v in l.items():
         console.drawStr(base, start+i, k+': ', fg=v[1])
         console.drawStr(base+len(k)+2, start+i, ' '*math.floor(v[0]), bg=v[1])
@@ -87,27 +84,21 @@ def draw_stats(GS):
 
     # Ranged Weapon
     if player.ranged_weapon:
-        console.drawStr(base, start+10, 'RW: '+str(player.ranged_weapon.name))
-        console.drawStr(base+bounds+4, start+10, 'Missles: '+str(len(player.missles)))
+        console.drawStr(base, start+9, 'RW: '+str(player.ranged_weapon.name))
+        console.drawStr(base+bounds+4, start+9, 'Missles: '+str(len(player.missles)))
 
     # Game State
-    console.drawStr(base, start+11, 'Turn '+str(GS['turns']))
-    console.drawStr(base+bounds+4, start+11, 'Score: '+str(player.score(GS)))
+    console.drawStr(base, start+10, 'Turn '+str(GS['turns']))
+    console.drawStr(base+bounds+4, start+10, 'Score: '+str(player.score(GS)))
 
 def draw_messages(GS):
     console = GS['console']
+    ms = 'MESSAGES\n'+'\n'.join(list(reversed(GS['messages'])))
     if len(GS['messages']) >= consts.MESSAGE_NUMBER:
         GS['messages'] = [GS['messages'][0]]
-        
-    for (i, m) in enumerate(reversed(GS['messages'])):
-        color = colors.white
-        message = m
-        if len(m.split(': ')) > 1:
-            color = eval("colors." + m.split(': ')[0])
-            message = m.split(': ')[1]
-            
-        GS['console'].drawStr(math.ceil(consts.WIDTH/2)+1, i, message, fg=color)
-
+    base = math.floor(consts.WIDTH/2)+1
+    draw_square(console, base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER,
+                text=ms, spacing=1)
     return GS['messages']
     
 def draw_hud_screen(GS):
@@ -170,9 +161,6 @@ def draw_man_screen(GS):
         
 def draw_hud(GS):
     consts.EDGE_POS = math.ceil(consts.WIDTH/2)+2
-    for i in range(0, consts.HEIGHT):
-        GS['console'].drawChar(consts.EDGE_POS-2, i, chr(179))
-        
     return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS) or GS['messages']
 
 frame = 0
@@ -205,13 +193,15 @@ def draw_charsel_screen(GS, frame):
     if selected_race:
         race = selected_race 
         race_display = """BASELINE STATS
-        Level Up Bonus: %d
-        Speed: %d
-        Number of Levels: %d
-        Strength:%d
-        Health: %d""" % (race.level_up_bonus, race.speed, race.levels,
-                         race.first_level['strength'],
-                         race.first_level['max_health'])
+        dark_yellow: Level Up Bonus -> %d
+        light_blue: Speed -> %d
+        light_blue: Number of Levels -> %d
+        grey: Strength -> %d
+        green: Health -> %d
+        Description -> %s""" % (race.level_up_bonus, race.speed, race.levels,
+                 race.first_level['strength'],
+                 race.first_level['max_health'],
+                 race.description)
         draw_square(console, int(consts.WIDTH/2)-27, 30, 54, 30, race_display)
 
 def draw_intro_screen(GS, frame):
@@ -388,47 +378,23 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
         elif not going_right:
             char = chr(consts.TCOD_CHAR_ARROW_E)
         
-    result = line(console, a[0], a[1], b[0], b[1], char, color)
-    
+    points = tdl.map.bresenham(a[0], a[1], b[0], b[1])
+    result = True
+    for pnt in points:
+        if GS['terrain_map'].get_type(pnt) == 'STONE':
+            result = False
+            break
+        else:
+            console.drawChar(pnt[0], pnt[1], char, fg=color)
     if start_char:
         console.drawChar(a[0], a[1], start_char, fg=colors.white, bg=colors.black)
     if end_char:
         console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
     return result
 
-def line(console, x0, y0, x1, y1, char, color):
-    "Bresenham's line algorithm"
-    dx = abs(x1 - x0)
-    dy = abs(y1 - y0)
-    x, y = x0, y0
-    sx = -1 if x0 > x1 else 1
-    sy = -1 if y0 > y1 else 1
-    if dx > dy:
-        err = dx / 2.0
-        while x != x1:
-            c = console.get_char(x, y)[0]
-            if c >= 176 and c <= 178: return False
-            console.drawChar(x, y, char, fg=color)
-            err -= dy
-            if err < 0:
-                y += sy
-                err += dx
-            x += sx
-        return True
-    else:
-        err = dy / 2.0
-        while y != y1:
-            c = console.get_char(x, y)[0]
-            if c >= 176 and c <= 178: return False
-            console.drawChar(x, y, char, fg=color)
-            err -= dx
-            if err < 0:
-                x += sx
-                err += dy
-            y += sy
-        return True
-
-def draw_square(console, x, y, width, height, text=''):
+def draw_square(console, x, y, width, height, text='', spacing=2):
+    # height = min(max(0, height), consts.HEIGHT)
+    # width = min(max(0, width), consts.WIDTH)
     for i in range(1, height):
         console.drawChar(x, y+i, chr(consts.TCOD_CHAR_VLINE))
         console.drawChar(width+x, y+i, chr(consts.TCOD_CHAR_VLINE))
@@ -437,10 +403,14 @@ def draw_square(console, x, y, width, height, text=''):
     console.drawChar(x, y, chr(consts.TCOD_CHAR_NW))
     
     console.drawStr(x+width, y+height, chr(consts.TCOD_CHAR_SE))
-    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_HLINE)*54)
+    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_HLINE)*width)
     console.drawChar(x+width, y, chr(consts.TCOD_CHAR_NE))
     
     console.drawStr(x, y+height, chr(consts.TCOD_CHAR_SW))
 
     for i, line in enumerate(text.split('\n')):
-        console.drawStr(x+1, y+i*2, line.strip())
+        color = colors.white
+        if len(line.split(': ')) > 1:
+            color = eval("colors." + line.split(': ')[0])
+            line = line.split(': ')[1]
+        console.drawStr(x+1, y+i*spacing, line.strip(), fg=color)
