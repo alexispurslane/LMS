@@ -1,5 +1,5 @@
 import tdl
-import random, math
+import random, math, copy
 import monsters, colors, consts, utils, items, dungeons, forests, area
 
 def connect_rooms(self, r1, r2):
@@ -13,9 +13,38 @@ def connect_rooms(self, r1, r2):
     r1.connected = True
     r2.connected = True
 
+MAP_TYPES = [
+    'standard',
+    # 'labrynth', <- Special algorithm for variety
+]
 def generate_new_dungeon_map(self):
-    return generate_new_standard_dungeon_map(self)
-    
+    rtype = random.choice(MAP_TYPES)
+    return globals()['generate_new_'+rtype+'_dungeon_map'](self)
+
+def generate_new_labrynth_dungeon_map(self):
+    # Braid maze algorithm:
+    start = (random.randint(0, self.width), random.randint(0, self.height))
+    self.dungeon['up_stairs'] = start
+
+    visited = [start]
+    while len(visited) < 300:
+        current = visited[-1]
+        apos = random.choice([(1, 0), (0, 1), (0, -1), (-1, 0)])
+        new = utils.tuple_add(current, apos)
+        if not new in visited and self.on_map(new):
+            self.place_cell(new, is_wall=False)
+            visited.append(new)
+        else:
+            visited.pop()
+
+    for pos in self.dungeon['visited']:
+        self.dungeon['decor'][pos] = None
+        self.dungeon['items'][pos] = []
+
+    self.dungeon['player_starting_pos'] = start
+    self.dungeon['down_stairs'] = visited[-1]
+    return start
+
 def generate_new_standard_dungeon_map(self):
     self.dungeon['decor'][0, 0] = None
     for pos in self.dungeon['visited']:
@@ -80,7 +109,7 @@ def generate_new_standard_dungeon_map(self):
                     ms += [monsters.Goblin] * 3
                     
                 # Deal with chosen monster
-                m = random.choice(ms)
+                m = random.choice(list(map(copy.copy, ms)))
                 m.pos = room.center
 
                 offset = (0, 0)
@@ -140,3 +169,4 @@ def generate_new_standard_dungeon_map(self):
     self.dungeon['player_starting_pos'] = self.dungeon['rooms'][1].center
 
     return self.dungeon['player_starting_pos']
+

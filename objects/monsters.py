@@ -173,11 +173,11 @@ def filtch(self, GS, player):
     
     if len(valid) > 0:
         pos = random.choice(valid)
-        items = list(filter(lambda x: x.weight <= 4, player.inventory))
+        items = list(filter(lambda x: x.weight <= 4, player.lin_inventory))
 
         if len(items) > 0:
             item = random.choice(items)
-            player.remove_inventory_item(player.inventory.index(item))
+            player.remove_inventory_item(item)
         
             GS['messages'].insert(0, 'light_blue: The Imp steals your ' + item.name + ' and throws it.')
             GS['terrain_map'].dungeon['items'][pos].append(item)
