@@ -1,4 +1,5 @@
 import colors, consts, yaml
+from itertools import groupby
 
 class Item:
     def __init__(self, name='Unknown item', weight=1,
@@ -84,7 +85,7 @@ class Food(Item):
     def equip(self, p):
         p.hunger -= self.nutrition
         p.hunger = max(0, p.hunger)
-        p.inventory.remove(self)
+        p.lin_inventory.remove(self)
 
     def dequip(self, p):
         pass

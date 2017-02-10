@@ -11,7 +11,6 @@ class TerrainMap:
         self.rooms = []
         self.width = w
         self.height = h
-        print(self.width, self.height)
 
         self.dungeon = {}
         self.reset_dungeon()

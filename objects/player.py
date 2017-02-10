@@ -1,4 +1,5 @@
 import tdl, copy, random
+from itertools import groupby
 import utils, consts, math, items
 
 class Player:
@@ -27,19 +28,24 @@ class Player:
         self.max_defence = self.defence = 0
 
         # Setup player's inventory
-        self.inventory = list(map(copy.copy, self.race.first_level['inventory']))
-        self.inventory = self.inventory+[items.FOOD_RATION]*8
+        self.lin_inventory = list(map(copy.copy,
+                                      self.race.first_level['inventory']))\
+                                      +[items.FOOD_RATION]*8
+        self.update_inventory()
         self.dequips = []
         
         # Book-keeping
         self.ranged_weapon = None
         self.missles = []
 
-        for item in self.inventory:
+        for item in self.lin_inventory:
             item.equip(self)
 
+    def update_inventory(self):
+        self.inventory = [(k, len(list(g))) for k, g in groupby(self.lin_inventory)]
+        
     def has(self, x):
-        return len([y for y in self.inventory
+        return len([y for y in self.lin_inventory
                     if y.equipped and
                     (x.name == y.name or y.char == x.char)]) > 0
             
@@ -85,7 +91,8 @@ class Player:
         if monster.speed < self.speed:
             monster.attack_player(self, GS)
             self.health += min(self.max_health - self.health, self.defence)
-            if self.health > 0 and random.randint(0, 20+self.exp) <= self.exp+10:
+            skill = self.race.skill['weapon']
+            if self.health > 0 and random.randint(0, 20+self.exp) <= self.exp*skill+10:
                 monster.health -= self.attack
                 GS['messages'].insert(0, 'yellow: You hit the monster a blow.')
                 GS['messages'].insert(0, 'yellow: The monster\'s health is '\
@@ -109,24 +116,27 @@ class Player:
     # And calculates the player's new speed value based on the new weight of the
     # combined inventory.
     def add_inventory_item(self, item):
-        self.inventory.append(copy.copy(item))
-        self.inventory.sort(key = lambda x: x.weight)
-        self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.inventory)))
+        self.lin_inventory.append(copy.copy(item))
+        self.lin_inventory.sort(key = lambda x: x.weight)
+        self.update_inventory()
+        self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
         
         if isinstance(item, items.Missle):
             item.equip(self)
 
     # Removes the i-th item from the inventory, dequips it, and resorts the inventory.
     def remove_inventory_item(self, i):
-        item = self.inventory[i]
+        item = self.inventory[i][0]
         item.dequip(self)
-        self.inventory.remove(item)
+        self.lin_inventory.remove(item)
+        self.update_inventory()
+        
         self.inventory.sort(key = lambda x: x.weight)
 
     # Calculates the total weight of the player's entire inventory.
     def total_weight(self):
         total = 0
-        for i in self.inventory:
+        for i in self.lin_inventory:
             total += i.weight
             
         return total
@@ -138,8 +148,8 @@ class Player:
     # If he has less than two armor items and three or less weapons, he is light,
     # and quiet.
     def light(self):
-        num_armor = len(list(filter(lambda a: isinstance(a, items.Armor), self.inventory)))
-        num_weapon = len(list(filter(lambda a: isinstance(a, items.Weapon), self.inventory)))
+        num_armor = len(list(filter(lambda a: isinstance(a, items.Armor), self.lin_inventory)))
+        num_weapon = len(list(filter(lambda a: isinstance(a, items.Weapon), self.lin_inventory)))
 
         if self.race.name == 'Bowman':
             if num_armor <= 4 and num_weapon <= 3:
@@ -233,7 +243,7 @@ class Player:
             if GS['terrain_map'].in_area(new_pos) == 'Cave':
                 GS['terrain_map'].place_cell(new_pos)
             else:
-                GS['messages'].insert(0, "grey: You hit a wall. Stoppit.")
+                GS['messages'].insert(0, "grey: You run into a wall.")
                 new_pos = self.pos
                 n_x, n_y = new_pos
             
@@ -261,11 +271,9 @@ class Player:
             self.speed = speed
 
         decor = GS['terrain_map'].dungeon['decor']
-        if decor[new_pos] == 'FM':
-            decor[new_pos] = None
-        elif decor[new_pos] == 'FR' or decor[new_pos] == 'FL':
-            decor[new_pos] = None
-            player.health -= 1
-            GS['messages'].insert(0, 'The fire burns you.')
-            
+        if new_pos in decor:
+            if decor[new_pos] == 'FR' or decor[new_pos] == 'FL':
+                decor[new_pos] = None
+                player.health -= 1
+                GS['messages'].insert(0, 'The fire burns you.')
 

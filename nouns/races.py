@@ -32,6 +32,7 @@ class Race:
         self.level_up_bonus = settings['bonus']
         self.speed = settings['speed']
         self.name = settings['name']
+        self.skills = first_level['skills']
         self.levels = settings['levels']
         self.color = settings['color']
         self.suggested_difficulty = settings['suggested_difficulty']
@@ -47,9 +48,9 @@ BERSERKER = Race({
         items.LEATHER_BREASTPLATE
     ],
     'skills': {
-        'weapon': 0.9,
+        'weapon': 1.2,
         'spell': 0.5,
-        'range': 0
+        'range': 0.1
     }
 }, {
     'name': 'Berserker',
@@ -70,9 +71,9 @@ BOWMAN = Race({
         items.ROBE
     ]+[items.WOOD_ARROW]*21,
     'skills': {
-        'weapon': 0.98,
+        'weapon': 0.9,
         'spell': 1,
-        'range': 1.2
+        'range': 1.3
     }
 }, {
     'name': 'Bowman',

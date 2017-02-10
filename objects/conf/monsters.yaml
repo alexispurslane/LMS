@@ -70,6 +70,7 @@ monsters:
     speed: 1
     attack: 22
     action: poison
+    ranged: True
 
 - Rat:
     char: r

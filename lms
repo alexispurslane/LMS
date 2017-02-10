@@ -33,7 +33,6 @@ reset_GS()
     
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')
-    consts.quit(GS, GS['player'])
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -44,7 +43,7 @@ class Game(tdl.event.App):
     def ev_KEYDOWN(self, event):
         global GS
         if event.keychar.upper() == 'Q':
-            consts.quit(GS, GS['player'])
+            pass
         elif GS['side_screen'] == 'INVENTORY':
             if event.keychar.upper() == 'UP':
                 GS['selection'] -= 1
@@ -58,13 +57,14 @@ class Game(tdl.event.App):
                     GS['player'].inventory[GS['selection']])
                 GS['player'].remove_inventory_item(GS['selection'])
             elif event.keychar.upper() == 'W':
-                GS['player'].inventory[GS['selection']].equip(GS['player'])
+                GS['player'].inventory[GS['selection']][0].equip(GS['player'])
             elif event.keychar.upper() == 'T':
-                GS['player'].inventory[GS['selection']].dequip(GS['player'])
+                GS['player'].inventory[GS['selection']][0].dequip(GS['player'])
             elif event.keychar.upper() == 'I':
                 GS['side_screen'] = 'HUD'
             elif event.keychar.isnumeric():
                 GS['selection'] = int(event.keychar)
+            GS['player'].update_inventory()
         elif GS['screen'] == 'DEATH':
             if event.keychar.upper() == 'R':
                 reset_GS()
@@ -72,9 +72,17 @@ class Game(tdl.event.App):
                 event.keychar.upper() == 'SPACE':
             GS['screen'] = 'CHARSEL'
         elif GS['screen'] == 'CHARSEL':
-            if event.keychar.isalpha() and len(event.keychar) == 1:
-                racen = ord(event.keychar.lower())-97
-                if racen < len(races.RACES):
+            if event.keychar.upper() == 'UP':
+                GS['selection'] -= 1
+                GS['selection'] %= len(races.RACES)+1
+            elif event.keychar.upper() == 'DOWN':
+                GS['selection'] += 1
+                GS['selection'] %= len(races.RACES)+1
+            elif event.keychar.isnumeric() and len(event.keychar) == 1:
+                GS['selection'] = int(event.keychar)
+            elif event.keychar.upper() == 'ENTER':
+                racen = GS['selection']-1
+                if racen < len(races.RACES) and racen >= 0:
                     selected_race = races.RACES[racen]
                     GS['player'] = player.Player(selected_race)
                     consts.DIFFICULTY = selected_race.suggested_difficulty
@@ -100,7 +108,7 @@ class Game(tdl.event.App):
             GS['turns'] += 1
 
     def ev_QUIT(self, event):
-        consts.quit(GS, GS['player'])
+        pass
 
     def ev_MOUSEDOWN(self, event):
         if event.button == 'RIGHT':

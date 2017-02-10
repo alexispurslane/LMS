@@ -1,4 +1,4 @@
-import utils, draw, itertools, math, tdl, random
+import utils, draw, itertools, math, tdl, random, colors
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -100,7 +100,9 @@ def fire(GS, p):
             for i, m in enumerate(ms):
                 start = (p.pos[0]-ox, p.pos[1]-oy)
                 end = (m.pos[0]-ox, m.pos[1]-oy)
-                if not draw.draw_line(GS, start, end, '*', '@', str(i)):
+                if not draw.draw_line(GS, start, end,
+                                      colors.light_blue,
+                                      start_char='@', end_char=str(i)):
                     ms.remove(m)
                     removed = True
 
@@ -114,7 +116,9 @@ def fire(GS, p):
             if key.keychar != 'ESCAPE':
                 GS['messages'].insert(0, 'yellow: You shoot the '+utils.ordinal(key.keychar)+' target!')
                 target = ms[int(key.keychar)%len(ms)]
-                if target and random.randint(0,max(1, 100-p.exp-5)) < target.speed*20+5:
+                skill = p.race.skills['range']
+                handicap = max(0, math.ceil(1-skill))+5
+                if target and random.randint(0,max(1, 100-p.exp*skill-handicap)) < target.speed*20+5:
                     missle = list(filter(lambda m:
                                         p.ranged_weapon.missle_type in m.missle_type,
                                         p.missles))[-1]
@@ -123,6 +127,8 @@ def fire(GS, p):
                     if target.health <= 0:
                         GS['messages'].insert(0, 'green: Your shot hit home! The '+target.name+' dies.')
                         GS['terrain_map'].dungeon['monsters'].remove(target)
+                        p.killed_monsters += 1
+                        p.learn(GS, target)
                     p.missles.remove(missle)
                     missle.equipped = False
                     GS['terrain_map'].dungeon['items'][target.pos].append(missle)
@@ -149,27 +155,19 @@ def reset(GS, p):
         GS['screen'] = 'GAME'
 
 # Quits the game and prints ending player state.
-def quit(GS, p):
-    print('\nGame Stats')
-    print('----------')
-    print('  Turns: ' + str(GS['turns']))
-    print('  Score: ' + str(p.score(GS)))
-    print('  Kills: ' + str(p.killed_monsters))
-    print('  Exp:   ' + str(p.exp))
-    print('  Inventory:\n' +\
-          ',\n'.join(list(map(lambda x:
-                              '    '+x[0].name+' x'+str(len(list(x[1]))),
-                              itertools.groupby(p.inventory)))))
-    exit(0)
-
 def auto_move(d):
     event = tdl.event.KeyDown(d, d, False, False, False, False, False)
     def do(GS, p):
+        turns = 0
         changed = True
         while changed:
             pp = p.pos
             p.move(event, GS)
+            p.hunger += 1
             changed = pp != p.pos
+            if turns % 3 == 0:
+                utils.monster_turn(GS)
+            turns += 1
     return do
     
 GAME_ACTION_KEYS = {
@@ -179,7 +177,6 @@ GAME_ACTION_KEYS = {
     'f': fire,
     'i': inventory,
     'escape': inventory,
-    'q': quit,
     '+': lambda GS, p: eval('consts.WIZARD_MODE = not consts.WIZARD_MODE'),
 
     # Auto-movement

@@ -1,8 +1,17 @@
-import random, math, yaml, copy, os
+import random, math, yaml, copy, os, time
 import colors, utils, consts, items
 
 class Monster:
-    def __init__(self, name, char, fg, speed=0, health=0, attack=0, special_action=lambda self, GS, p: -1, agressive=False):
+    def __init__(self,
+                 name,
+                 char,
+                 fg,
+                 speed=0,
+                 health=0,
+                 attack=0,
+                 special_action=lambda self, GS, p: -1,
+                 agressive=False,
+                 ranged=False):
         self.char = char
         self.name = name
         self.pos = (0, 0)
@@ -12,11 +21,14 @@ class Monster:
         self.attack = attack
         self.special_action = special_action
         self.agressive = agressive
-        self.drops = [items.FOOD_RATION]*8 + [items.TORCH]
+        self.ranged = ranged
+        self.drops = [items.FOOD_RATION]*8 + [items.TORCH, items.SWORD, items.GAMBESON]
         
         self.sight = int(self.speed/2)
         if self.sight < 8:
             self.sight = 8
+            if self.ranged:
+                self.sight += 3
         
         if self.health >= 20:
             self.drops.append(items.ITEMS)
@@ -56,6 +68,8 @@ class Monster:
     def choose(self, player, lst, key):
         if self.agressive:
             return min(lst, key=key)
+        elif self.ranged:
+            return max(lst, key=key)
         elif self.speed > player.speed:
             if self.health > player.health:
                 return min(lst, key=key)
@@ -112,13 +126,28 @@ class Monster:
                 else:
                     GS['terrain_map'].dungeon['items'][self.pos] = [random.choice(self.drops)]
         elif utils.dist(self.pos, GS['player'].pos) <= self.sight:
-            if len(choices) > 0:
+            if self.ranged:
+                p = GS['player']
+                m = self
+                
+                ox = max(0, GS['player'].pos[0]-math.floor(WIDTH/4))
+                oy = max(0, GS['player'].pos[1]-math.floor(HEIGHT/2))
+                
+                start = (m.pos[0]-ox, m.pos[1]-oy)
+                end = (p.pos[0]-ox, p.pos[1]-oy)
+                
+                draw.draw_line(GS, start, end, self.fg,
+                               start_char=self.char, end_char='@')
+                time.sleep(0.3)
+                p.health -= self.speed
+                
+            elif len(choices) > 0:
                 self.pos = self.choose(
                     GS['player'],
                     choices,
                     lambda p: utils.dist(p, GS['player'].pos))
         else:                            # Monster moves in random direction.
-            if len(choices) >= 2:
+            if len(choices) > 0:
                 self.pos = random.choice(choices)
                 
         self.sight = sight
@@ -134,7 +163,7 @@ def breed(self, GS, player):
         (x, y-1),
     ]
     valid = list(filter(GS['terrain_map'].is_walkable, posns))
-    if len(valid) > 0 and random.randint(1,3) == 1:
+    if len(valid) > 0 and random.randint(1,2) == 1:
         GS['messages'].insert(0, "You chop the slime in half. The new half is alive!")
         if consts.DEBUG:
             print('Slime breeding.')
@@ -158,7 +187,7 @@ def filtch(self, GS, player):
     
     if len(valid) > 0:
         pos = random.choice(valid)
-        items = list(filter(lambda x: x.weight < 4, player.inventory))
+        items = list(filter(lambda x: x.weight <= 4, player.inventory))
 
         if len(items) > 0:
             item = random.choice(items)

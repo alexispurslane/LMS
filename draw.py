@@ -16,7 +16,7 @@ def draw_stats(GS):
     start = consts.MESSAGE_NUMBER
 
     console.drawStr(base-1, start-1, chr(consts.TCOD_CHAR_TEEE))
-    console.drawStr(base, start-1, chr(consts.TCOD_CHAR_HLINE)*(base-1))
+    console.drawStr(base, start-1, chr(consts.TCOD_CHAR_HLINE)*(base-2))
 
     # Description
     console.drawStr(base, start, player.race.name + ' ('+player.attributes()+')')
@@ -117,35 +117,45 @@ def draw_hud_screen(GS):
 
 def draw_inventory_screen(GS):
     console = GS['console']
-    lst = groupby(GS['player'].inventory)
-    for (i, grp) in enumerate(lst):
-        item, number = grp
+    placing = 0
+    for (i, grp) in enumerate(GS['player'].inventory):
+        item, number = grp[0], grp[1]
         item_display = ""
         if isinstance(item, items.Armor):
-            item_display = '(%s) -> W/D:%d' % (item.char, item.weight)
+            item_display = 'Character: %s\nWeight: %d\nDefence: %d'\
+                           % (item.char, item.weight, item.defence)
         elif isinstance(item, items.Weapon):
-            item_display = '(%s) -> W:%d, A:%d' % (item.char, item.weight, item.attack)
+            item_display = 'Character: %s\nWeight: %d\nAttack: %d'\
+                           % (item.char, item.weight, item.attack)
         elif isinstance(item, items.RangedWeapon):
-            item_display = '(%s) -> W:%d, R:%d' % (item.char, item.weight, item.range)
+            item_display = 'Character: %s\nWeight: %d\nRange: %d'\
+                           % (item.char, item.weight, item.range)
         elif isinstance(item, items.Missle):
-            item_display = '(%s) -> H:%d' % (item.char, item.hit)
+            item_display = 'Character: %s\nHit Damage: %d'\
+                           % (item.char, item.hit)
         elif isinstance(item, items.Light):
-            item_display = '(%s) -> R:%d, L:%d' % (item.char, item.radius, item.lasts)
+            item_display = 'Character: %s\nRadius: %d\nLasts (turns): %d'\
+                           % (item.char, item.radius, item.lasts)
         elif isinstance(item, items.Food):
-            item_display = '(%s) -> N:%d' % (item.char, item.nutrition)
+            item_display = 'Character: %s\nNutrition Value:%d'\
+                           % (item.char, item.nutrition)
 
-        color = colors.black
+        item_display += '\nAmount: '+str(number)
+        color = colors.light_blue
+        color2 = colors.white
         if item.equipped:
-            color = colors.red
-            
-        try:
-            if item == GS['player'].inventory[GS['selection']]:
-                color = colors.grey
-        except:
-            pass
+            color2 = color = colors.red
         
-        console.drawStr(consts.EDGE_POS+1, i+1, '('+str(i)+') '+item.name+' -> '+item_display+' (Pr'+str(item.probability)+'%) x'+str(len(list(number))),
-                        bg=color)
+        try:
+            if i == GS['selection']:
+                color2 = color = colors.grey
+        except: pass
+        
+        console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name, bg=color)
+        for line in item_display.split("\n"):
+            placing += 1
+            console.drawStr(consts.EDGE_POS+5, placing, line, fg=color2)
+        placing += 2
 
 def draw_man_screen(GS):
     with open('manual.txt', 'r') as myfile:
@@ -182,14 +192,27 @@ def draw_static(console, frame):
 
 def draw_charsel_screen(GS, frame):
     console = GS['console']
+    selected_race = None
     for (i, race) in enumerate(races.RACES):
-        race_display = 'LuB:%d, Sp:%d, MxL:%d; ST:%d, HT: %d' %\
-                       (race.level_up_bonus, race.speed, race.levels,
-                        race.first_level['strength'], race.first_level['max_health'])
+        color = colors.black
+        if i+1 == GS['selection']:
+            selected_race = race
+            color = colors.grey
         console.drawStr(int(consts.WIDTH/2)-28, i*2+5,
-                        '('+chr(97+i)+') '+race.name+' -> '+race_display)
+                        str(i+1)+') '+race.name,
+                        bg=color)
 
-    draw_static(console, frame)
+    if selected_race:
+        race = selected_race 
+        race_display = """BASELINE STATS
+        Level Up Bonus: %d
+        Speed: %d
+        Number of Levels: %d
+        Strength:%d
+        Health: %d""" % (race.level_up_bonus, race.speed, race.levels,
+                         race.first_level['strength'],
+                         race.first_level['max_health'])
+        draw_square(console, int(consts.WIDTH/2)-27, 30, 54, 30, race_display)
 
 def draw_intro_screen(GS, frame):
     console = GS['console']
@@ -230,7 +253,7 @@ def draw_death_screen(GS, frame):
     console.drawStr(consts.WIDTH/2-11, 6, 'Exp:   ' + str(player.exp), fg=colors.light_blue)
     console.drawStr(consts.WIDTH/2-11, 7, 'Inventory: ')
     for i, g in enumerate(groupby(player.inventory)):
-        console.drawStr(consts.WIDTH/2-7, 8+i, g[0].name + ' x'+str(len(list(g[1]))))
+        console.drawStr(consts.WIDTH/2-7, 8+i, g[0][0].name + ' x'+str(len(list(g[1]))))
 
 def draw_game_screen(GS, frame):
     console = GS['console']
@@ -245,6 +268,8 @@ def draw_game_screen(GS, frame):
             GS['console'].drawChar(m.pos[0]-ox, m.pos[1]-oy, m.char, fg=m.fg, bg=bg_color)
 
     bg_color = GS['map_console'].get_char(GS['player'].pos[0], GS['player'].pos[1])[2]
+    if bg_color == (0, 0, 0):
+        bg_color = GS['map_console'].get_char(GS['player'].pos[0], GS['player'].pos[1])[1]
     console.drawChar(GS['player'].pos[0]-ox, GS['player'].pos[1]-oy, '@', bg=bg_color,
                      fg=GS['player'].race.color)
     GS['messages'] = draw_hud(GS)
@@ -262,8 +287,6 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         back = (12,12,12)
         if len(items) > 1:
             back = colors.white
-        if isinstance(items[-1], list):
-            print(items[-1])
         console.drawChar(x, y, items[-1].char,
                          fg=colors.tint(items[-1].fg, tint),
                          bg=back)
@@ -301,7 +324,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         elif area == 'Cave':
             color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
             
-        console.drawChar(x, y, ' ', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
+        console.drawChar(x, y, ' ', fg=color, bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
             console.drawChar(x, y, chr(consts.TCOD_CHAR_CHECKBOX_SET),
@@ -349,22 +372,23 @@ def draw_forest_tile(terrain_map, console, pos, tint):
     elif terrain_map.get_type(x, y) == 'TREE':
         console.drawChar(x, y, 'T', fg=colors.tint(colors.green, tint))
 
-def draw_line(GS, a, b, char, start_char=None, end_char=None):
+def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
     console = GS['console']
-    
-    going_right = a[0] > b[0]
-    vertical_up =  a[0] == b[0] and a[1] > b[1]
-    vertical_down =  a[0] == b[0] and a[1] <= b[1]
-    if vertical_up:
-        char = chr(consts.TCOD_CHAR_ARROW_N)
-    elif vertical_down:
-        char = chr(consts.TCOD_CHAR_ARROW_S)
-    elif going_right:
-        char = chr(consts.TCOD_CHAR_ARROW_W)
-    elif not going_right:
-        char = chr(consts.TCOD_CHAR_ARROW_E)
+
+    if char == None:
+        going_right = a[0] > b[0]
+        vertical_up =  a[0] == b[0] and a[1] > b[1]
+        vertical_down =  a[0] == b[0] and a[1] <= b[1]
+        if vertical_up:
+            char = chr(consts.TCOD_CHAR_ARROW_N)
+        elif vertical_down:
+            char = chr(consts.TCOD_CHAR_ARROW_S)
+        elif going_right:
+            char = chr(consts.TCOD_CHAR_ARROW_W)
+        elif not going_right:
+            char = chr(consts.TCOD_CHAR_ARROW_E)
         
-    result = line(console, a[0], a[1], b[0], b[1], char)
+    result = line(console, a[0], a[1], b[0], b[1], char, color)
     
     if start_char:
         console.drawChar(a[0], a[1], start_char, fg=colors.white, bg=colors.black)
@@ -372,7 +396,7 @@ def draw_line(GS, a, b, char, start_char=None, end_char=None):
         console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
     return result
 
-def line(console, x0, y0, x1, y1, char):
+def line(console, x0, y0, x1, y1, char, color):
     "Bresenham's line algorithm"
     dx = abs(x1 - x0)
     dy = abs(y1 - y0)
@@ -384,7 +408,7 @@ def line(console, x0, y0, x1, y1, char):
         while x != x1:
             c = console.get_char(x, y)[0]
             if c >= 176 and c <= 178: return False
-            console.drawChar(x, y, char, fg=colors.light_blue)
+            console.drawChar(x, y, char, fg=color)
             err -= dy
             if err < 0:
                 y += sy
@@ -396,7 +420,7 @@ def line(console, x0, y0, x1, y1, char):
         while y != y1:
             c = console.get_char(x, y)[0]
             if c >= 176 and c <= 178: return False
-            console.drawChar(x, y, char, fg=colors.light_blue)
+            console.drawChar(x, y, char, fg=color)
             err -= dx
             if err < 0:
                 x += sx
@@ -404,7 +428,19 @@ def line(console, x0, y0, x1, y1, char):
             y += sy
         return True
 
-def scroll_screen(GS):
-    offset_x = math.floor(consts.WIDTH/4) - GS['player'].pos[0]
-    offset_y = math.floor(consts.HEIGHT/4) - GS['player'].pos[1]
-    GS['console'].scroll(offset_x, offset_y)
+def draw_square(console, x, y, width, height, text=''):
+    for i in range(1, height):
+        console.drawChar(x, y+i, chr(consts.TCOD_CHAR_VLINE))
+        console.drawChar(width+x, y+i, chr(consts.TCOD_CHAR_VLINE))
+        
+    console.drawStr(x, y, chr(consts.TCOD_CHAR_HLINE)*width)
+    console.drawChar(x, y, chr(consts.TCOD_CHAR_NW))
+    
+    console.drawStr(x+width, y+height, chr(consts.TCOD_CHAR_SE))
+    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_HLINE)*54)
+    console.drawChar(x+width, y, chr(consts.TCOD_CHAR_NE))
+    
+    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_SW))
+
+    for i, line in enumerate(text.split('\n')):
+        console.drawStr(x+1, y+i*2, line.strip())
