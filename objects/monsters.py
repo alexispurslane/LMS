@@ -114,7 +114,7 @@ class Monster:
 
                 animation.FireMissleAnimation().run(GS, [items.WOOD_ARROW, start, end])
                 p.health -= self.speed
-            else:
+            elif self.agressive:
                 if len(self.path) == 0 or self.path[-1] != GS['player'].pos:
                     # Reset the path (A* algorithm)
                     self.path = GS['terrain_map'].dungeon['visited'].compute_path(
@@ -128,6 +128,11 @@ class Monster:
                     npos = self.path.pop()
                     if GS['terrain_map'].is_walkable(npos):
                         self.pos = npos
+            else:
+                npos = utils.tuple_add(self.pos, (random.randint(-1, 1),
+                                              random.randint(-1, 1)))
+                if GS['terrain_map'].is_walkable(npos):
+                    self.pos = npos
         else:
             npos = utils.tuple_add(self.pos, (random.randint(-1, 1),
                                               random.randint(-1, 1)))
