@@ -127,6 +127,7 @@ class Monster:
                         GS['player'].pos[0],
                         GS['player'].pos[1],
                         diagonal_cost=0)
+                    self.path.reverse()
                 if len(self.path) > 0:
                     npos = self.path.pop()
                     if GS['terrain_map'].is_walkable(npos):

@@ -117,12 +117,16 @@ class Player:
     # And calculates the player's new speed value based on the new weight of the
     # combined inventory.
     def add_inventory_item(self, item):
-        self.lin_inventory.append(copy.copy(item))
-        self.update_inventory()
-        self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
+        if len(self.inventory) < consts.MAX_INVENTORY:
+            self.lin_inventory.append(copy.copy(item))
+            self.update_inventory()
+            self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
         
-        if isinstance(item, items.Missle):
-            item.equip(self)
+            if isinstance(item, items.Missle):
+                item.equip(self)
+            return True
+        else:
+            return False
 
     # Removes the i-th item from the inventory, dequips it, and resorts the inventory.
     def remove_inventory_item(self, item):
@@ -228,8 +232,10 @@ class Player:
                     GS['messages'].insert(0, "You find a " + e.name + ".")
                     if isinstance(e, items.Light) or isinstance(e, items.Food)\
                        or isinstance(e, items.Missle):
-                        GS['messages'].insert(0, "You pick up a " + e.name + ".")
-                        self.add_inventory_item(e)
+                        if self.add_inventory_item(e):
+                            GS['messages'].insert(0, "You pick up a " + e.name + ".")
+                        else:
+                            GS['messages'].insert(0, "Your inventory is full.")
                         for k, v in GS['terrain_map'].dungeon['items'].items():
                             if e in v:
                                 GS['terrain_map'].dungeon['items'][k].remove(e)
@@ -263,7 +269,10 @@ class Player:
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
                 
-            if self_dead and not consts.WIZARD_MODE: GS['screen'] = 'DEATH'
+            if self_dead and not consts.WIZARD_MODE:
+                GS['screen'] = 'DEATH'
+                with open('.gamescores', 'a') as scores:
+                    scores.write(str(self.score(GS)))
                 
             self.speed = speed
 

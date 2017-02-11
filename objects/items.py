@@ -20,8 +20,7 @@ class Item:
 class Armor(Item):
     def __init__(self, name='Unknown armor', weight=3,
                          probability=40, char=']', defence=1, color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.equipped = False
         self.defence = defence
 
@@ -42,8 +41,7 @@ class Armor(Item):
 class Weapon(Item):
     def __init__(self, name='Unknown weapon', weight=2, attack=5,
                          probability=20, char='|', color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.attack = attack
         self.equipped = False
         
@@ -62,8 +60,7 @@ class Weapon(Item):
 class Light(Item):
     def __init__(self, name='Torch', weight=1, radius=10, lasts=500,
                          probability=55, char='\\', color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.radius = radius
         self.lasts = lasts
 
@@ -78,8 +75,7 @@ class Light(Item):
 class Food(Item):
     def __init__(self, name='Food Ration', weight=0, nutrition=10,
                          probability=55, char='%', color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.nutrition = nutrition
 
     def equip(self, p):
@@ -94,8 +90,7 @@ class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2,
                          probability=20, char=')',
                  missle_type='Arrow', range=8, color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.missle_type = missle_type
         self.range = range
 
@@ -112,8 +107,7 @@ class RangedWeapon(Item):
 class Missle(Item):
     def __init__(self, name='Regular Arrow', weight=0,
                          probability=45, char='-', hit=15, color=colors.grey):
-        super().__init__(name=name, weight=weight,
-                         probability=probability, char=char, color=color)
+        super().__init__(name, weight, probability, char, color)
         self.missle_type = name.split()[1]
         self.hit = hit
 

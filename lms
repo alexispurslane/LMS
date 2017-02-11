@@ -13,6 +13,7 @@ tdl.event.set_key_repeat(delay=40, interval=0)
 GS = {}
 def reset_GS():
     global GS
+    
     GS = {
         'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
         'screen': 'INTRO',
@@ -24,13 +25,18 @@ def reset_GS():
         'turns': 0,
         'wins': 0,
         'map_console': None,
+        'scores': [],
         'mouse_pos': (-1,-1)
     }
     GS['map_console'] = tdl.Console(GS['terrain_map'].width,
                                     GS['terrain_map'].height)
 
 reset_GS()
-    
+
+with open('.gamescores', 'r') as scores:
+    for score in scores:
+        GS['scores'].append(int(score))
+
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')
     exit()

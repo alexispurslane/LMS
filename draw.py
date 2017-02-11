@@ -113,23 +113,17 @@ def draw_inventory_screen(GS):
         item, number = grp[0], grp[1]
         item_display = ""
         if isinstance(item, items.Armor):
-            item_display = 'Character: %s\nWeight: %d\nDefence: %d'\
-                           % (item.char, item.weight, item.defence)
+            item_display = 'Weight: %d\nDefence: %d' % (item.weight, item.defence)
         elif isinstance(item, items.Weapon):
-            item_display = 'Character: %s\nWeight: %d\nAttack: %d'\
-                           % (item.char, item.weight, item.attack)
+            item_display = 'Weight: %d\nAttack: %d' % (item.weight, item.attack)
         elif isinstance(item, items.RangedWeapon):
-            item_display = 'Character: %s\nWeight: %d\nRange: %d'\
-                           % (item.char, item.weight, item.range)
+            item_display = 'Weight: %d\nRange: %d' % (item.weight, item.range)
         elif isinstance(item, items.Missle):
-            item_display = 'Character: %s\nHit Damage: %d'\
-                           % (item.char, item.hit)
+            item_display = 'Hit Damage: %d' % (item.hit)
         elif isinstance(item, items.Light):
-            item_display = 'Character: %s\nRadius: %d\nLasts (turns): %d'\
-                           % (item.char, item.radius, item.lasts)
+            item_display = 'Radius: %d\nLasts (turns): %d' % (item.radius, item.lasts)
         elif isinstance(item, items.Food):
-            item_display = 'Character: %s\nNutrition Value:%d'\
-                           % (item.char, item.nutrition)
+            item_display = 'Nutrition Value:%d' % (item.nutrition)
 
         item_display += '\nAmount: '+str(number)
         color = colors.light_blue
@@ -142,7 +136,7 @@ def draw_inventory_screen(GS):
                 color2 = color = colors.grey
         except: pass
         
-        console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name, bg=color)
+        console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name+' ('+item.char+')', bg=color)
         for line in item_display.split("\n"):
             placing += 1
             console.drawStr(consts.EDGE_POS+5, placing, line, fg=color2)
@@ -212,24 +206,14 @@ def draw_intro_screen(GS, frame):
     for i, line in enumerate(f.renderText(consts.GAME_TITLE).split("\n")):
         if i == 0:
             l = math.floor(len(line)/2)
-        console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.green)
+        console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.brown)
 
     console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
                     fg=colors.darken(colors.grey))
 
-    story = """
-    Ragnorak has come and gone, and left the gods and their mortal enemies,
-    the ice giants, extinct races, the hollow echos of their great exploits
-    the only remnant of their passing in the world. Fate decreed it so.....
-    And Fate decrees also that a warrior of Norse stock, brave and worthy, 
-    undertake to destroy, in revenge for the gods' fall, the ice giant's 
-    last remaining kin and minions.
-    """.split('\n')
+    scores = '\n'.join(list(map(str, sorted(GS['scores'], reverse=True))))
+    draw_square(console, int(consts.WIDTH/2)-7, 20, 14, 20, text='TOP 20 SCORES\n'+scores, spacing=1)
 
-    for (i, line) in enumerate(story):
-        console.drawStr(int(consts.WIDTH/2)-30, 20+i, line, fg=colors.grey)
-
-    draw_static(console, frame)
 
 def draw_death_screen(GS, frame):
     console = GS['console']
@@ -381,7 +365,7 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
     points = tdl.map.bresenham(a[0], a[1], b[0], b[1])
     result = True
     for pnt in points:
-        if GS['terrain_map'].get_type(pnt) == 'STONE':
+        if GS['terrain_map'].dungeon['visited'].walkable[pnt] == False:
             result = False
             break
         else:

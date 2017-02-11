@@ -1,4 +1,4 @@
-import utils, draw, itertools, math, tdl, random, colors
+import utils, draw, itertools, math, tdl, random, colors, animation
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -7,9 +7,9 @@ FLOOR_LEVEL      = 0.43
 WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
 WIDTH, HEIGHT    = int(1280/FONT_SIZE), int(800/FONT_SIZE)
-FOV              = False
+FOV              = True
 CUMULATE_FOV     = True
-MESSAGE_NUMBER   = 6
+MESSAGE_NUMBER   = 8
 FOREST_LEVELS    = 0
 MAX_ROOMS        = 85
 ITEMS_PER_ROOM   = 2
@@ -19,6 +19,7 @@ DEBUG            = False
 DIFFICULTY       = 18
 EDGE_POS         = math.ceil(WIDTH/2)+2
 MAP_WIDTH, MAP_HEIGHT = WIDTH, HEIGHT
+MAX_INVENTORY    = 12
 
 MIN_ROOM_WIDTH = 4
 MIN_ROOM_HEIGHT = 4
@@ -61,12 +62,13 @@ GAME_MOVEMENT_KEYS = {
 def pickup(GS, p):
     dun_items = GS['terrain_map'].dungeon['items']
     if p.pos in dun_items and len(dun_items[p.pos]) > 0:
-        item = dun_items[p.pos].pop()
-        GS['messages'].insert(0, 'You pick up a '+item.name)
-        
-        p.add_inventory_item(item)
-
-# Have the player rest until no more rest is needed.
+        item = dun_items[p.pos][-1]
+        if p.add_inventory_item(item):
+            GS['messages'].insert(0, 'You pick up a '+item.name)
+            del dun_items[p.pos][-1]
+        else:
+            GS['messages'].insert(0, 'Your inventory is full.')
+            
 # Hunger builds more slowly and monsters each get a turn.
 def auto_rest(GS, p):
     while p.health < p.max_health:
@@ -89,7 +91,7 @@ def fire(GS, p):
         GS['messages'].insert(0, 'red: You have no missles to shoot with!')
     else:
         ms = list(filter(lambda m:
-                        utils.dist(m.pos, p.pos) < p.ranged_weapon.range and\
+                        utils.dist(m.pos, p.pos) <= p.ranged_weapon.range and\
                         GS['terrain_map'].dungeon['lighted'].fov[m.pos],
                         GS['terrain_map'].dungeon['monsters']))
         ox = max(0, GS['player'].pos[0]-math.floor(WIDTH/4))
@@ -118,10 +120,15 @@ def fire(GS, p):
                 target = ms[int(key.keychar)%len(ms)]
                 skill = p.race.skills['range']
                 handicap = max(0, math.ceil(1-skill))+5
-                if target and random.randint(0,max(1, 100-p.exp*skill-handicap)) < target.speed*20+5:
-                    missle = list(filter(lambda m:
-                                        p.ranged_weapon.missle_type in m.missle_type,
-                                        p.missles))[-1]
+                missle = list(filter(lambda m:
+                                     p.ranged_weapon.missle_type in m.missle_type,
+                                     p.missles))[-1]
+                # Animation
+                start = (p.pos[0]-ox, p.pos[1]-oy)
+                end = (target.pos[0]-ox, target.pos[1]-oy)
+                animation.FireMissleAnimation().run(GS, [missle, start, end])
+                
+                if target and random.randrange(0,max(1, 100-p.exp*skill-handicap)) < target.speed*20+5:
                     target.health -= missle.hit
                     GS['messages'].insert(0, 'yellow: You hit the '+target.name+'.')
                     if target.health <= 0:
