@@ -84,9 +84,11 @@ class Room(Area):
 
         # Add decoration/fire and items.
         if not wall:
-            decor = ['FM', None, None, None, None]
+            decor = ['FM', None, None, None]
             if tmap.is_hell_level():
                 decor = ['FR', 'FL', None, None, None, None]
+            if random.randint(1, 1000) < 5:
+                decor = ['TTRAP', 'DTRAP']
             tmap.dungeon['decor'][pos] = random.choice(decor)
 
             if self.item_attempts < consts.ITEMS_PER_ROOM:

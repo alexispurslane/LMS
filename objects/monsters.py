@@ -101,8 +101,6 @@ class Monster:
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
                     GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
-                else:
-                    GS['terrain_map'].dungeon['items'][self.pos] = [random.choice(self.drops)]
         elif utils.dist(self.pos, GS['player'].pos) <= self.sight:
             if self.ranged:
                 p = GS['player']
@@ -113,10 +111,8 @@ class Monster:
                 
                 start = (m.pos[0]-ox, m.pos[1]-oy)
                 end = (p.pos[0]-ox, p.pos[1]-oy)
-                
-                draw.draw_line(GS, start, end, self.fg,
-                               start_char=self.char, end_char='@')
-                time.sleep(0.3)
+
+                animation.FireMissleAnimation().run(GS, [items.WOOD_ARROW, start, end])
                 p.health -= self.speed
             else:
                 if len(self.path) == 0 or self.path[-1] != GS['player'].pos:

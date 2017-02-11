@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import tdl, time, math, random, sys, signal
+import tdl, time, math, random, sys, signal, pickle, os
 
 sys.path.append('generators/')
 sys.path.append('lib/')
@@ -13,33 +13,35 @@ tdl.event.set_key_repeat(delay=40, interval=0)
 GS = {}
 def reset_GS():
     global GS
-    
-    GS = {
-        'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
-        'screen': 'INTRO',
-        'player': player.Player(races.WARRIOR),
-        'terrain_map': maps.TerrainMap(consts.MAP_WIDTH, consts.MAP_HEIGHT),
-        'messages': [],
-        'selection': 0,
-        'side_screen': 'HUD',
-        'turns': 0,
-        'wins': 0,
-        'map_console': None,
-        'scores': [],
-        'mouse_pos': (-1,-1)
-    }
-    GS['map_console'] = tdl.Console(GS['terrain_map'].width,
-                                    GS['terrain_map'].height)
+    if os.path.exists('.gamesave') and os.path.getsize('.gamesave') > 0:
+        with open('.gamesave', 'r') as gsf: GS = pickle.load(gsf)
+    else:
+        GS = {
+            'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
+            'screen': 'INTRO',
+            'player': player.Player(races.WARRIOR),
+            'terrain_map': maps.TerrainMap(consts.MAP_WIDTH, consts.MAP_HEIGHT),
+            'messages': [],
+            'selection': 0,
+            'side_screen': 'HUD',
+            'turns': 0,
+            'map_console': None,
+            'scores': [],
+            'mouse_pos': (-1,-1)
+        }
+        GS['map_console'] = tdl.Console(GS['terrain_map'].width,
+                                        GS['terrain_map'].height)
 
 reset_GS()
 
 with open('.gamescores', 'r') as scores:
     for score in scores:
-        GS['scores'].append(int(score))
+        if score.strip() != '':
+            GS['scores'].append(int(score.strip()))
 
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')
-    exit()
+    consts.quit(GS)
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -50,7 +52,7 @@ class Game(tdl.event.App):
     def ev_KEYDOWN(self, event):
         global GS
         if event.keychar.upper() == 'Q':
-            exit()
+            consts.quit(GS)
         elif GS['side_screen'] == 'INVENTORY':
             if event.keychar.upper() == 'UP':
                 GS['selection'] -= 1
@@ -115,7 +117,7 @@ class Game(tdl.event.App):
             GS['turns'] += 1
 
     def ev_QUIT(self, event):
-        exit()
+        consts.quit(GS)
 
     def ev_MOUSEDOWN(self, event):
         if event.button == 'RIGHT':
@@ -146,7 +148,9 @@ class Game(tdl.event.App):
             GS['messages'].insert(0, 'You see ' + obj + ' there.')
             
     def update(self, dt):
-        if GS['player'].health <= 0 and not consts.WIZARD_MODE:
+        if GS['player'].health <= 0 and not GS['screen'] == 'DEATH':
+            with open('.gamescores', 'a') as scores:
+                scores.write(str(GS['player'].score(GS))+'\n')
             GS['screen'] = 'DEATH'
         draw.draw_screen(GS)
             

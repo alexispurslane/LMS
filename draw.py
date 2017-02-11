@@ -261,9 +261,12 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         back = (12,12,12)
         if len(items) > 1:
             back = colors.white
-        console.drawChar(x, y, items[-1].char,
-                         fg=colors.tint(items[-1].fg, tint),
-                         bg=back)
+        if not isinstance(items[-1], list):
+            console.drawChar(x, y, items[-1].char,
+                             fg=colors.tint(items[-1].fg, tint),
+                             bg=back)
+        else:
+            print(items[-1])
     elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
         decor = terrain_map.dungeon['decor']
         if decor[pos] == 'FM':
@@ -290,6 +293,12 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         elif decor[pos] == 'FL':
             console.drawChar(x, y, '^', fg=colors.darken(colors.yellow),
                              bg=colors.darken(colors.red))
+        elif decor[pos] == 'DTRAPD':
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_ARROW2_S),
+                             fg=colors.darken(colors.yellow))
+        elif decor[pos] == 'TTRAPD':
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_BULLET_SQUARE),
+                             fg=colors.darken(colors.yellow))
     elif terrain_map.get_type(pos) == 'FLOOR':
         area = terrain_map.in_area(pos)
         color = colors.tint((12, 12, 12), tint)
@@ -365,7 +374,7 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
     points = tdl.map.bresenham(a[0], a[1], b[0], b[1])
     result = True
     for pnt in points:
-        if GS['terrain_map'].dungeon['visited'].walkable[pnt] == False:
+        if GS['terrain_map'].get_type(pnt) == 'STONE':
             result = False
             break
         else:
@@ -392,7 +401,7 @@ def draw_square(console, x, y, width, height, text='', spacing=2):
     
     console.drawStr(x, y+height, chr(consts.TCOD_CHAR_SW))
 
-    for i, line in enumerate(text.split('\n')):
+    for i, line in enumerate(text.split('\n')[:65]):
         color = colors.white
         if len(line.split(': ')) > 1:
             color = eval("colors." + line.split(': ')[0])

@@ -22,7 +22,7 @@ class Animation:
             return callback(frame, duration)
     
 class FireMissleAnimation(Animation):
-    def __init__(self, duration=60):
+    def __init__(self, duration=20):
         super().__init__(duration)
 
     def perform_animation_frame(self, console, args, frame):

@@ -14,7 +14,7 @@ def connect_rooms(self, r1, r2):
     r2.connected = True
 
 def generate_new_dungeon_map(self):
-    maps = ['standard', 'standard']
+    maps = ['standard']
     if self.dungeon_level > 5:
         maps.append('labrynth')
     rtype = random.choice(maps)

@@ -1,4 +1,4 @@
-import utils, draw, itertools, math, tdl, random, colors, animation
+import utils, draw, itertools, math, tdl, random, colors, animation, pickle
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -24,6 +24,13 @@ MAX_INVENTORY    = 12
 MIN_ROOM_WIDTH = 4
 MIN_ROOM_HEIGHT = 4
 MAX_ROOM_SIZE = math.floor(WIDTH/8.83)
+
+def quit(GS):
+    # with open('.gamesave', 'w') as gsf:
+    #     if not GS['screen'] == 'DEATH':
+    #         pickle.dump(GS, gsf, -1)
+    #     else: pass
+    exit()
 
 MAP = {
     'OCTAVES': 2, # Controls the amount of detail in the noise.
@@ -100,6 +107,7 @@ def fire(GS, p):
         while removed:
             removed = False
             for i, m in enumerate(ms):
+                print(utils.dist(m.pos, p.pos))
                 start = (p.pos[0]-ox, p.pos[1]-oy)
                 end = (m.pos[0]-ox, m.pos[1]-oy)
                 if not draw.draw_line(GS, start, end,
@@ -128,7 +136,7 @@ def fire(GS, p):
                 end = (target.pos[0]-ox, target.pos[1]-oy)
                 animation.FireMissleAnimation().run(GS, [missle, start, end])
                 
-                if target and random.randrange(0,max(1, 100-p.exp*skill-handicap)) < target.speed*20+5:
+                if target and random.randint(0,max(1, int(100-p.exp*skill-handicap))) < target.speed*20+5:
                     target.health -= missle.hit
                     GS['messages'].insert(0, 'yellow: You hit the '+target.name+'.')
                     if target.health <= 0:

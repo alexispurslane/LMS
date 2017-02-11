@@ -120,7 +120,7 @@ class Player:
         if len(self.inventory) < consts.MAX_INVENTORY:
             self.lin_inventory.append(copy.copy(item))
             self.update_inventory()
-            self.speed = 4 + sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
+            self.speed = sum(list(map(lambda x: max(0, x.weight-self.strength), self.lin_inventory)))
         
             if isinstance(item, items.Missle):
                 item.equip(self)
@@ -269,11 +269,6 @@ class Player:
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
                 
-            if self_dead and not consts.WIZARD_MODE:
-                GS['screen'] = 'DEATH'
-                with open('.gamescores', 'a') as scores:
-                    scores.write(str(self.score(GS)))
-                
             self.speed = speed
 
         decor = GS['terrain_map'].dungeon['decor']
@@ -282,4 +277,12 @@ class Player:
                 decor[new_pos] = None
                 player.health -= 1
                 GS['messages'].insert(0, 'The fire burns you.')
+            elif decor[new_pos] == 'TTRAP':
+                self.pos = random.choice(GS['terrain_map'].dungeon['rooms']).center
+                GS['messages'].insert(0, 'You stumble apon a teleport trap.')
+                decor[new_pos] = 'TTRAPD'
+            elif decor[new_pos] == 'DTRAP':
+                self.pos = random.choice(GS['terrain_map'].dungeon['rooms']).center
+                GS['messages'].insert(0, 'You fall down a trap door.')
+                decor[new_pos] = 'DTRAPD'
 
