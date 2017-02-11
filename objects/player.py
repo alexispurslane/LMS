@@ -218,8 +218,7 @@ class Player:
             n_x, n_y = new_pos
 
         w, h = GS['terrain_map'].width, GS['terrain_map'].height
-        if GS['terrain_map'].is_walkable(new_pos) and new_pos < (w-1, h-1) and\
-           new_pos >= (0,0):
+        if GS['terrain_map'].is_walkable(new_pos):
             self.prev_pos = self.pos
             self.pos = new_pos
             di = GS['terrain_map'].dungeon['items']
@@ -234,6 +233,7 @@ class Player:
                         for k, v in GS['terrain_map'].dungeon['items'].items():
                             if e in v:
                                 GS['terrain_map'].dungeon['items'][k].remove(e)
+                                break
             if new_pos in GS['terrain_map'].dungeon['water']:
                 GS['messages'].insert(0, "blue: You slosh through the cold water.")
         else:

@@ -13,33 +13,67 @@ def connect_rooms(self, r1, r2):
     r1.connected = True
     r2.connected = True
 
-MAP_TYPES = ['standard']
 def generate_new_dungeon_map(self):
-    rtype = random.choice(MAP_TYPES)
+    maps = ['standard', 'standard']
+    if self.dungeon_level > 5:
+        maps.append('labrynth')
+    rtype = random.choice(maps)
     return globals()['generate_new_'+rtype+'_dungeon_map'](self)
 
 def generate_new_labrynth_dungeon_map(self):
-    # Braid maze algorithm:
-    start = (random.randint(0, self.width), random.randint(0, self.height))
+    # @trincot's modification of the 'confused digger' algorithm.
+    start = (random.randint(1, self.width-6),
+             random.randint(1, self.height-10))
     self.dungeon['up_stairs'] = start
 
-    visited = [start]
-    while len(visited) < 300:
-        current = visited[-1]
-        apos = random.choice([(1, 0), (0, 1), (0, -1), (-1, 0)])
-        new = utils.tuple_add(current, apos)
-        if not new in visited and self.on_map(new):
-            self.place_cell(new, is_wall=False)
-            visited.append(new)
-        else:
-            visited.pop()
-
+    def on_edge(p):
+        return p[0] == 0 or p[1] == 0 or\
+            p[0] == self.width or p[1] == self.height
+    
+    current = start
+    frontier = set()
+    visited = set([start])
+    ms = monsters.select_by_difficulty(self.dungeon_level)
+    while len(visited) < 1300:
+        self.place_cell(current, is_wall=False)
+        frontier.add(current)
+        found = False
+        while not found:
+            choices = [(1, 0), (0, 1), (0, -1), (-1, 0)]
+            random.shuffle(choices)
+            for apos in choices:
+                new = utils.tuple_add(current, apos)
+                if not new in visited and self.on_map(new) and not on_edge(new):
+                    found = True
+                    decor = ['FM', None, None]
+                    self.dungeon['decor'][new] = random.choice(decor)
+                    break
+                
+            if not found:
+                if utils.dist(start, current) > 8 and len(visited)%3 == 0:
+                    m = copy.copy(random.choice(ms))
+                    m.pos = current
+                    self.dungeon['monsters'].append(m)
+                elif len(visited) % 2 == 0:
+                    n = random.randint(1, 100)
+                    pitems = list(filter(lambda x: n < x.probability,
+                                         sorted(items.ITEMS,
+                                                key=lambda x: x.probability)))
+                    if len(pitems) > 0:
+                        self.dungeon['items'][current] = [pitems[0]]
+                
+                frontier.discard(current)
+                current = random.sample(frontier, 1)[0]
+        current = new    
+        visited.add(current)
+        
     for pos in self.dungeon['visited']:
         self.dungeon['decor'][pos] = None
-        self.dungeon['items'][pos] = []
+        if not pos in self.dungeon['items']:
+            self.dungeon['items'][pos] = []
 
     self.dungeon['player_starting_pos'] = start
-    self.dungeon['down_stairs'] = visited[-1]
+    self.dungeon['down_stairs'] = random.choice(list(visited))
     return start
 
 def generate_new_standard_dungeon_map(self):
