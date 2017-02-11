@@ -137,7 +137,6 @@ class TerrainMap:
     # Draws a horizontal corridor to the 'visited' map.
     def add_h_corridor(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2)):
-            x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
             self.dungeon['lighted'].transparent[x, y] = True
             self.dungeon['lighted'].walkable[x, y] = True
             self.dungeon['items'][x, y] = []
@@ -145,7 +144,6 @@ class TerrainMap:
     # Draws a horizontal corridor to the 'visited' map.
     def add_v_corridor(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2)):
-            x, y = utils.clamp_point((x, y), maxs=(self.width, self.height))
             self.dungeon['lighted'].transparent[x, y] = True
             self.dungeon['lighted'].walkable[x, y] = True
             self.dungeon['items'][x, y] = []
@@ -216,6 +214,7 @@ class TerrainMap:
                 self.dungeon['remembered_fov'].add(p)
         else:
             fov = self.dungeon['lighted']
+            self.dungeon['remembered_fov'] = set(fov)
 
         # Draw up-stairs and down-stairs no matter what.
         if len(self.dungeon['monsters']) == 0:

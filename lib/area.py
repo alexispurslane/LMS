@@ -46,14 +46,12 @@ class Room(Area):
         self.radius = math.floor(w/2)
 
         # Room type:
-        # 3/5 chance to be square,
-        # 1/5 chance to be round,
-        # 1/5 chance to be a sanctuary.
         self.room_type = random.choice([
             'Square', 'Square',
             'Square', 'Round',
             'Round', 'Sanctuary',
-            'Square', 'Sancutary'
+            'Square', 'Sancutary',
+            'Pool'
         ])
 
         # Room center.
@@ -122,7 +120,7 @@ class Room(Area):
             tmap.dungeon['areas'].append(Area(self.pos1[0]-1, self.pos1[1]-1, self.w+1, self.h+1, at='Marble'))
             for x in range(0, self.w):
                 for y in range(0, self.h):
-                    self.create_block(tmap, spacing, (x, y))
+                    self.create_block(tmap, 60, (x, y))
                     
             gap = random.randint(1, math.floor(self.w/2)-3)
             for x in range(gap, self.w-gap):
@@ -135,3 +133,12 @@ class Room(Area):
                 for y in range(gap+1, self.h-gap-1):
                     pos = utils.tuple_add(self.pos1, (x, y))
                     tmap.place_cell(pos)
+        elif self.room_type == 'Pool':
+            for x in range(0, self.w):
+                for y in range(0, self.h):
+                    if x > 0 and y > 0 and x < self.w-1 and y < self.h-1:
+                        tmap.dungeon['water'][x, y] = True
+                    else:
+                        tmap.place_cell((x,y), is_wall=False)
+                        tmap.dungeon['items'][x,y] = []
+                        tmap.dungeon['decor'][x,y] = None

@@ -5,6 +5,9 @@ def dist(p1, p2):
     return math.ceil(math.sqrt(math.pow(p2[0] - p1[0], 2) +
                                math.pow(p2[1] - p1[1], 2)))
 
+def manhatten_dist(p1, p2):
+    return abs(p1[0]-p2[0])+abs(p1[1]-p2[1])
+
 def flip(t, do_it=True):
     if do_it:
         return t[1], t[0]

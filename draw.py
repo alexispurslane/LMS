@@ -256,6 +256,14 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         console.drawChar(x, y, chr(consts.TCOD_CHAR_ARROW2_S), fg=colors.grey, bg=colors.red)
     elif pos == terrain_map.dungeon['up_stairs']:
         console.drawChar(x, y, chr(consts.TCOD_CHAR_ARROW2_N), fg=colors.grey, bg=colors.blue)
+    elif pos in terrain_map.dungeon['water']:
+        rn = random.randint(0, 100)
+        color = colors.blue
+        if rn < 20:
+            color = colors.light_blue
+        elif rn > 60:
+            color = colors.medium_blue
+        console.drawChar(x, y, '~', bg=color)
     elif pos in terrain_map.dungeon['items'] and terrain_map.dungeon['items'][pos] != []:
         items = terrain_map.dungeon['items'][pos]
         back = (12,12,12)
@@ -330,7 +338,6 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             color = colors.tint(colors.brown, tint)
             fg = colors.tint(colors.black, tint)
             char = chr(consts.TCOD_CHAR_BLOCK1)
-        
         console.drawChar(x, y, char, bg=color, fg=fg)
 
 def draw_forest_tile(terrain_map, console, pos, tint):

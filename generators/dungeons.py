@@ -3,12 +3,13 @@ import random, math, copy
 import monsters, colors, consts, utils, items, dungeons, forests, area
 
 def connect_rooms(self, r1, r2):
-    if random.randint(1, 2) == 1:
-        self.add_h_corridor(r2.center[0]+1, r1.center[0], r1.center[1])
-        self.add_v_corridor(r1.center[1], r2.center[1]+1, r1.center[0])
+    rn = random.randint(1, 2)
+    if rn == 1:
+        self.add_h_corridor(r1.center[0], r2.center[0], r1.center[1])
+        self.add_v_corridor(r1.center[1], r2.center[1], r1.center[0])
     else:
-        self.add_v_corridor(r1.center[1], r2.center[1]+1, r1.center[0])
-        self.add_h_corridor(r2.center[0]+1, r1.center[0], r1.center[1])
+        self.add_v_corridor(r1.center[1], r2.center[1], r1.center[0])
+        self.add_h_corridor(r1.center[0], r2.center[0], r1.center[1])
         
     r1.connected = True
     r2.connected = True
@@ -112,7 +113,7 @@ def generate_new_standard_dungeon_map(self):
 
         if not failed:
             #################### ADD PASSAGES ####################
-            connect_rooms(self, room, self.dungeon['rooms'][-1])
+            connect_rooms(self, room, random.choice(self.dungeon['rooms']))
 
             #################### ADD ROOM TO MAP ####################
             room.draw_into_map(number, self)
@@ -127,7 +128,8 @@ def generate_new_standard_dungeon_map(self):
             #################### ADD MONSTERS ####################
             cal_size = math.floor(room.w*room.h/80)
             x_i, y_i = (0, 0)
-            for i in range(0, max(self.dungeon_level*2+cal_size, 4)):
+            mn = min(max(self.dungeon_level*2+cal_size, 4), len(room.edge_points()))
+            for i in range(0, mn):
                 # Choose monster selection
                 ms = monsters.select_by_difficulty(self.dungeon_level)
                 a = self.in_area(room.center)
@@ -141,19 +143,8 @@ def generate_new_standard_dungeon_map(self):
                     
                 # Deal with chosen monster
                 m = random.choice(list(map(copy.copy, ms)))
-                m.pos = room.center
-
-                offset = (0, 0)
-                if random.randint(1, 2) == 1 or y_i > math.floor(room.h/2):
-                    offset = (x_i, 0)
-                    x_i += 1
-                else:
-                    offset = (0, y_i)
-                    y_i += 1
-
-                m.pos = utils.tuple_add(m.pos, offset)
-                if m and self.is_walkable(m.pos) and self.get_type(m.pos) == 'FLOOR'\
-                   and room != self.dungeon['rooms'][1]:
+                m.pos = random.choice(room.edge_points())
+                if self.is_walkable(m.pos) and room != self.dungeon['rooms'][1]:
                     proweling_monsters.append(m)
                     
             self.dungeon['monsters'] = proweling_monsters
