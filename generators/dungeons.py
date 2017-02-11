@@ -67,7 +67,7 @@ def generate_new_labrynth_dungeon_map(self):
         current = new    
         visited.add(current)
         
-    for pos in self.dungeon['visited']:
+    for pos in self.dungeon['lighted']:
         self.dungeon['decor'][pos] = None
         if not pos in self.dungeon['items']:
             self.dungeon['items'][pos] = []
@@ -78,7 +78,7 @@ def generate_new_labrynth_dungeon_map(self):
 
 def generate_new_standard_dungeon_map(self):
     self.dungeon['decor'][0, 0] = None
-    for pos in self.dungeon['visited']:
+    for pos in self.dungeon['lighted']:
         self.dungeon['decor'][pos] = None
         
     self.dungeon['rooms'] = []
@@ -159,7 +159,7 @@ def generate_new_standard_dungeon_map(self):
             self.dungeon['monsters'] = proweling_monsters
 
     last_was_door = False
-    for x, y in self.dungeon['visited']:
+    for x, y in self.dungeon['lighted']:
         #################### BLOCK EDGES ####################
         y_extreme = y == 1 or y == self.height-1
         x_extreme = x == self.width-1 or x == 1
@@ -180,8 +180,8 @@ def generate_new_standard_dungeon_map(self):
                 
                 self.dungeon['doors'][x, y] = True
                 
-                self.dungeon['visited'].transparent[x, y] = False
-                self.dungeon['visited'].walkable[x, y] = False
+                self.dungeon['lighted'].transparent[x, y] = False
+                self.dungeon['lighted'].walkable[x, y] = False
 
                 last_was_door += 1
             elif last_was_door >= 3:

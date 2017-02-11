@@ -216,8 +216,8 @@ class Player:
            not GS['terrain_map'].is_walkable(new_pos):
             
             GS['terrain_map'].dungeon['doors'][new_pos] = False
-            GS['terrain_map'].dungeon['visited'].walkable[new_pos] = True
-            GS['terrain_map'].dungeon['visited'].transparent[new_pos] = True
+            GS['terrain_map'].dungeon['lighted'].walkable[new_pos] = True
+            GS['terrain_map'].dungeon['lighted'].transparent[new_pos] = True
             new_pos = self.pos
             n_x, n_y = new_pos
 

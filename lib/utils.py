@@ -14,7 +14,7 @@ def flip(t, do_it=True):
 def clamp(x, a=1, b=2):
     return max(a, min(x, b-1))
 
-def clamp_point(p, mins=(1, 1), maxs=(1, 1)):
+def clamp_point(p, mins=(0, 0), maxs=(1, 1)):
     return (clamp(p[0], a=mins[0], b=maxs[0]),
             clamp(p[1], a=mins[1], b=maxs[1]))
 
