@@ -83,12 +83,12 @@ BOWMAN = Race({
     'max_health': 18,
     'strength': 2,
     'inventory': [
-        items.DAGGAR,
+        items.LONG_DAGGAR,
         items.ELM_BOW,
         items.ELVEN_HELM,
         items.TORCH,
         items.ROBE
-    ]+[items.WOOD_ARROW]*21,
+    ]+[items.WOOD_ARROW]*21+[items.THROWING_KNIFE]*8,
     'skills': {
         'weapon': 0.9,
         'spell': 1,

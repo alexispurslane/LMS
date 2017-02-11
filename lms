@@ -65,9 +65,9 @@ class Game(tdl.event.App):
                 item = GS['player'].inventory[GS['selection']][0]
                 GS['terrain_map'].dungeon['items'][pos].append(item)
                 GS['player'].remove_inventory_item(item)
-            elif event.keychar.upper() == 'W':
+            elif event.keychar.upper() == 'ENTER':
                 GS['player'].inventory[GS['selection']][0].equip(GS['player'])
-            elif event.keychar.upper() == 'T':
+            elif event.keychar.upper() == 'ESCAPE':
                 GS['player'].inventory[GS['selection']][0].dequip(GS['player'])
             elif event.keychar.upper() == 'I':
                 GS['side_screen'] = 'HUD'

@@ -32,7 +32,7 @@ class Monster:
                 self.sight += 3
         
         if self.health >= 20:
-            self.drops.append(items.ITEMS)
+            self.drops += items.ITEMS
 
     # Removes the monster's attack value from the players health, then
     # runs the monster's special action on the player reference.

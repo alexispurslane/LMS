@@ -88,17 +88,19 @@ def auto_rest(GS, p):
         utils.monster_turn(GS)
         
         GS['turns'] += 1
-
+        
 # Fire the first available missle using the player's current ranged weapon at
-# the closest monster that A* can find a path to and is in the player's LoS.
 def fire(GS, p):
-    if not p.ranged_weapon:
-        GS['messages'].insert(0, 'red: You have no ranged weapon!')
-    elif len(p.missles) <= 0:
+    if len(p.missles) <= 0:
         GS['messages'].insert(0, 'red: You have no missles to shoot with!')
     else:
+        if not p.ranged_weapon: # Throwing with hands
+            rng = 4
+        else:
+            rng = p.ranged_weapon.range
+            
         ms = list(filter(lambda m:
-                        utils.dist(m.pos, p.pos) <= p.ranged_weapon.range and\
+                        utils.dist(m.pos, p.pos) <= rng and\
                         GS['terrain_map'].dungeon['lighted'].fov[m.pos],
                         GS['terrain_map'].dungeon['monsters']))
         ox = max(0, GS['player'].pos[0]-math.floor(WIDTH/4))
@@ -128,8 +130,13 @@ def fire(GS, p):
                 target = ms[int(key.keychar)%len(ms)]
                 skill = p.race.skills['range']
                 handicap = max(0, math.ceil(1-skill))+5
+                if not p.ranged_weapon:
+                    tpe = 'Knife'
+                else:
+                    tpe = p.ranged_weapon.missle_type
+                    
                 missle = list(filter(lambda m:
-                                     p.ranged_weapon.missle_type in m.missle_type,
+                                     tpe in m.missle_type,
                                      p.missles))[-1]
                 # Animation
                 start = (p.pos[0]-ox, p.pos[1]-oy)

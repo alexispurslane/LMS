@@ -11,9 +11,10 @@ weapons:
     attack: 21
     probability: 5
 
-- Daggar:
+- Long Daggar:
     char: '!'
     weight: 1
+    color: grey
     attack: 12
     probability: 10
 
@@ -128,6 +129,13 @@ ranged weapons:
     char: '^'
 
 missles:
+- Throwing Knife:
+    char: '!'
+    color: white
+    weight: 1
+    hit: 8
+    probability: 15
+
 - Iron Bolt:
     weight: 2
     hit: 10
