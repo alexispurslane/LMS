@@ -88,8 +88,8 @@ class Player:
             GS['messages'].append('green: You have leveled up to level '+str(self.level))
             
         ratio = self.health/self.max_health
-        self.max_health = (self.level+1)*self.race.level_up_bonus
-        self.health = self.max_health*ratio
+        self.max_health += self.race.level_up_bonus
+        self.health += self.max_health*ratio
         self.max_strength += math.floor(self.race.level_up_bonus/10)
         self.strength = self.max_strength
 
