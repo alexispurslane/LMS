@@ -69,7 +69,7 @@ class Player:
     # calls level_up with the current level calculated via the exp.
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
-        s = math.floor(self.exp/(30+self.level*5))
+        s = math.floor(self.exp/(40+self.level*5))
         
         if s >= 1 and s <= self.race.levels:
             self.level_up(GS, s)

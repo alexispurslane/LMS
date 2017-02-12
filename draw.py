@@ -386,11 +386,9 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
     points = tdl.map.bresenham(a[0], a[1], b[0], b[1])
     result = True
     for pnt in points:
+        console.drawChar(pnt[0], pnt[1], char, fg=color)
         if GS['terrain_map'].get_type(pnt) == 'STONE':
             result = False
-            break
-        else:
-            console.drawChar(pnt[0], pnt[1], char, fg=color)
     if start_char:
         console.drawChar(a[0], a[1], start_char, fg=colors.white, bg=colors.black)
     if end_char:

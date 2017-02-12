@@ -113,7 +113,7 @@ def fire(GS, p):
 
         if len(ms) > 0:
             key = tdl.event.wait(timeout=None, flush=True)
-            while not key.keychar.isnumeric() and key.keychar != 'ESCAPE':
+            while not ('KEY' in key.type and (key.keychar.isnumeric() or key.keychar == 'ESCAPE')):
                 GS['messages'].append('Please type number or ESC.')
                 draw.draw_hud_screen(GS)
                 key = tdl.event.wait(timeout=None, flush=True)
