@@ -81,7 +81,6 @@ class Food(Item):
 
     def equip(self, p):
         p.hunger -= self.nutrition
-        p.hunger = max(0, p.hunger)
         p.lin_inventory.remove(self)
 
     def dequip(self, p):

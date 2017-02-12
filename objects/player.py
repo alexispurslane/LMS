@@ -201,8 +201,16 @@ class Player:
             self.hunger += 1
 
         if self.hunger > 20 and GS['turns'] % 3 == 0:
-            GS['messages'].append('red: You feel hungry.')
-            self.health -= 1
+            descriptor = 'hungry'
+            if self.hunger > 40:
+                descriptor = 'Ravinous'
+            elif self.hunger > 60:
+                descriptor = 'Starving'
+                
+            GS['messages'].append('red: You feel '+descriptor+'.')
+            self.health -= int(self.hunger/20)
+        elif self.hunger >= 80:
+            self.health = 0
 
         delta = consts.GAME_KEYS['M'][event.keychar]
         new_pos = utils.tuple_add(self.pos, delta)

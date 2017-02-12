@@ -42,12 +42,18 @@ def draw_stats(GS):
                          bg=console.get_char(base+i, start+1)[2])
     
     # Hunger
-    if player.hunger >= 40:
-        console.drawStr(base+bounds+13, start+1, 'Very Hungry', fg=colors.red)
+    if player.hunger >= 60:
+        console.drawStr(base+bounds+13, start+1, 'Starving', fg=colors.red)
+    elif player.hunger >= 40:
+        console.drawStr(base+bounds+13, start+1, 'Near Starving', fg=colors.red)
     elif player.hunger >= 20:
         console.drawStr(base+bounds+13, start+1, 'Hungry', fg=colors.yellow)
     elif player.hunger >= 15:
         console.drawStr(base+bounds+13, start+1, 'Getting Hungry', fg=colors.green)
+    elif player.hunger <= 0 and player.hunger >= -15:
+        console.drawStr(base+bounds+13, start+1, 'Full', fg=colors.blue)
+    else:
+        console.drawStr(base+bounds+13, start+1, 'Stuffed', fg=colors.light_blue)
 
     # Light Source Radius
     nm = len(GS['terrain_map'].dungeon['monsters'])
