@@ -1,4 +1,4 @@
-import utils, draw, itertools, math, tdl, random, colors, animation, pickle
+import utils, draw, itertools, math, tdl, random, colors, animation, pickle, time
 
 ################### GAME SETTINGS ###################
 FONT_SIZE        = 12
@@ -186,6 +186,9 @@ def auto_move(d):
             changed = pp != p.pos
             if turns % 3 == 0:
                 utils.monster_turn(GS)
+            draw.draw_game_screen(GS, 0)
+            tdl.flush()
+            time.sleep(0.01)
             turns += 1
     return do
     
