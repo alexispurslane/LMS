@@ -40,13 +40,14 @@ class Armor(Item):
     
 class Weapon(Item):
     def __init__(self, name='Unknown weapon', weight=2, attack=5,
-                         probability=20, char='|', color=colors.grey):
+                         probability=20, char='|', color=colors.grey, handedness=1):
         super().__init__(name, weight, probability, char, color)
         self.attack = attack
         self.equipped = False
+        self.handedness = handedness
         
     def equip(self, player):
-        if not self.equipped and not player.has(self):
+        if not self.equipped and not player.hands_left(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = self.attack
             self.equipped = True
@@ -88,11 +89,12 @@ class Food(Item):
 
 class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2,
-                         probability=20, char=')',
+                 probability=20, char=')', load_speed=2,
                  missle_type='Arrow', range=8, color=colors.grey):
         super().__init__(name, weight, probability, char, color)
         self.missle_type = missle_type
         self.range = range
+        self.load_speed = load_speed
 
     def equip(self, player):
         if not self.equipped:

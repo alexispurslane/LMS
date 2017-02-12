@@ -1,132 +1,173 @@
 weapons:
+
+# Axe skill tree:
+  
 - Dane Axe:
     char: '>'
-    weight: 20
+    weight: 23
     attack: 30
     probability: 5
-    
-- Broad Sword:
-    char: '|'
+    handedness: 2
+
+- Double-Bladed Axe:
+    char: '>'
+    color: blue
+    weight: 20
+    attack: 23
+    probability: 8
+    handedness: 2
+
+- Hand Axe:
+    weight: 15
+    char: '>'
+    handedness: 1
+    attack: 19
+    color: brown
+    probability: 12
+      
+- Hatchet:
+    char: '>'
+    weight: 10
+    attack: 15
+    color: grey
+    probability: 15
+    handedness: 1
+
+# Sword skill tree:
+- Claymoor:
+    char: ')'
     weight: 10
     attack: 21
     probability: 5
+    handedness: 2
+    
+- Long Sword:
+    char: ')'
+    color: blue
+    weight: 6
+    attack: 16
+    probability: 8
+    handedness: 1
+
+- Short Sword:
+    char: '('
+    color: brown
+    attack: 12
+    weight: 4
+    probability: 12
+    handedness: 1
 
 - Long Daggar:
     char: '!'
     weight: 1
     color: grey
-    attack: 12
-    probability: 10
-
-- Well Made Sword:
-    char: '/'
-    weight: 5
-    attack: 16
-    probability: 8
-
-- Sword:
-    char: '('
-    attack: 12
-    weight: 4
-    probability: 12
+    attack: 6
+    probability: 15
+    handedness: 1
 
 armor:
-- Robe:
-    char: '^'
-    color: brown
-    weight: 0
-    defence: 1
-    probability: 20
-    
-- Gambeson:
-    char: '['
-    color: blue
-    weight: 3
-    probability: 18
-
-- Leather Breastplate:
-    char: '['
-    weight: 5
-    color: brown
-    probability: 13
-
-- Steel Mail:
-    char: '['
-    weight: 0
-    color: white
-    defence: 11
-    probability: 3
-
-- Lamellar Armor:
-    char: '&'
-    color: grey
-    weight: 10
-    probability: 10
-
+# Armor class
 - Knightly Armor:
-    char: '&'
-    color: dark_grey
+    char: '['
     weight: 20
     defence: 25
     probability: 8
+    
+- Lamellar Armor:
+    char: '['
+    color: red
+    weight: 10
+    probability: 10
+    
+- Steel Mail:
+    char: '['
+    weight: 0
+    color: yellow
+    defence: 11
+    probability: 3
 
-- Round Sheild:
-    char: '}'
+- Leather Breastplate:
+    char: ']'
+    weight: 5
+    color: blue
+    probability: 13
+
+- Gambeson:
+    char: ']'
+    color: brown
+    weight: 3
+    probability: 18
+
+- Robe:
+    char: '^'
     color: grey
-    weight: 2
+    weight: 0
+    defence: 1
     probability: 20
+  
+# Sheild class
+- Kite Sheild:
+    char: '}'
+    weight: 6
+    probability: 5
 
 - Wood Buckler:
     char: '}'
     color: brown
     weight: 3
-    probability: 15
+    probability: 8
 
-- Kite Sheild:
-    char: '}'
-    color: dark_grey
-    weight: 6
-    probability: 15
-
-- Elven Helm:
-    char: '*'
+- Small Round Sheild:
+    char: 'o'
     color: grey
-    weight: 1
-    probability: 5
+    weight: 2
+    probability: 15
+
+# Helmet class
 
 - Viking Helm:
     char: '*'
-    color: brown
     weight: 3
-    probability: 8
+    probability: 5
+    
+- Leather Cap:
+    char: '*'
+    color: grey
+    weight: 1
+    probability: 15
 
 ranged weapons:
 - Yew Bow:
     weight: 3
-    probability: 20
-    range: 10
+    probability: 5
+    range: 13
+    load_speed: 0
     char: ')'
     
 - Ash Bow:
+    color: blue
     weight: 2
-    probability: 15
-    color: red
-    range: 12
+    probability: 8
+    load_speed: 1
+    range: 10
     char: ')'
 
 - Elm Bow:
+    color: brown
     weight: 1
-    probability: 13
-    color: green
-    range: 13
+    probability: 12
+    load_speed: 1
+    range: 7
     char: ')'
     
 - Crossbow:
-    weight: 5
-    probability: 10
-    range: 30
-    missle_type: 'Bolt'
     char: '^'
+    weight: 5
+    probability: 15
+    range: 8
+    color: grey
+    load_speed: 2
+    missle_type: 'Bolt'
 
 missles:
 - Throwing Knife:
@@ -137,13 +178,13 @@ missles:
     probability: 15
 
 - Iron Bolt:
-    weight: 2
+    weight: 1
     hit: 10
     char: '_'
     probability: 10
     
 - Wood Arrow:
-    weight: 1
+    weight: 0
     hit: 5
     char: '-'
     probability: 15

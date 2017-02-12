@@ -86,7 +86,7 @@ class Room(Area):
             if tmap.is_hell_level():
                 decor = ['FR', 'FL', None, None, None, None]
             if random.randint(1, 1000) < 5:
-                decor = ['TTRAP', 'DTRAP']
+                decor = ['TTRAP', 'TTRAP', 'DTRAP', 'ITRAP']
             tmap.dungeon['decor'][pos] = random.choice(decor)
 
             if self.item_attempts < consts.ITEMS_PER_ROOM:

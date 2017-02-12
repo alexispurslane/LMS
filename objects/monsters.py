@@ -23,7 +23,7 @@ class Monster:
         self.path = []
         self.agressive = agressive
         self.ranged = ranged
-        self.drops = [items.FOOD_RATION]*8 + [items.TORCH, items.SWORD, items.GAMBESON]
+        self.drops = [items.FOOD_RATION, items.TORCH]*8
         
         self.sight = int(self.speed/2)
         if self.sight < 8:
@@ -59,11 +59,11 @@ class Monster:
             miss_level = "widely "
             
         if miss <= 0:
-            GS['messages'].insert(0, "red: The monster hits you "+hit_level+".")
+            GS['messages'].append("red: The monster hits you "+hit_level+".")
             player.health -= self.attack
             self.special_action(self, GS, player)
         else:
-            GS['messages'].insert(0, "green: The monster "+miss_level+"misses you.")
+            GS['messages'].append("green: The monster "+miss_level+"misses you.")
 
     # Check equality
     def __eq__(self, other):
@@ -93,10 +93,10 @@ class Monster:
             self.sight = 3
 
         if utils.dist(GS['player'].pos, self.pos) == 1:
-            GS['messages'].insert(0, 'red: The '+self.name+' attacks you.')
+            GS['messages'].append('red: The '+self.name+' attacks you.')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
-                GS['messages'].insert(0, 'yellow: You destroy the '+self.name)
+                GS['messages'].append('yellow: You destroy the '+self.name)
                 GS['terrain_map'].dungeon['monsters'].remove(self)
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
@@ -152,7 +152,7 @@ def breed(self, GS, player):
     ]
     valid = list(filter(GS['terrain_map'].is_walkable, posns))
     if len(valid) > 0 and random.randint(1,2) == 1:
-        GS['messages'].insert(0, "You chop the slime in half. The new half is alive!")
+        GS['messages'].append("You chop the slime in half. The new half is alive!")
         if consts.DEBUG:
             print('Slime breeding.')
         slime = copy.copy(Slime)
@@ -181,16 +181,16 @@ def filtch(self, GS, player):
             item = random.choice(items)
             player.remove_inventory_item(item)
         
-            GS['messages'].insert(0, 'light_blue: The Imp steals your ' + item.name + ' and throws it.')
+            GS['messages'].append('light_blue: The Imp steals your ' + item.name + ' and throws it.')
             GS['terrain_map'].dungeon['items'][pos].append(item)
     
 def poison(self, GS, player):
     if player.defence <= 5:
         if player.poisoned <= 0 and random.randint(1, 100) < 80:
             player.poisoned = self.health
-            GS['messages'].insert(0, 'green: You have been poisoned!')
+            GS['messages'].append('green: You have been poisoned!')
     else:
-        GS['messages'].insert(0, 'grey: You\'re armor protects you from bite.')
+        GS['messages'].append('grey: You\'re armor protects you from bite.')
  
 def create_monster(name, mon):
     color = None

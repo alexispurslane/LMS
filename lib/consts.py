@@ -71,10 +71,10 @@ def pickup(GS, p):
     if p.pos in dun_items and len(dun_items[p.pos]) > 0:
         item = dun_items[p.pos][-1]
         if p.add_inventory_item(item):
-            GS['messages'].insert(0, 'You pick up a '+item.name)
+            GS['messages'].append('You pick up a '+item.name)
             del dun_items[p.pos][-1]
         else:
-            GS['messages'].insert(0, 'Your inventory is full.')
+            GS['messages'].append('Your inventory is full.')
             
 # Hunger builds more slowly and monsters each get a turn.
 def auto_rest(GS, p):
@@ -92,51 +92,44 @@ def auto_rest(GS, p):
 # Fire the first available missle using the player's current ranged weapon at
 def fire(GS, p):
     if len(p.missles) <= 0:
-        GS['messages'].insert(0, 'red: You have no missles to shoot with!')
+        GS['messages'].append('red: You have no missles to shoot with!')
     else:
-        if not p.ranged_weapon: # Throwing with hands
-            rng = 4
-        else:
+        rng = 4
+        if p.ranged_weapon:
             rng = p.ranged_weapon.range
             
         ms = list(filter(lambda m:
                         utils.dist(m.pos, p.pos) <= rng and\
                         GS['terrain_map'].dungeon['lighted'].fov[m.pos],
                         GS['terrain_map'].dungeon['monsters']))
+        
         ox = max(0, GS['player'].pos[0]-math.floor(WIDTH/4))
         oy = max(0, GS['player'].pos[1]-math.floor(HEIGHT/2))
-        removed = True
-        while removed:
-            removed = False
-            for i, m in enumerate(ms):
-                print(utils.dist(m.pos, p.pos))
-                start = (p.pos[0]-ox, p.pos[1]-oy)
-                end = (m.pos[0]-ox, m.pos[1]-oy)
-                if not draw.draw_line(GS, start, end,
-                                      colors.light_blue,
-                                      start_char='@', end_char=str(i)):
-                    ms.remove(m)
-                    removed = True
+        for i, m in enumerate(ms):
+            start = (p.pos[0]-ox, p.pos[1]-oy)
+            end = (m.pos[0]-ox, m.pos[1]-oy)
+            draw.draw_line(GS, start, end, colors.light_blue,
+                           start_char='@', end_char=str(i))
 
         if len(ms) > 0:
             key = tdl.event.wait(timeout=None, flush=True)
             while not key.keychar.isnumeric() and key.keychar != 'ESCAPE':
-                GS['messages'].insert(0, 'Please type number or ESC.')
+                GS['messages'].append('Please type number or ESC.')
                 draw.draw_hud_screen(GS)
                 key = tdl.event.wait(timeout=None, flush=True)
 
             if key.keychar != 'ESCAPE':
-                GS['messages'].insert(0, 'yellow: You shoot the '+utils.ordinal(key.keychar)+' target!')
+                GS['messages'].append('yellow: You shoot the '+utils.ordinal(key.keychar)+' target!')
                 target = ms[int(key.keychar)%len(ms)]
                 skill = p.race.skills['range']
                 handicap = max(0, math.ceil(1-skill))+5
-                if not p.ranged_weapon:
-                    tpe = 'Knife'
-                else:
+                
+                tpe = ''
+                if p.ranged_weapon:
                     tpe = p.ranged_weapon.missle_type
                     
                 missle = list(filter(lambda m:
-                                     tpe in m.missle_type,
+                                     not p.ranged_weapon or tpe in m.missle_type,
                                      p.missles))[-1]
                 # Animation
                 start = (p.pos[0]-ox, p.pos[1]-oy)
@@ -144,22 +137,26 @@ def fire(GS, p):
                 animation.FireMissleAnimation().run(GS, [missle, start, end])
                 
                 if target and random.randint(0,max(1, int(100-p.exp*skill-handicap))) < target.speed*20+5:
-                    target.health -= missle.hit
-                    GS['messages'].insert(0, 'yellow: You hit the '+target.name+'.')
+                    if tpe == '':
+                        target.health -= (missle.hit-2)
+                    else:
+                        target.health -= missle.hit
+                    GS['messages'].append('yellow: You hit the '+target.name+'.')
                     if target.health <= 0:
-                        GS['messages'].insert(0, 'green: Your shot hit home! The '+target.name+' dies.')
+                        GS['messages'].append('green: Your shot hit home! The '+target.name+' dies.')
                         GS['terrain_map'].dungeon['monsters'].remove(target)
                         p.killed_monsters += 1
                         p.learn(GS, target)
+                        
                     p.missles.remove(missle)
                     missle.equipped = False
                     GS['terrain_map'].dungeon['items'][target.pos].append(missle)
                 else:
-                    GS['messages'].insert(0, 'red: You miss the enemy.')
+                    GS['messages'].append('red: You miss the enemy.')
             else:
-                GS['messages'].insert(0, 'grey: Nevermind.')
+                GS['messages'].append('grey: Nevermind.')
         else:
-            GS['messages'].insert(0, 'red: There are no enemies in range.')
+            GS['messages'].append('red: There are no enemies in range.')
 
 # Switches between inventory and HUD screens.
 def inventory(GS, p):

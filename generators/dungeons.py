@@ -126,9 +126,9 @@ def generate_new_standard_dungeon_map(self):
                 adjoin.connected = True
 
             #################### ADD MONSTERS ####################
-            cal_size = math.floor(room.w*room.h/80)
+            cal_size = math.floor(room.w*room.h/40)
             x_i, y_i = (0, 0)
-            mn = min(max(self.dungeon_level*2+cal_size, 4), len(room.edge_points()))
+            mn = min(max(self.dungeon_level*2+cal_size, 8), len(room.edge_points()))
             for i in range(0, mn):
                 # Choose monster selection
                 ms = monsters.select_by_difficulty(self.dungeon_level)

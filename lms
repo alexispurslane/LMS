@@ -6,10 +6,11 @@ sys.path.append('lib/')
 sys.path.append('nouns/')
 sys.path.append('objects/')
 
-import maps, monsters, consts, colors, utils, races, player, draw
+import maps, monsters, consts, colors, utils, races, player, draw, area
 
-tdl.setFont('font/terminal20x20_gs_ro.png', greyscale=True)
+tdl.setFont('font/IBMCGA16x16_gs_ro.png', greyscale=True)
 tdl.event.set_key_repeat(delay=40, interval=0)
+
 GS = {}
 def reset_GS():
     global GS
@@ -27,6 +28,7 @@ def reset_GS():
             'turns': 0,
             'map_console': None,
             'scores': [],
+            'message_offset': 0,
             'mouse_pos': (-1,-1)
         }
         GS['map_console'] = tdl.Console(GS['terrain_map'].width,
@@ -46,9 +48,6 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 class Game(tdl.event.App):
-    def ev_MOUSEMOVE(self, event):
-        GS['mouse_pos'] = event.cell
-
     def ev_KEYDOWN(self, event):
         global GS
         if event.keychar.upper() == 'Q':
@@ -120,8 +119,14 @@ class Game(tdl.event.App):
         consts.quit(GS)
 
     def ev_MOUSEDOWN(self, event):
+        GS['mouse_pos'] = event.cell
+        base = math.floor(consts.WIDTH/2)+1
+        b = area.Area(base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER)
         if event.button == 'RIGHT':
             t = GS['terrain_map']
+            ox = max(0, GS['player'].pos[0]-math.floor(consts.WIDTH/4))
+            oy = max(0, GS['player'].pos[1]-math.floor(consts.HEIGHT/2))
+            event.cell = utils.tuple_add(event.cell, (ox, oy))
             monster = t.monster_at(event.cell)
             item    = event.cell in t.dungeon['items']
             decor   = event.cell in t.dungeon['decor']
@@ -130,8 +135,10 @@ class Game(tdl.event.App):
             obj = terrain.lower()
             if monster:
                 obj = 'a ' + monster.name
-            elif terrain == 'STONE' and decor:
-                obj = 'lichen-covered stone'
+            elif terrain == 'STONE' and decor and t.dungeon['decor'][event.cell] == 'FM':
+                obj = 'lichen-covered wall'
+            elif terrain == 'STONE':
+                obj = 'wall'
             elif item:
                 if len(t.dungeon['items'][event.cell]) > 0:
                     obj = t.dungeon['items'][event.cell][0].name
@@ -145,7 +152,13 @@ class Game(tdl.event.App):
                 else:
                     obj = 'hot rocks'
 
-            GS['messages'].insert(0, 'You see ' + obj + ' there.')
+            GS['messages'].append('You see ' + obj + ' there.')
+        elif event.button == 'SCROLLUP' and b.inside(event.cell):
+            if GS['message_offset'] > 0:
+                GS['message_offset'] -= 1
+        elif event.button == 'SCROLLDOWN' and b.inside(event.cell):
+            if GS['message_offset'] < len(GS['messages']):
+                GS['message_offset'] += 1
             
     def update(self, dt):
         if GS['player'].health <= 0 and not GS['screen'] == 'DEATH':

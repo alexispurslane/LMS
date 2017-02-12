@@ -93,9 +93,9 @@ def draw_stats(GS):
 
 def draw_messages(GS):
     console = GS['console']
-    start = consts.MESSAGE_NUMBER+GS['message_offset']-1
+    start = consts.MESSAGE_NUMBER+GS['message_offset']
     end = GS['message_offset']
-    shown_messages = list(reversed(GS['messages']))[end:start]
+    shown_messages = list(GS['messages'])[end:start]
     ms = 'MESSAGES\n'+'\n'.join(shown_messages)
     base = math.floor(consts.WIDTH/2)+1
     draw_square(console, base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER,
@@ -323,11 +323,11 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         console.drawChar(x, y, ' ', fg=color, bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
-            console.drawChar(x, y, '+',
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_CHECKBOX_SET),
                              fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.extreme_darken(colors.brown), tint))
         else:
-            console.drawChar(x, y, '\\',
+            console.drawChar(x, y, chr(consts.TCOD_CHAR_CHECKBOX_UNSET),
                              fg=colors.tint(colors.brown, tint),
                              bg=colors.tint(colors.black, tint))
     elif terrain_map.get_type(pos) == 'STONE':

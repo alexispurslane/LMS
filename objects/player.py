@@ -7,11 +7,13 @@ class Player:
         self.pos = (0, 0)
         
         self.light_source_radius = 1
+        self.hands = 2
         self.hunger = 0
         self.killed_monsters = 0
         
         self.level = 0
         self.exp = 0
+        self.frozen = 0
         
         self.prev_pos = (-1,-1)
         self.poisoned = 0
@@ -41,6 +43,13 @@ class Player:
         for item in self.lin_inventory:
             item.equip(self)
 
+    def hands_left(self, x):
+        if self.hands > x.handedness:
+            self.hands -= x.handedness
+            return True
+        else:
+            False
+            
     def update_inventory(self):
         self.lin_inventory.sort(key = lambda x: x.weight)
         self.inventory = [(k, len(list(g))) for k, g in groupby(self.lin_inventory)]
@@ -76,7 +85,7 @@ class Player:
         prevlev = self.level
         self.level = s
         if self.level > prevlev:
-            GS['messages'].insert(0, 'green: You have leveled up to level '+str(self.level))
+            GS['messages'].append('green: You have leveled up to level '+str(self.level))
             
         ratio = self.health/self.max_health
         self.max_health = (self.level+1)*self.race.level_up_bonus
@@ -95,11 +104,11 @@ class Player:
             skill = self.race.skills['weapon']
             if self.health > 0 and random.randint(0, 20+self.exp) <= self.exp*skill+10:
                 monster.health -= self.attack
-                GS['messages'].insert(0, 'yellow: You hit the monster a blow.')
-                GS['messages'].insert(0, 'yellow: The monster\'s health is '\
+                GS['messages'].append('yellow: You hit the monster a blow.')
+                GS['messages'].append('yellow: The monster\'s health is '\
                                       +str(monster.health)+'.')
             else:
-                GS['messages'].insert(0, 'red: You miss the monster.')
+                GS['messages'].append('red: You miss the monster.')
         elif monster.speed >= self.speed:
             monster.health -= self.attack
             if monster.health > 0:
@@ -182,7 +191,7 @@ class Player:
             item.lasts -= 1
             if item.lasts <= 0:
                 item.dequip(self)
-                GS['messages'].insert(0, 'yellow: Your '+item.name+' flickers out.')
+                GS['messages'].append('yellow: Your '+item.name+' flickers out.')
                 self.dequips.remove(item)
                 
         if self.health < self.max_health and GS['turns'] % 3 == 0:
@@ -192,7 +201,7 @@ class Player:
             self.hunger += 1
 
         if self.hunger > 20 and GS['turns'] % 3 == 0:
-            GS['messages'].insert(0, 'red: You feel hungry.')
+            GS['messages'].append('red: You feel hungry.')
             self.health -= 1
 
         delta = consts.GAME_KEYS['M'][event.keychar]
@@ -201,15 +210,15 @@ class Player:
         
         if new_pos == GS['terrain_map'].dungeon['down_stairs'] and\
            GS['terrain_map'].is_dungeons():
-           
-            GS['messages'].insert(0, "light_blue: You decend.")
+
+            GS['messages'].append("light_blue: You decend.")
             self.pos = GS['terrain_map'].generate_new_map()
 
         if new_pos == GS['terrain_map'].dungeon['up_stairs'] and\
            len(GS['terrain_map'].dungeons) > 1:
             
             if GS['terrain_map'].restore_dungeon(GS['terrain_map'].dungeon_level-1):
-                GS['messages'].insert(0, "light_blue: You ascend.")
+                GS['messages'].append("light_blue: You ascend.")
                 self.pos = GS['terrain_map'].dungeon['player_starting_pos']
                 
         if new_pos in GS['terrain_map'].dungeon['doors'] and\
@@ -222,49 +231,53 @@ class Player:
             n_x, n_y = new_pos
 
         w, h = GS['terrain_map'].width, GS['terrain_map'].height
-        if GS['terrain_map'].is_walkable(new_pos):
+        self.frozen -= 1
+        if GS['terrain_map'].is_walkable(new_pos) and self.frozen <= 0:
             self.prev_pos = self.pos
             self.pos = new_pos
             di = GS['terrain_map'].dungeon['items']
             if self.pos in di:
                 i = di[self.pos]
                 for e in i:
-                    GS['messages'].insert(0, "You find a " + e.name + ".")
+                    GS['messages'].append("You find a " + e.name + ".")
                     if isinstance(e, items.Light) or isinstance(e, items.Food)\
                        or isinstance(e, items.Missle):
                         if self.add_inventory_item(e):
-                            GS['messages'].insert(0, "You pick up a " + e.name + ".")
+                            GS['messages'].append("You pick up a " + e.name + ".")
                         else:
-                            GS['messages'].insert(0, "Your inventory is full.")
+                            GS['messages'].append("Your inventory is full.")
                         for k, v in GS['terrain_map'].dungeon['items'].items():
                             if e in v:
                                 GS['terrain_map'].dungeon['items'][k].remove(e)
                                 break
             if new_pos in GS['terrain_map'].dungeon['water']:
-                GS['messages'].insert(0, "blue: You slosh through the cold water.")
+                GS['messages'].append("blue: You slosh through the cold water.")
         else:
             if GS['terrain_map'].in_area(new_pos) == 'Cave':
                 GS['terrain_map'].place_cell(new_pos)
+                self.pos = new_pos
+            elif self.frozen > 0:
+                GS['messages'].append('You are frozen for '+str(self.frozen)+' more turns.')
             else:
-                GS['messages'].insert(0, "grey: You run into a wall.")
+                GS['messages'].append("grey: You run into a wall.")
                 new_pos = self.pos
                 n_x, n_y = new_pos
             
         m = GS['terrain_map'].monster_at(new_pos)
         speed = self.speed
         if utils.streight_line(self.prev_pos, (new_pos)) and self.light() and m:
-            GS['messages'].insert(0, "You gallantly charge the monster!")
+            GS['messages'].append("You gallantly charge the monster!")
             self.speed = 0
             
         if m != None:
             (self_dead, monster_dead) = self.attack_monster(GS, m)
-            GS['messages'].insert(0, "green: You attack the "+m.name)
+            GS['messages'].append("green: You attack the "+m.name)
             
             if not monster_dead:
-                GS['messages'].insert(0, "red: The "+m.name+" attacks you")
-                GS['messages'].insert(0, "red: It's health is now "+str(m.health))
+                GS['messages'].append("red: The "+m.name+" attacks you")
+                GS['messages'].append("red: It's health is now "+str(m.health))
             else:
-                GS['messages'].insert(0, "green: You vanquish the "+m.name)
+                GS['messages'].append("green: You vanquish the "+m.name)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
                 GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
@@ -276,13 +289,20 @@ class Player:
             if decor[new_pos] == 'FR' or decor[new_pos] == 'FL':
                 decor[new_pos] = None
                 player.health -= 1
-                GS['messages'].insert(0, 'The fire burns you.')
+                GS['messages'].append('The fire burns you.')
             elif decor[new_pos] == 'TTRAP':
                 self.pos = random.choice(GS['terrain_map'].dungeon['rooms']).center
-                GS['messages'].insert(0, 'You stumble apon a teleport trap.')
+                GS['messages'].append('red: You stumble apon a teleport trap.')
                 decor[new_pos] = 'TTRAPD'
             elif decor[new_pos] == 'DTRAP':
-                self.pos = random.choice(GS['terrain_map'].dungeon['rooms']).center
-                GS['messages'].insert(0, 'You fall down a trap door.')
+                if GS['terrain_map'].is_dungeons():
+                    GS['messages'].append("light_blue: You decend.")
+                    self.pos = GS['terrain_map'].generate_new_map()
+                GS['messages'].append('red: You fall down a trap door.')
                 decor[new_pos] = 'DTRAPD'
+            elif decor[new_pos] == 'ITRAP':
+                GS['messages'].append('light_blue: Ice creeps up your legs. You are frozen!')
+                self.pos = self.prev_pos
+                self.frozen = 4
+                decor[new_pos] = 'ITRAPD'
 

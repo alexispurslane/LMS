@@ -13,6 +13,7 @@ monsters:
     speed: 4
     health: 30
     attack: 25
+    agressive: True
 
 - Dragon:
     char: D
@@ -20,7 +21,6 @@ monsters:
     health: 300
     speed: 15
     attack: 90
-    agressive: True
 
 - Goblin:
     char: g
@@ -53,7 +53,6 @@ monsters:
     speed: 4
     attack: 17
     action: filtch
-    agressive: True
   
 - Snake:
     char: S
@@ -62,6 +61,7 @@ monsters:
     speed: 2
     attack: 14
     action: poison
+    agressive: True
 
 - Adder:
     char: A
@@ -71,6 +71,7 @@ monsters:
     attack: 22
     action: poison
     ranged: True
+    agressive: True
 
 - Rat:
     char: r

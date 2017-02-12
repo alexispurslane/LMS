@@ -9,10 +9,10 @@ defaults = {
         'range': 0.8
     },
     'inventory': [
-        items.SWORD,
-        items.GAMBESON,
-        items.VIKING_HELM,
-        items.ROUND_SHEILD,
+        items.LONG_DAGGAR,
+        items.ROBE,
+        items.LEATHER_CAP,
+        items.SMALL_ROUND_SHEILD,
         
         items.TORCH
     ]
@@ -52,9 +52,9 @@ BERSERKER = Race({
     'strength': 10,
     'inventory': [
         items.TORCH,
-        items.DANE_AXE,
+        items.HAND_AXE,
         items.VIKING_HELM,
-        items.LEATHER_BREASTPLATE
+        items.GAMBESON
     ],
     'skills': {
         'weapon': 1.2,
@@ -84,11 +84,11 @@ BOWMAN = Race({
     'strength': 2,
     'inventory': [
         items.LONG_DAGGAR,
-        items.ELM_BOW,
-        items.ELVEN_HELM,
+        items.CROSSBOW,
+        items.LEATHER_CAP,
         items.TORCH,
-        items.ROBE
-    ]+[items.WOOD_ARROW]*21+[items.THROWING_KNIFE]*8,
+        items.GAMBESON
+    ]+[items.IRON_BOLT]*21+[items.THROWING_KNIFE]*8,
     'skills': {
         'weapon': 0.9,
         'spell': 1,
