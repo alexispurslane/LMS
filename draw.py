@@ -168,21 +168,25 @@ def draw_man_screen(GS):
 def draw_skills_screen(GS):
     text = ''
     skt = list(GS['player'].skill_tree.items())
-    longest_key = max(skt, key=lambda x: len(x[0]))[0]
-    for k, v in skt:
-        space = ' '*(len(longest_key)-len(k))
-        color = "grey"
-        if v <= 5:
-            color = "white"
-        elif v <= 8:
-            color = "blue"
-        elif v <= 12:
-            color = "brown"
+    pos = 1
+    for skill, progress in skt:
+        barbasex = math.ceil((len(skill)+1)/2)
+        for i in range(1, 20-progress):
+            color = colors.lighten(colors.grey)
+            if progress <= 5:
+                color = colors.white
+            elif progress <= 8:
+                color = colors.blue
+            elif progress <= 12:
+                color = colors.brown
+                
+            GS['console'].drawChar(pos+barbasex, consts.HEIGHT-4-i,
+                                   chr(consts.TCOD_CHAR_HLINE), fg=color)
             
-        text += ('%s: %s%s%s %d\n' % (color, k, space, chr(consts.TCOD_CHAR_ARROW_E), v))
-        
-    draw_square(GS, GS['console'], consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4,
-                consts.HEIGHT-1, text='SKILLS ('+str(len(skt))+' learned)\n'+text)
+        draw_square(GS, pos, consts.HEIGHT-4, len(skill)+1, 1, spacing=1, text='\n'+skill.upper())
+        pos += len(skill)+2
+    draw_square(GS, 0, 0, consts.WIDTH-1, consts.HEIGHT-1,
+                text='SKILLS ('+str(len(skt))+' learning)')
 
 def draw_hud(GS):
     consts.EDGE_POS = math.ceil(consts.WIDTH/2)+2
