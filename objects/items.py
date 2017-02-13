@@ -50,12 +50,14 @@ class Weapon(Item):
         if not self.equipped and not player.hands_left(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = self.attack
+            player.hands -= self.handedness
             self.equipped = True
         
     def dequip(self, player):
         if self.equipped:
             if consts.DEBUG: print('dequip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = 0
+            player.hands += self.handedness
             self.equipped = False
 
 class Light(Item):
@@ -89,11 +91,12 @@ class Food(Item):
 class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2,
                  probability=20, char=')', load_speed=2,
-                 missle_type='Arrow', range=8, color=colors.grey):
+                 missle_type='Arrow', range=8, color=colors.grey, handedness=2):
         super().__init__(name, weight, probability, char, color)
         self.missle_type = missle_type
         self.range = range
         self.load_speed = load_speed
+        self.handedness = handedness
 
     def equip(self, player):
         if not self.equipped:
@@ -117,13 +120,13 @@ class Missle(Item):
     def equip(self, player):
         if not self.equipped:
             player.missles.append(self)
-            self.equipped = True
+        self.equipped = True
 
     def dequip(self, player):
         if self.equipped:
             if self in player.missles:
                 player.missles.remove(self)
-            self.equipped = False
+        self.equipped = False
 
 yaml_items = {}
 ITEMS = []

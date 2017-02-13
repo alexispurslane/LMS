@@ -62,9 +62,10 @@ def draw_stats(GS):
     console.drawStr(base, start+2, 'LoS dist: ' + str(player.light_source_radius))
     console.drawStr(base+bounds+4, start+2, 'Dungeon '+str(GS['terrain_map'].dungeon_level))
 
-    # Kills
-    console.drawStr(base, start+3, 'Monsters: ' + str(nm))
-    console.drawStr(base+bounds+4, start+3, 'Kills: ' + str(player.killed_monsters))
+    if len(player.inventory) == 12:
+        console.drawStr(base, start+3, 'Inventory Full', fg=colors.red)
+        
+    console.drawStr(base+bounds+6, start+3, 'Kills: ' + str(player.killed_monsters))
 
     # Level
     lvl = math.floor(player.level/player.race.levels)
@@ -118,7 +119,7 @@ def draw_hud_screen(GS):
 def draw_inventory_screen(GS):
     console = GS['console']
     placing = 1
-    draw_square(console, consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4, consts.HEIGHT-1, text='INVENTORY')
+    draw_square(console, consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4, consts.HEIGHT-1, text='INVENTORY ('+str(GS['player'].hands)+' hands free)')
     for (i, grp) in enumerate(GS['player'].inventory):
         item, number = grp[0], grp[1]
         item_display = ""

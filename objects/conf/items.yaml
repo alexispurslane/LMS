@@ -76,6 +76,7 @@ armor:
 - Lamellar Armor:
     char: '['
     color: red
+    defence: 10
     weight: 10
     probability: 10
     

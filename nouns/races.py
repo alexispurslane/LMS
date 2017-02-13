@@ -88,7 +88,7 @@ BOWMAN = Race({
         items.LEATHER_CAP,
         items.TORCH,
         items.GAMBESON
-    ]+[items.IRON_BOLT]*21+[items.THROWING_KNIFE]*8,
+    ]+[items.IRON_BOLT]*21,
     'skills': {
         'weapon': 0.9,
         'spell': 1,
