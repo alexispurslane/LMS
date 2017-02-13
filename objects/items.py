@@ -98,11 +98,13 @@ class RangedWeapon(Item):
     def equip(self, player):
         if not self.equipped:
             player.ranged_weapon = self
+            player.hands -= self.handedness
             self.equipped = True
 
     def dequip(self, player):
         if self.equipped:
             player.ranged_weapon = None
+            player.hands += self.handedness
             self.equipped = false
 
 class Missle(Item):

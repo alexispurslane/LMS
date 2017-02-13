@@ -44,11 +44,7 @@ class Player:
             item.equip(self)
 
     def hands_left(self, x):
-        if self.hands > x.handedness:
-            self.hands -= x.handedness
-            return True
-        else:
-            False
+        return self.hands >= x.handedness
             
     def update_inventory(self):
         self.lin_inventory.sort(key = lambda x: x.weight)
@@ -89,7 +85,7 @@ class Player:
             
         ratio = self.health/self.max_health
         self.max_health += self.race.level_up_bonus
-        self.health += self.max_health*ratio
+        self.health = self.max_health*ratio
         self.max_strength += math.floor(self.race.level_up_bonus/10)
         self.strength = self.max_strength
 

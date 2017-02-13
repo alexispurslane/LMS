@@ -87,6 +87,10 @@ def auto_rest(GS, p):
             p.hunger += 1
         utils.monster_turn(GS)
         
+        draw.draw_game_screen(GS, 0)
+        tdl.flush()
+        time.sleep(0.01)
+        
         GS['turns'] += 1
         
 # Fire the first available missle using the player's current ranged weapon at

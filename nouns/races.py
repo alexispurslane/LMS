@@ -52,7 +52,7 @@ BERSERKER = Race({
     'strength': 10,
     'inventory': [
         items.TORCH,
-        items.HAND_AXE,
+        items.HATCHET,
         items.VIKING_HELM,
         items.GAMBESON
     ],

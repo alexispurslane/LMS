@@ -18,7 +18,7 @@ def reset_GS():
         with open('.gamesave', 'r') as gsf: GS = pickle.load(gsf)
     else:
         GS = {
-            'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing', renderer=u'GLSL'),
+            'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing'),
             'screen': 'INTRO',
             'player': player.Player(races.WARRIOR),
             'terrain_map': maps.TerrainMap(consts.MAP_WIDTH, consts.MAP_HEIGHT),
@@ -33,13 +33,12 @@ def reset_GS():
         }
         GS['map_console'] = tdl.Console(GS['terrain_map'].width,
                                         GS['terrain_map'].height)
+        with open('.gamescores', 'r') as scores:
+            for score in scores:
+                if score.strip() != '':
+                    GS['scores'].append(int(score.strip()))
 
 reset_GS()
-
-with open('.gamescores', 'r') as scores:
-    for score in scores:
-        if score.strip() != '':
-            GS['scores'].append(int(score.strip()))
 
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')

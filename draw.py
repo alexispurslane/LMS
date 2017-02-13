@@ -1,7 +1,9 @@
 import tdl, math, re, random
 import maps, monsters, consts, colors, utils, races, player, items
+
 from itertools import groupby
 from pyfiglet import Figlet
+from colour import Color
 
 def display_stat(name, obj):
     a = getattr(obj, 'max_'+name)
@@ -123,7 +125,7 @@ def draw_inventory_screen(GS):
         if isinstance(item, items.Armor):
             item_display = 'Weight: %d\nDefence: %d' % (item.weight, item.defence)
         elif isinstance(item, items.Weapon):
-            item_display = 'Weight: %d\nAttack: %d' % (item.weight, item.attack)
+            item_display = 'Weight: %d\nAttack: %d, %d-handed' % (item.weight, item.attack, item.handedness)
         elif isinstance(item, items.RangedWeapon):
             item_display = 'Weight: %d\nRange: %d' % (item.weight, item.range)
         elif isinstance(item, items.Missle):
@@ -206,26 +208,36 @@ def draw_charsel_screen(GS, frame):
                  race.description)
         draw_square(console, int(consts.WIDTH/2)-27, 30, 54, 30, race_display)
 
+fade = list(Color("red").range_to(Color(rgb=(0.1, 0.1, 0.1)), 50))
 def draw_intro_screen(GS, frame):
+    global fade
     console = GS['console']
     
-    f = Figlet(font='doom')
+    f = Figlet(font='gothic')
     l = 24
+    if frame % len(fade) == 0:
+        fade.reverse()
+    color = fade[frame%len(fade)].rgb
+    rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
     for i, line in enumerate(f.renderText(consts.GAME_TITLE).split("\n")):
         if i == 0:
             l = math.floor(len(line)/2)
-        console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.brown)
+        console.drawStr(int(consts.WIDTH/2)-l, i+1, line, fg=colors.red)
 
-    console.drawStr(int(consts.WIDTH/2)-12, 18, 'press any key to continue',
-                    fg=colors.darken(colors.grey))
+    console.drawStr(int(consts.WIDTH/2)-12, 19, 'press any key to continue', bg=rgb_color)
 
-    scores = '\n'.join(list(map(str, sorted(GS['scores'], reverse=True))))
-    draw_square(console, int(consts.WIDTH/2)-7, 20, 14, 20, text='TOP 20 SCORES\n'+scores, spacing=1)
+    scores = '\n'.join(list(map(str, sorted(GS['scores'], reverse=True)))[0:19])
+    draw_square(console, int(consts.WIDTH/2)-7, 21, 14, 20, text='TOP 20 SCORES\n'+scores, spacing=1)
 
 
 def draw_death_screen(GS, frame):
     console = GS['console']
     player = GS['player']
+
+    if frame % len(fade) == 0:
+        fade.reverse()
+    color = fade[frame%len(fade)].rgb
+    rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
     
     console.drawStr(consts.WIDTH/2-11, 0, 'Game Stats')
     console.drawStr(0, 1, chr(consts.TCOD_CHAR_DHLINE)*consts.WIDTH)
@@ -236,6 +248,7 @@ def draw_death_screen(GS, frame):
     console.drawStr(consts.WIDTH/2-11, 7, 'Inventory: ')
     for i, g in enumerate(groupby(player.inventory)):
         console.drawStr(consts.WIDTH/2-7, 8+i, g[0][0].name + ' x'+str(len(list(g[1]))))
+    console.drawStr(int(consts.WIDTH/2)-12, 19, 'press `r` to restart', bg=rgb_color)
 
 def draw_game_screen(GS, frame):
     console = GS['console']
