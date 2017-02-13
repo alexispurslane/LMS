@@ -8,6 +8,7 @@ WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
 WIDTH, HEIGHT    = int(1280/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
+SHOW_MONSTERS    = True
 MUSIC            = False
 CUMULATE_FOV     = True
 MESSAGE_NUMBER   = 8
@@ -169,6 +170,12 @@ def inventory(GS, p):
         GS['side_screen'] == 'HUD'
     else:
         GS['side_screen'] = 'INVENTORY'
+        
+def skills(GS, p):
+    if GS['side_screen'] == 'SKILLS':
+        GS['side_screen'] = 'HUD'
+    else:
+        GS['side_screen'] = 'SKILLS'
 
 # Resets all screens back to the default playing setup. 
 def reset(GS, p):
@@ -196,12 +203,6 @@ def auto_move(d):
             time.sleep(0.01)
             turns += 1
     return do
-
-def skills(GS, p):
-    if GS['side_screen'] != 'SKILLS':
-        GS['side_screen'] = 'SKILLS'
-    else:
-        GS['side_screen'] = 'HUD'
 
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),

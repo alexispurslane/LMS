@@ -39,7 +39,7 @@ weapons:
 
 # Sword skill tree:
 - Claymoor:
-    char: ')'
+    char: '|'
     weight: 10
     attack: 21
     category: ['sword', 'axe']
@@ -47,7 +47,7 @@ weapons:
     handedness: 2
     
 - Long Sword:
-    char: ')'
+    char: '|'
     color: blue
     weight: 6
     attack: 16
@@ -151,7 +151,7 @@ armor:
 
 # Helmet class
 
-- Viking Helm:
+- Viking Helmb:
     char: '*'
     weight: 3
     probability: 15

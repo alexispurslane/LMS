@@ -152,7 +152,8 @@ def create_items(tipe):
                 code += k+'='+str(v)+','
 
         code = code.rstrip(',')+')'
-        ITEMS.append(eval(code))
+        item = eval(code)
+        ITEMS.append(item)
 
 create_items('weapons')
 create_items('armor')

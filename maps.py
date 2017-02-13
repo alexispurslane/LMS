@@ -217,12 +217,9 @@ class TerrainMap:
             fov = self.dungeon['lighted']
             self.dungeon['remembered_fov'] = set(fov)
 
-        # Draw up-stairs and down-stairs no matter what.
         if len(self.dungeon['monsters']) == 0:
             draw.draw_dungeon_tile(self, GS, console, self.dungeon['down_stairs'], (0,0,0))
             
-        draw.draw_dungeon_tile(self, GS, console, self.dungeon['up_stairs'], (0,0,0))
-
         # Draw map
         for x, y in list(self.dungeon['remembered_fov']):
             tint = (-90, -90, -90)

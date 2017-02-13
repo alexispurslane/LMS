@@ -46,20 +46,23 @@ class Player:
         for item in self.lin_inventory:
             item.equip(self)
 
-    def can_use(self, x):
+    def get_skill_with_item(self, x):
         baseline = 0
         if isinstance(x, items.Weapon):
             baseline = 15
         elif isinstance(x, items.Armor):
             baseline = 20
             
-        skill_levels = [(k, self.skill_tree.setdefault(k, baseline))
+        skill_levels = [(k, self.skill_tree.setdefault(k, (baseline, baseline)))
                         for k in x.category]
-        best = min(skill_levels, key=lambda x: x[1])
-        
-        print(self.skill_tree)
-        
-        return best[1] <= x.probability
+        return min(skill_levels, key=lambda x: x[1][0])[1]
+
+    def get_skill(self, s):
+        return self.skill_tree[s]
+    
+    def can_use(self, x): 
+        return self.get_skill_with_item(x)[0] <= x.probability
+    
     def hands_left(self, x):
         return self.hands >= x.handedness
             
@@ -82,7 +85,7 @@ class Player:
     # calls level_up with the current level calculated via the exp.
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
-        s = math.floor(self.exp/(30+self.level*5))
+        s = math.floor(self.exp/(35+self.level*5))
         
         if s >= 1 and s <= self.race.levels:
             self.level_up(GS, s)
@@ -105,11 +108,12 @@ class Player:
         self.health = self.max_health*ratio
         self.max_strength += math.floor(self.race.level_up_bonus/10)
         self.strength = self.max_strength
-        for item, items in self.inventory:
-            if item.equipped and (isinstance(item, Armor) or isinstance(item, Weapon)):
-                for catigory in item.catigory:
-                    if self.skill_tree[catigory] > 5:
-                        self.skill_tree[catigory] -= 2
+        for item, lst in self.inventory:
+            if item.equipped and (isinstance(item, items.Armor) or\
+                                  isinstance(item, items.Weapon)):
+                for category in item.category:
+                    if self.skill_tree[catigory][0] > 5:
+                        self.skill_tree[catigory][0] -= 2
 
     # If the monster is faster, the monster attacks first, otherwise the player
     # attacks first. The monster is passed a reference to the player to do special

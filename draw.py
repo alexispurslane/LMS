@@ -138,14 +138,15 @@ def draw_inventory_screen(GS):
             item_display = 'Nutrition Value:%d' % (item.nutrition)
 
         item_display += '\nAmount: '+str(number)
+        
         color = colors.light_blue
         color2 = colors.white
         if item.equipped:
-            color2 = color = colors.red
+            color2 = color = utils.get_skill_color(GS['player'].get_skill_with_item(item)[0])
         
         try:
             if i == GS['selection']:
-                color2 = color = colors.grey
+                color2 = color = colors.red
         except: pass
         
         console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name+' ('+item.char+')', bg=color)
@@ -171,14 +172,8 @@ def draw_skills_screen(GS):
     pos = 1
     for skill, progress in skt:
         barbasex = math.ceil((len(skill)+1)/2)
-        for i in range(1, 20-progress):
-            color = colors.lighten(colors.grey)
-            if progress <= 5:
-                color = colors.white
-            elif progress <= 8:
-                color = colors.blue
-            elif progress <= 12:
-                color = colors.brown
+        for i in range(1, progress[1] - progress[0]):
+            color = utils.get_skill_color(progress)
                 
             GS['console'].drawChar(pos+barbasex, consts.HEIGHT-4-i,
                                    chr(consts.TCOD_CHAR_HLINE), fg=color)
@@ -283,7 +278,7 @@ def draw_game_screen(GS, frame):
     GS['console'].blit(GS['map_console'], 0, 0, -1, -1, ox, oy)
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
-        if fov[m.pos] or not consts.FOV:
+        if fov[m.pos] or not consts.FOV or consts.SHOW_MONSTERS:
             bg_color = GS['map_console'].get_char(m.pos[0], m.pos[1])[2]
             GS['console'].drawChar(m.pos[0]-ox, m.pos[1]-oy, m.char, fg=m.fg, bg=bg_color)
 
@@ -469,3 +464,4 @@ def draw_square(GS, x, y, width, height, text='', spacing=2):
             color = eval("colors." + line.split(': ')[0])
             line = line.split(': ')[1]
         console.drawStr(x+1, y+i*spacing, line.strip(), fg=color)
+

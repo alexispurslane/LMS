@@ -1,4 +1,4 @@
-import math, random, consts, items
+import math, random, consts, items, colors
 
 # Calculate distance.
 def dist(p1, p2):
@@ -65,3 +65,13 @@ def ordinal(value):
         ordval = u"%d%s" % (value, "th")
 
     return ordval
+
+def get_skill_color(progress):
+    if progress <= 5:
+        return colors.white
+    elif progress <= 8:
+        return colors.blue
+    elif progress <= 12:
+        return colors.brown
+    else:
+        return colors.lighten(colors.grey)
