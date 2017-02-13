@@ -16,7 +16,7 @@ def draw_stats(GS):
     base = math.ceil(consts.WIDTH/2)+1
     bounds = len('Health: ')+3
     start = consts.MESSAGE_NUMBER+1
-    draw_square(console, base, start, consts.WIDTH-base-2, 11,
+    draw_square(GS, base, start, consts.WIDTH-base-2, 11,
                 text=(player.race.name + ' ('+player.attributes()+')').upper())
     base += 1
     
@@ -107,7 +107,7 @@ def draw_messages(GS):
     shown_messages = list(reversed(GS['messages']))[end:start]
     ms = 'MESSAGES\n'+'\n'.join(shown_messages)
     base = math.floor(consts.WIDTH/2)+1
-    draw_square(console, base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER,
+    draw_square(GS, base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER,
                 text=ms, spacing=1)
     return GS['messages']
     
@@ -119,7 +119,8 @@ def draw_hud_screen(GS):
 def draw_inventory_screen(GS):
     console = GS['console']
     placing = 1
-    draw_square(console, consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4, consts.HEIGHT-1, text='INVENTORY ('+str(GS['player'].hands)+' hands free)')
+    draw_square(GS, consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4,
+                consts.HEIGHT-1, text='INVENTORY ('+str(GS['player'].hands)+' hands free)')
     for (i, grp) in enumerate(GS['player'].inventory):
         item, number = grp[0], grp[1]
         item_display = ""
@@ -180,7 +181,7 @@ def draw_skills_screen(GS):
             
         text += ('%s: %s%s%s %d\n' % (color, k, space, chr(consts.TCOD_CHAR_ARROW_E), v))
         
-    draw_square(GS['console'], consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4,
+    draw_square(GS, GS['console'], consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4,
                 consts.HEIGHT-1, text='SKILLS ('+str(len(skt))+' learned)\n'+text)
 
 def draw_hud(GS):
@@ -226,7 +227,7 @@ def draw_charsel_screen(GS, frame):
                  race.first_level['strength'],
                  race.first_level['max_health'],
                  race.description)
-        draw_square(console, int(consts.WIDTH/2)-27, 30, 54, 30, race_display)
+        draw_square(GS, int(consts.WIDTH/2)-27, 30, 54, 30, race_display)
 
 fade = list(Color("red").range_to(Color(rgb=(0.1, 0.1, 0.1)), 50))
 def draw_intro_screen(GS, frame):
@@ -247,7 +248,7 @@ def draw_intro_screen(GS, frame):
     console.drawStr(int(consts.WIDTH/2)-12, 19, 'press any key to continue', bg=rgb_color)
 
     scores = '\n'.join(list(map(str, sorted(GS['scores'], reverse=True)))[0:19])
-    draw_square(console, int(consts.WIDTH/2)-7, 21, 14, 20, text='TOP 20 SCORES\n'+scores, spacing=1)
+    draw_square(GS, int(consts.WIDTH/2)-7, 21, 14, 20, text='TOP 20 SCORES\n'+scores, spacing=1)
 
 
 def draw_death_screen(GS, frame):
@@ -434,21 +435,29 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
         console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
     return result
 
-def draw_square(console, x, y, width, height, text='', spacing=2):
-    # height = min(max(0, height), consts.HEIGHT)
-    # width = min(max(0, width), consts.WIDTH)
+fade = list(Color("red").range_to(Color("white"), 25))
+def draw_square(GS, x, y, width, height, text='', spacing=2):
+    console = GS['console']
+    hp = math.floor(GS['player'].health/GS['player'].max_health*100)
+    rgb_color = colors.white
+    if hp < 40:
+        if frame % len(fade) == 0:
+            fade.reverse()
+        color = fade[frame%len(fade)].rgb
+        rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
+    
     for i in range(1, height):
-        console.drawChar(x, y+i, chr(consts.TCOD_CHAR_VLINE))
-        console.drawChar(width+x, y+i, chr(consts.TCOD_CHAR_VLINE))
+        console.drawChar(x, y+i, chr(consts.TCOD_CHAR_VLINE), fg=rgb_color)
+        console.drawChar(width+x, y+i, chr(consts.TCOD_CHAR_VLINE), fg=rgb_color)
         
-    console.drawStr(x, y, chr(consts.TCOD_CHAR_HLINE)*width)
-    console.drawChar(x, y, chr(consts.TCOD_CHAR_NW))
+    console.drawStr(x, y, chr(consts.TCOD_CHAR_HLINE)*width, fg=rgb_color)
+    console.drawChar(x, y, chr(consts.TCOD_CHAR_NW), fg=rgb_color)
     
-    console.drawStr(x+width, y+height, chr(consts.TCOD_CHAR_SE))
-    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_HLINE)*width)
-    console.drawChar(x+width, y, chr(consts.TCOD_CHAR_NE))
+    console.drawStr(x+width, y+height, chr(consts.TCOD_CHAR_SE), fg=rgb_color)
+    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_HLINE)*width, fg=rgb_color)
+    console.drawChar(x+width, y, chr(consts.TCOD_CHAR_NE), fg=rgb_color)
     
-    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_SW))
+    console.drawStr(x, y+height, chr(consts.TCOD_CHAR_SW), fg=rgb_color)
 
     for i, line in enumerate(text.split('\n')[:65]):
         color = colors.white

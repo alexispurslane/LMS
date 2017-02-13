@@ -29,6 +29,7 @@ class TerrainMap:
     def reset_dungeon(self):
         self.dungeon = {
             'monsters': [],
+            'monsters_alerted': False,
             
             'water': {},
             'areas': [],

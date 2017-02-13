@@ -53,8 +53,8 @@ BERSERKER = Race({
     'inventory': [
         items.TORCH,
         items.HATCHET,
-        items.VIKING_HELM,
-        items.GAMBESON
+        items.LEATHER_CAP,
+        items.ROBE
     ],
     'skills': {
         'weapon': 1.2,
@@ -87,7 +87,7 @@ BOWMAN = Race({
         items.CROSSBOW,
         items.LEATHER_CAP,
         items.TORCH,
-        items.GAMBESON
+        items.ROBE
     ]+[items.IRON_BOLT]*21,
     'skills': {
         'weapon': 0.9,

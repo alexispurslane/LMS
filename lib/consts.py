@@ -8,6 +8,7 @@ WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
 WIDTH, HEIGHT    = int(1280/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
+MUSIC            = False
 CUMULATE_FOV     = True
 MESSAGE_NUMBER   = 8
 FOREST_LEVELS    = 0

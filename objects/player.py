@@ -57,8 +57,7 @@ class Player:
                         for k in x.category]
         best = min(skill_levels, key=lambda x: x[1])
         
-        print(best)
-        print(skill_levels)
+        print(self.skill_tree)
         
         return best[1] <= x.probability
     def hands_left(self, x):
@@ -133,6 +132,12 @@ class Player:
             self.learn(GS, monster)
         if monster.health <= 0:
             self.killed_monsters += 1
+            
+            for r in GS['terrain_map'].dungeon['rooms']:
+                if r.inside(self.pos):
+                    r.kills += 1
+                    if r.kills > 5:
+                        GS['terrain_map'].dungeon['monsters_alerted'] = True
         return (self.health <= 0, monster.health <= 0)
 
     # Adds a copy of the inventory item to the inventory (this is because all

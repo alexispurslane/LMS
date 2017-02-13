@@ -88,6 +88,8 @@ class Monster:
 
     # Move monster according to choose() and deal with movement effects.
     def move(self, GS):
+        if GS['turns'] % 20 == 0:
+            GS['terrain_map'].dungeon['monsters_alerted'] = False
         sight = self.sight
         if GS['player'].light():
             self.sight = 3
@@ -101,7 +103,7 @@ class Monster:
                 
                 if self.pos in GS['terrain_map'].dungeon['items']:
                     GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
-        elif utils.dist(self.pos, GS['player'].pos) <= self.sight:
+        elif utils.dist(self.pos, GS['player'].pos) <= self.sight or GS['terrain_map'].dungeon['monsters_alerted']:
             if self.ranged:
                 p = GS['player']
                 m = self

@@ -132,21 +132,21 @@ armor:
 - Kite Sheild:
     char: '}'
     weight: 6
-    probability: 5
+    probability: 10
     category: ['sheild']
 
 - Wood Buckler:
     char: '}'
     color: brown
     weight: 3
-    probability: 8
+    probability: 15
     category: ['sheild']
 
 - Small Round Sheild:
     char: 'o'
     color: grey
     weight: 2
-    probability: 15
+    probability: 20
     category: ['sheild']
 
 # Helmet class
@@ -154,14 +154,14 @@ armor:
 - Viking Helm:
     char: '*'
     weight: 3
-    probability: 5
+    probability: 15
     category: ['helmet']
     
 - Leather Cap:
     char: '*'
     color: grey
     weight: 1
-    probability: 15
+    probability: 20
     category: ['helmet']
 
 ranged weapons:

@@ -7,8 +7,9 @@ sys.path.append('nouns/')
 sys.path.append('objects/')
 
 import maps, monsters, consts, colors, utils, races, player, draw, area
+from playsound import playsound
 
-tdl.setFont('font/IBMCGA16x16_gs_ro.png', greyscale=True)
+tdl.setFont('assets/font/IBMCGA16x16_gs_ro.png', greyscale=True)
 tdl.event.set_key_repeat(delay=40, interval=0)
 
 GS = {}
@@ -39,6 +40,9 @@ def reset_GS():
                     GS['scores'].append(int(score.strip()))
 
 reset_GS()
+
+if consts.MUSIC:
+    playsound('assets/Fantascape_Looping.mp3', False)
 
 def signal_handler(signal, frame):
     print('SIGINT received, exiting now.')

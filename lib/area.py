@@ -41,6 +41,7 @@ class Room(Area):
         # Diagnostic: is this room connected according to the DGA?
         self.connected = False
         self.item_attempts = 0
+        self.kills = 0
         
         # Circle dimentions
         self.radius = math.floor(w/2)
