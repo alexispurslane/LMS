@@ -105,6 +105,11 @@ class Player:
         self.health = self.max_health*ratio
         self.max_strength += math.floor(self.race.level_up_bonus/10)
         self.strength = self.max_strength
+        for item, items in self.inventory:
+            if item.equipped and (isinstance(item, Armor) or isinstance(item, Weapon)):
+                for catigory in item.catigory:
+                    if self.skill_tree[catigory] > 5:
+                        self.skill_tree[catigory] -= 2
 
     # If the monster is faster, the monster attacks first, otherwise the player
     # attacks first. The monster is passed a reference to the player to do special
