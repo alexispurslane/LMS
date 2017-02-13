@@ -1,6 +1,8 @@
 import tdl, copy, random
 from itertools import groupby
 import utils, consts, math, items
+from functools import *
+import operator
 
 class Player:
     def __init__(self, race):
@@ -13,10 +15,11 @@ class Player:
         
         self.level = 0
         self.exp = 0
-        self.frozen = 0
+        self.skill_tree = {}
         
         self.prev_pos = (-1,-1)
         self.poisoned = 0
+        self.frozen = 0
 
         # Setup character's race.
         self.race = race
@@ -43,6 +46,21 @@ class Player:
         for item in self.lin_inventory:
             item.equip(self)
 
+    def can_use(self, x):
+        baseline = 0
+        if isinstance(x, items.Weapon):
+            baseline = 15
+        elif isinstance(x, items.Armor):
+            baseline = 20
+            
+        skill_levels = [(k, self.skill_tree.setdefault(k, baseline))
+                        for k in x.category]
+        best = min(skill_levels, key=lambda x: x[1])
+        
+        print(best)
+        print(skill_levels)
+        
+        return best[1] <= x.probability
     def hands_left(self, x):
         return self.hands >= x.handedness
             

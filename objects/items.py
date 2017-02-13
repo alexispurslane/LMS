@@ -19,13 +19,15 @@ class Item:
 
 class Armor(Item):
     def __init__(self, name='Unknown armor', weight=3,
-                         probability=40, char=']', defence=1, color=colors.grey):
+                         probability=40, char=']', defence=1, color=colors.grey,
+                 category=['cloth']):
         super().__init__(name, weight, probability, char, color)
         self.equipped = False
         self.defence = defence
+        self.category = category
 
     def equip(self, player):
-        if not self.equipped and not player.has(self):
+        if not self.equipped and not player.has(self) and player.can_use(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.defence += self.defence
             player.max_defence = player.defence
@@ -40,14 +42,16 @@ class Armor(Item):
     
 class Weapon(Item):
     def __init__(self, name='Unknown weapon', weight=2, attack=5,
-                         probability=20, char='|', color=colors.grey, handedness=1):
+                 probability=20, char='|', color=colors.grey, handedness=1,
+                 category=[]):
         super().__init__(name, weight, probability, char, color)
         self.attack = attack
         self.equipped = False
         self.handedness = handedness
+        self.category = category
         
     def equip(self, player):
-        if not self.equipped and not player.hands_left(self):
+        if not self.equipped and player.hands_left(self) and player.can_use(self):
             if consts.DEBUG: print('equip '+self.name+' ('+str(self.equipped)+')')
             player.max_attack = player.attack = self.attack
             player.hands -= self.handedness

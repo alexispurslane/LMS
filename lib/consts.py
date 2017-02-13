@@ -195,15 +195,20 @@ def auto_move(d):
             time.sleep(0.01)
             turns += 1
     return do
-    
+
+def skills(GS, p):
+    if GS['side_screen'] != 'SKILLS':
+        GS['side_screen'] = 'SKILLS'
+    else:
+        GS['side_screen'] = 'HUD'
+
 GAME_ACTION_KEYS = {
     '.': lambda GS, p: p.rest(),
     ',': pickup,
     ';': auto_rest,
     'f': fire,
     'i': inventory,
-    'escape': inventory,
-    '+': lambda GS, p: eval('consts.WIZARD_MODE = not consts.WIZARD_MODE'),
+    'm': skills,
 
     # Auto-movement
     'L': auto_move('l'),

@@ -163,7 +163,26 @@ def draw_man_screen(GS):
             else:
                 GS['console'].drawStr(consts.EDGE_POS, i, line)
     return GS['messages']
+
+def draw_skills_screen(GS):
+    text = ''
+    skt = list(GS['player'].skill_tree.items())
+    longest_key = max(skt, key=lambda x: len(x[0]))[0]
+    for k, v in skt:
+        space = ' '*(len(longest_key)-len(k))
+        color = "grey"
+        if v <= 5:
+            color = "white"
+        elif v <= 8:
+            color = "blue"
+        elif v <= 12:
+            color = "brown"
+            
+        text += ('%s: %s%s%s %d\n' % (color, k, space, chr(consts.TCOD_CHAR_ARROW_E), v))
         
+    draw_square(GS['console'], consts.EDGE_POS, 0, math.floor(consts.WIDTH/2)-4,
+                consts.HEIGHT-1, text='SKILLS ('+str(len(skt))+' learned)\n'+text)
+
 def draw_hud(GS):
     consts.EDGE_POS = math.ceil(consts.WIDTH/2)+2
     return globals()['draw_'+GS['side_screen'].lower()+'_screen'](GS) or GS['messages']
