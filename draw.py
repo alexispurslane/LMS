@@ -198,6 +198,10 @@ def draw_screen(GS):
     console.clear()
 
     globals()['draw_'+GS['screen'].lower()+'_screen'](GS, frame)
+
+    for animation in GS['animations']:
+        animation.run(GS, frame)
+        
     frame += 1
 
     tdl.flush()
