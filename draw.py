@@ -54,7 +54,7 @@ def draw_stats(GS):
         console.drawStr(base+bounds+13, start+1, 'Getting Hungry', fg=colors.green)
     elif player.hunger <= 0 and player.hunger >= -15:
         console.drawStr(base+bounds+13, start+1, 'Full', fg=colors.blue)
-    else:
+    elif player.hunger < -15:
         console.drawStr(base+bounds+13, start+1, 'Stuffed', fg=colors.light_blue)
 
     # Light Source Radius
@@ -110,7 +110,7 @@ def draw_messages(GS):
     draw_square(GS, base, 0, consts.WIDTH-base-2, consts.MESSAGE_NUMBER,
                 text=ms, spacing=1)
     return GS['messages']
-    
+
 def draw_hud_screen(GS):
     console = GS['console']
     draw_stats(GS)
@@ -141,15 +141,18 @@ def draw_inventory_screen(GS):
         
         color = colors.light_blue
         color2 = colors.white
+        fgcolor = colors.white
         if item.equipped:
             color2 = color = utils.get_skill_color(GS['player'].get_skill_with_item(item)[0])
+        if color == colors.lighten(colors.grey) or color == colors.white:
+            fgcolor = colors.black
         
         try:
             if i == GS['selection']:
                 color2 = color = colors.red
         except: pass
         
-        console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name+' ('+item.char+')', bg=color)
+        console.drawStr(consts.EDGE_POS+1, placing, str(i+1)+') '+item.name+' ('+item.char+')', fg=fgcolor, bg=color)
         for line in item_display.split("\n"):
             placing += 1
             console.drawStr(consts.EDGE_POS+5, placing, line, fg=color2)
@@ -314,8 +317,6 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, items[-1].char,
                              fg=colors.tint(items[-1].fg, tint),
                              bg=back)
-        else:
-            print(items[-1])
     elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
         decor = terrain_map.dungeon['decor']
         if decor[pos] == 'FM':
@@ -363,8 +364,8 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
             console.drawChar(x, y, chr(239),
-                             fg=colors.tint(colors.dark_grey, tint),
-                             bg=colors.tint(colors.grey, tint))
+                             fg=colors.tint(colors.grey, tint),
+                             bg=colors.tint(colors.darkmed_grey, tint))
         else:
             console.drawChar(x, y, chr(239),
                              fg=colors.tint(colors.grey, tint),

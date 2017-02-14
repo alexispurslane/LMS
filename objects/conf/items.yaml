@@ -12,7 +12,7 @@ weapons:
 
 - Double-Bladed Axe:
     char: '>'
-    color: blue
+    color: medium_blue
     weight: 20
     attack: 39
     probability: 8
@@ -48,7 +48,7 @@ weapons:
     
 - Long Sword:
     char: '|'
-    color: blue
+    color: medium_blue
     weight: 6
     attack: 16
     probability: 8
@@ -101,7 +101,7 @@ armor:
 - Leather Breastplate:
     char: ']'
     weight: 5
-    color: blue
+    color: medium_blue
     probability: 13
     category: ['breastplate']
 
@@ -170,13 +170,15 @@ ranged weapons:
     probability: 5
     range: 13
     load_speed: 0
+    category: ['bow']
     char: ')'
     
 - Ash Bow:
-    color: blue
+    color: medium_blue
     weight: 2
     probability: 8
     load_speed: 1
+    category: ['bow']
     range: 10
     char: ')'
 
@@ -184,6 +186,7 @@ ranged weapons:
     color: brown
     weight: 1
     probability: 12
+    category: ['bow']
     load_speed: 1
     range: 7
     char: ')'
@@ -193,6 +196,7 @@ ranged weapons:
     weight: 5
     probability: 15
     range: 8
+    category: ['bow']
     color: grey
     load_speed: 2
     missle_type: 'Bolt'

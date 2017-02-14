@@ -2,12 +2,20 @@
 
 - [X] Alert farther monsters if player makes a big scuffle.
 - [X] Flash the HUD outline red when player is low on health.
-- [X] Implement training method for skill tree.
-- [X] Create better graphics for skill tree
+- [X] Implement training method for player skill tree.
+- [X] Create better graphics for player skill tree
+- [] Add hidden doors (placed at any dead-end corridors that but up with a room)
+- [] Add searching action with probabilities based on class aptitudes.
+- [] Have poison making you confused
+- [] Add more kinds of special monsters
+- [] Fix monster ranged attack
+- [] Allow closing doors
+- [] Fix door-placing algorithm
 - [] Improve skill tree, create more branches and interesting interactions.
 - [] Include mutually-esclusive training branches for skill tree.
+- [] Show skills as actual GUI tree.
 - [] Convert monster AI to finite state machine based setup.
-- [] Read states for FSM from YAML conf-file.
 - [] Implement potion and staff system
 - [] Implement MR-based magic system.
 - [] Finish music system.
+- [] ANIMATE EVERYTHING!

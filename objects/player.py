@@ -44,18 +44,22 @@ class Player:
         self.missles = []
 
         for item in self.lin_inventory:
-            item.equip(self)
+            if not isinstance(item, items.Food):
+                item.equip(self)
 
     def get_skill_with_item(self, x):
-        baseline = 0
-        if isinstance(x, items.Weapon):
-            baseline = 15
-        elif isinstance(x, items.Armor):
-            baseline = 20
-            
-        skill_levels = [(k, self.skill_tree.setdefault(k, (baseline, baseline)))
-                        for k in x.category]
-        return min(skill_levels, key=lambda x: x[1][0])[1]
+        if isinstance(x, items.Weapon) or isinstance(x, items.RangedWeapon) or\
+           isinstance(x, items.Armor):
+            baseline = 0
+            if isinstance(x, items.Weapon) or isinstance(x, items.RangedWeapon):
+                baseline = 15
+            elif isinstance(x, items.Armor):
+                baseline = 20
+
+            skill_levels = [(k, self.skill_tree.setdefault(k, (baseline, baseline)))
+                            for k in x.category]
+            return min(skill_levels, key=lambda x: x[1][0])[1]
+        return (8,8)
 
     def get_skill(self, s):
         return self.skill_tree[s]
@@ -86,7 +90,7 @@ class Player:
     # calls level_up with the current level calculated via the exp.
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
-        s = math.floor(self.exp/(45+self.level*5))
+        s = math.floor(self.exp/(60+self.level*5))
         
         if s >= 1 and s <= self.race.levels:
             self.level_up(GS, s)
@@ -197,12 +201,13 @@ class Player:
         else:
             if num_armor <= 3 and num_weapon <= 3:
                 return 'light'
+        return None
 
     def fast(self):
         if self.speed <= 5:
             return 'fast'
         else:
-            return ''
+            return None
 
     # Formats and calculates the player's attributes nicely.
     def attributes(self):
@@ -297,14 +302,13 @@ class Player:
             elif self.frozen > 0:
                 GS['messages'].append('You are frozen for '+str(self.frozen)+' more turns.')
             else:
-                GS['messages'].append("grey: You run into a wall.")
                 new_pos = self.pos
                 n_x, n_y = new_pos
             
         m = GS['terrain_map'].monster_at(new_pos)
         speed = self.speed
-        if utils.streight_line(self.prev_pos, (new_pos)) and self.light() and m:
-            GS['messages'].append("You gallantly charge the monster!")
+        if utils.streight_line(self.prev_pos, new_pos) and self.light() and m:
+            GS['messages'].append("green: You gallantly charge the monster!")
             self.speed = 0
             
         if m != None:

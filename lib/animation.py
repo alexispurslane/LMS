@@ -20,9 +20,24 @@ class Animation:
 
         if callback:
             return callback(frame, duration)
+
+class NonBlockingAnimation(Animation):
+    def __init__(self, GS, duration=500):
+        super().__init__(duration)
+        GS['animations'].append(self)
+
+    def run(self, GS, args, duration=None, callback=None):
+        if not duration:
+            duration = self.duration
+            
+        frame = args[0]
+        done = self.perform_animation_frame(GS['console'], args[1:], )
+        if done: GS['animations'].remove(self)
     
+        return done
+
 class FireMissleAnimation(Animation):
-    def __init__(self, duration=20):
+    def __init__(self, duration=15):
         super().__init__(duration)
 
     def perform_animation_frame(self, console, args, frame):

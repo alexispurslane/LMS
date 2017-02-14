@@ -70,7 +70,7 @@ def get_skill_color(progress):
     if progress <= 5:
         return colors.white
     elif progress <= 8:
-        return colors.blue
+        return colors.medium_blue
     elif progress <= 12:
         return colors.brown
     else:

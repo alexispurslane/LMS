@@ -95,12 +95,14 @@ class Food(Item):
 class RangedWeapon(Item):
     def __init__(self, name='Unknown ranged weapon', weight=2,
                  probability=20, char=')', load_speed=2,
+                 category=['bow'],
                  missle_type='Arrow', range=8, color=colors.grey, handedness=2):
         super().__init__(name, weight, probability, char, color)
         self.missle_type = missle_type
         self.range = range
         self.load_speed = load_speed
         self.handedness = handedness
+        self.category = category
 
     def equip(self, player):
         if not self.equipped:

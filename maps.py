@@ -178,6 +178,7 @@ class TerrainMap:
     def generate_new_map(self):
         self.dungeons.append(self.dungeon)
         self.reset_dungeon()
+        print(self.dungeon)
         self.dungeon['areas'] = self.generate_areas()
         
         if self.is_forests():
@@ -217,6 +218,7 @@ class TerrainMap:
             fov = self.dungeon['lighted']
             self.dungeon['remembered_fov'] = set(fov)
 
+        # Draw up-stairs and down-stairs no matter what.
         if len(self.dungeon['monsters']) == 0:
             draw.draw_dungeon_tile(self, GS, console, self.dungeon['down_stairs'], (0,0,0))
             

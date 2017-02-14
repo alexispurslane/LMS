@@ -30,7 +30,8 @@ def reset_GS():
             'map_console': None,
             'scores': [],
             'message_offset': 0,
-            'mouse_pos': (-1,-1)
+            'mouse_pos': (-1,-1),
+            'animations': []
         }
         GS['map_console'] = tdl.Console(GS['terrain_map'].width,
                                         GS['terrain_map'].height)
