@@ -60,7 +60,8 @@ class Player:
     def get_skill(self, s):
         return self.skill_tree[s]
     
-    def can_use(self, x): 
+    def can_use(self, x):
+        print(self.get_skill_with_item(x), x.probability)
         return self.get_skill_with_item(x)[0] <= x.probability
     
     def hands_left(self, x):
@@ -85,7 +86,7 @@ class Player:
     # calls level_up with the current level calculated via the exp.
     def learn(self, GS, monster):
         self.exp += math.floor(monster.attack/2)
-        s = math.floor(self.exp/(35+self.level*5))
+        s = math.floor(self.exp/(45+self.level*5))
         
         if s >= 1 and s <= self.race.levels:
             self.level_up(GS, s)
@@ -112,8 +113,9 @@ class Player:
             if item.equipped and (isinstance(item, items.Armor) or\
                                   isinstance(item, items.Weapon)):
                 for category in item.category:
-                    if self.skill_tree[catigory][0] > 5:
-                        self.skill_tree[catigory][0] -= 2
+                    if self.skill_tree[category][0] > 5:
+                        self.skill_tree[category] = (self.skill_tree[category][0]-1,
+                                                     self.skill_tree[category][1])
 
     # If the monster is faster, the monster attacks first, otherwise the player
     # attacks first. The monster is passed a reference to the player to do special

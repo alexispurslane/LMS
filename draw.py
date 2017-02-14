@@ -173,7 +173,7 @@ def draw_skills_screen(GS):
     for skill, progress in skt:
         barbasex = math.ceil((len(skill)+1)/2)
         for i in range(1, progress[1] - progress[0]):
-            color = utils.get_skill_color(progress)
+            color = utils.get_skill_color(progress[0])
                 
             GS['console'].drawChar(pos+barbasex, consts.HEIGHT-4-i,
                                    chr(consts.TCOD_CHAR_HLINE), fg=color)
@@ -335,7 +335,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
                 elif area == 'Cave':
                     color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
 
-                console.drawChar(x, y, ' ', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
+                console.drawChar(x, y, '.', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
         elif decor[pos] == 'FR':
             console.drawChar(x, y, '^', fg=colors.darken(colors.red),
                              bg=colors.red)
@@ -353,21 +353,21 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
                              fg=colors.darken(colors.yellow))
     elif terrain_map.get_type(pos) == 'FLOOR':
         area = terrain_map.in_area(pos)
-        color = colors.tint((12, 12, 12), tint)
+        color = colors.tint((18, 18, 18), tint)
         if area == 'Marble':
             color = colors.tint((20,20,20), tint)
         elif area == 'Cave':
             color = colors.tint(colors.extreme_darken(colors.dark_brown), tint)
             
-        console.drawChar(x, y, ' ', fg=color, bg=color)
+        console.drawChar(x, y, '.', fg=colors.tint(colors.darkmed_grey, tint), bg=color)
     elif terrain_map.get_type(pos) == 'DOOR':
         if terrain_map.dungeon['doors'][pos]:
-            console.drawChar(x, y, '+',
-                             fg=colors.tint(colors.brown, tint),
-                             bg=colors.tint(colors.extreme_darken(colors.brown), tint))
+            console.drawChar(x, y, chr(239),
+                             fg=colors.tint(colors.dark_grey, tint),
+                             bg=colors.tint(colors.grey, tint))
         else:
-            console.drawChar(x, y, '\\',
-                             fg=colors.tint(colors.brown, tint),
+            console.drawChar(x, y, chr(239),
+                             fg=colors.tint(colors.grey, tint),
                              bg=colors.tint(colors.black, tint))
     elif terrain_map.get_type(pos) == 'STONE':
         area = terrain_map.in_area(pos)

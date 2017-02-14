@@ -5,7 +5,7 @@ weapons:
 - Dane Axe:
     char: '>'
     weight: 23
-    attack: 30
+    attack: 41
     probability: 5
     handedness: 2
     category: ['axe']
@@ -14,7 +14,7 @@ weapons:
     char: '>'
     color: blue
     weight: 20
-    attack: 23
+    attack: 39
     probability: 8
     category: ['axe']
     handedness: 2
@@ -35,7 +35,7 @@ weapons:
     color: grey
     probability: 15
     handedness: 1
-    category: ['sword', 'axe']
+    category: ['axe']
 
 # Sword skill tree:
 - Claymoor:
@@ -125,7 +125,7 @@ armor:
     color: grey
     weight: 0
     defence: 1
-    category: ['cloth']
+    category: ['cloth', 'breastplate']
     probability: 20
   
 # Sheild class
@@ -221,14 +221,14 @@ lights:
 - Fat Lamp:
     char: '#'
     weight: 2
-    radius: 10
+    radius: 13
     lasts: 200
     probability: 20
 
 - Torch:
     char: ','
     weight: 1
-    radius: 5
+    radius: 8
     lasts: 500
     probability: 25
 

@@ -1,4 +1,4 @@
-# LMS TODO LIST
+# LMS TODO LIST FOR ALPHA RELEASE
 
 - [X] Alert farther monsters if player makes a big scuffle.
 - [X] Flash the HUD outline red when player is low on health.
