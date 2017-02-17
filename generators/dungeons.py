@@ -16,7 +16,7 @@ def generate_new_dungeon_map(self):
 # Must return starting location of player, up_stairs, and down_stairs
 
 class Walker:
-    def __init__(self, pos=(8, 8), direction=0):
+    def __init__(self, pos=(50, 50), direction=0):
         self.pos, self.direction = pos, direction
         self.smoothing = 0.4
         self.wiggle_max = 0.8
@@ -50,11 +50,15 @@ def generate_new_catacomb_map(self):
     return self.dungeon['rooms'][0].pos1
 
 def create_dungeon(self, walk_length=1300, has_stairs=True, walker=Walker()):
+    encounter = 0
     while walk_length > 0:
         walk_length -= 1
 
         if self.on_map(walker.pos):
             self.place_cell(walker.pos, is_wall=False)
+        else:
+            walker.direction += 2*random.randint(0, 2) - 1
+            
         walker.wander()
 
         if walk_length % 80 == 0:

@@ -321,7 +321,10 @@ class Player:
                 GS['messages'].append("green: You vanquish the "+m.name)
                 
                 GS['terrain_map'].dungeon['monsters'].remove(m)
-                GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
+                if m.pos in GS['terrain_map'].dungeon['items']:
+                    GS['terrain_map'].dungeon['items'][m.pos].append(random.choice(m.drops))
+                else:
+                    GS['terrain_map'].dungeon['items'][m.pos]= [random.choice(m.drops)]
                 
             self.speed = speed
 

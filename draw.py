@@ -327,6 +327,20 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, items[-1].char,
                              fg=colors.tint(items[-1].fg, tint),
                              bg=back)
+    elif terrain_map.get_type(pos) == 'STONE':
+        area = terrain_map.in_area(pos)
+        color = colors.tint(colors.darkmed_grey, tint)
+        fg = colors.tint(colors.darken(colors.brown), tint)
+        char = chr(consts.TCOD_CHAR_BLOCK3)
+        if area == 'Marble':
+            color = colors.tint(colors.white, tint)
+            fg = colors.tint(colors.darken(colors.white), tint)
+            char = chr(consts.TCOD_CHAR_BLOCK2)
+        elif area == 'Cave':
+            color = colors.tint(colors.brown, tint)
+            fg = colors.tint(colors.dark_brown, tint)
+            char = chr(consts.TCOD_CHAR_BLOCK1)
+        console.drawChar(x, y, char, bg=color, fg=fg)
     elif pos in terrain_map.dungeon['decor']:
         decor = terrain_map.dungeon['decor']
         
@@ -375,21 +389,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, chr(239),
                              fg=colors.tint(colors.grey, tint),
                              bg=colors.tint(colors.black, tint))
-    elif terrain_map.get_type(pos) == 'STONE':
-        area = terrain_map.in_area(pos)
-        color = colors.tint(colors.darkmed_grey, tint)
-        fg = colors.tint(colors.darken(colors.brown), tint)
-        char = chr(consts.TCOD_CHAR_BLOCK3)
-        if area == 'Marble':
-            color = colors.tint(colors.white, tint)
-            fg = colors.tint(colors.darken(colors.white), tint)
-            char = chr(consts.TCOD_CHAR_BLOCK2)
-        elif area == 'Cave':
-            color = colors.tint(colors.brown, tint)
-            fg = colors.tint(colors.dark_brown, tint)
-            char = chr(consts.TCOD_CHAR_BLOCK1)
-        console.drawChar(x, y, char, bg=color, fg=fg)
-
+            
 def draw_forest_tile(terrain_map, console, pos, tint):
     (x, y) = pos
     if not terrain_map.on_map(x+1,y):

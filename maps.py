@@ -97,7 +97,7 @@ class TerrainMap:
 
     # Checks if a point is on the map.
     def on_map(self, p):
-        return p[0] >= 0 and p[1] >= 0 and p[0] < self.width and p[1] < self.height
+        return p[0] > 0 and p[1] > 0 and p[0] < self.width and p[1] < self.height
 
     # Returns a monster at the given point.
     def monster_at(self, p):
