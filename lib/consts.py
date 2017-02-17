@@ -20,12 +20,18 @@ DUNGEON_LEVELS   = 9
 DEBUG            = False
 DIFFICULTY       = 18
 EDGE_POS         = math.ceil(WIDTH/2)+2
-MAP_WIDTH, MAP_HEIGHT = WIDTH, HEIGHT
 MAX_INVENTORY    = 12
 
 MIN_ROOM_WIDTH = 4
 MIN_ROOM_HEIGHT = 4
 MAX_ROOM_SIZE = math.floor(WIDTH/8.83)
+
+SOUTH = (0, 1)
+EAST  = (1, 0)
+WEST  = (-1, 0)
+NORTH = (0, -1)
+SOUTH = (0, 1)
+DIRS  = [NORTH, SOUTH, EAST, WEST]
 
 def quit(GS):
     # with open('.gamesave', 'w') as gsf:
@@ -141,8 +147,9 @@ def fire(GS, p):
                 start = (p.pos[0]-ox, p.pos[1]-oy)
                 end = (target.pos[0]-ox, target.pos[1]-oy)
                 animation.FireMissleAnimation().run(GS, [missle, start, end])
-                
-                if target and random.randint(0,max(1, int(100-p.exp*skill-handicap))) < target.speed*20+5:
+
+                cw = math.floor(p.ranged_weapon.weight/5)*4
+                if target and random.randint(0,max(1, int(100-p.exp*skill-handicap))) < cw+target.speed*20+5:
                     if tpe == '':
                         target.health -= (missle.hit-2)
                     else:

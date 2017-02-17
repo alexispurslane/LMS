@@ -33,7 +33,7 @@ class Area:
             pnts.append((self.pos2[0]-1, y))
 
         return pnts
-    
+
 # Represents a dungeon room.
 class Room(Area):
     def __init__(self, x, y, w, h):
@@ -88,7 +88,8 @@ class Room(Area):
                 decor = ['FR', 'FL', None, None, None, None]
             if random.randint(1, 1000) < 5:
                 decor = ['TTRAP', 'TTRAP', 'DTRAP', 'ITRAP']
-            tmap.dungeon['decor'][pos] = random.choice(decor)
+            c = random.choice(decor)
+            if c: tmap.dungeon['decor'][pos] = c
 
             if self.item_attempts < consts.ITEMS_PER_ROOM:
                 n = random.randint(1, 100)

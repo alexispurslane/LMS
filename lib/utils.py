@@ -38,13 +38,8 @@ def f7(seq):
     return [x for x in seq if not (x in seen or seen.add(x))]
 
 # Checks if b is adjacent to (in a streight line of) a.
-def streight_line(a, b):
-    return b in [
-        (a[0]-1, a[1]),
-        (a[0]+1, a[1]),
-        (a[0], a[1]-1),
-        (a[0], a[1]+1)
-    ]
+def adjacent(a, b):
+    return b in [(a[0]-1, a[1]), (a[0]+1, a[1]), (a[0], a[1]-1), (a[0], a[1]+1)]
 
 def ordinal(value):
     try:
@@ -75,3 +70,16 @@ def get_skill_color(progress):
         return colors.brown
     else:
         return colors.lighten(colors.grey)
+
+def LOS(tmap, a, b, dist):
+    path = tdl.map.bresenham(a[0], a[1], b[0], b[1])
+    blocked = False
+    for pnt in path:
+        if tmap.get_type(pnt) == 'STONE':
+            blocked = True
+            break
+
+    return not blocked and len(path) <= dist
+
+def get_perpendicular(d):
+    return [(-d[1], d[0]), (d[1], d[0])]

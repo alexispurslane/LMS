@@ -22,7 +22,7 @@ def reset_GS():
             'console': tdl.init(consts.WIDTH, consts.HEIGHT, 'Last Man Standing'),
             'screen': 'INTRO',
             'player': player.Player(races.WARRIOR),
-            'terrain_map': maps.TerrainMap(consts.MAP_WIDTH, consts.MAP_HEIGHT),
+            'terrain_map': maps.TerrainMap(),
             'messages': [],
             'selection': 0,
             'side_screen': 'HUD',

@@ -2,15 +2,13 @@ import tdl
 import random, math
 import monsters, colors, consts, utils, items, dungeons, forests, draw, area
 
-# TODO: Add comments
-# TODO: Refactor for less mutation
 class TerrainMap:
-    def __init__(self, w, h):
+    def __init__(self):
         self.forest_level = 0
         self.dungeon_level = 0
         self.rooms = []
-        self.width = w
-        self.height = h
+        self.width = consts.WIDTH
+        self.height = consts.HEIGHT
 
         self.dungeon = {}
         self.reset_dungeon()
@@ -135,20 +133,11 @@ class TerrainMap:
     def generate_new_forest_map(self):
         return forests.generate_new_forest_map(self)
 
-    # Draws a horizontal corridor to the 'visited' map.
-    def add_h_corridor(self, x1, x2, y):
-        for x in range(min(x1, x2), max(x1, x2)):
-            self.dungeon['lighted'].transparent[x, y] = True
-            self.dungeon['lighted'].walkable[x, y] = True
-            self.dungeon['items'][x, y] = []
-            
-    # Draws a horizontal corridor to the 'visited' map.
-    def add_v_corridor(self, y1, y2, x):
-        for y in range(min(y1, y2), max(y1, y2)):
-            self.dungeon['lighted'].transparent[x, y] = True
-            self.dungeon['lighted'].walkable[x, y] = True
-            self.dungeon['items'][x, y] = []
-            
+    def place_door(self, pnt):
+        self.dungeon['lighted'].transparent[pnt] = False
+        self.dungeon['lighted'].walkable[pnt] = False
+        self.dungeon['doors'][pnt] = True
+    
     # Generates a new dungeon map (ridirected to dungeons.py)
     # and saves it to the level list.
     def generate_new_dungeon_map(self):
@@ -178,7 +167,6 @@ class TerrainMap:
     def generate_new_map(self):
         self.dungeons.append(self.dungeon)
         self.reset_dungeon()
-        print(self.dungeon)
         self.dungeon['areas'] = self.generate_areas()
         
         if self.is_forests():

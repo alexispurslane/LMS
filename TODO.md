@@ -1,16 +1,23 @@
-# LMS TODO LIST FOR ALPHA RELEASE
+# LMS TODO LIST FOR ALPHA RELEASE (in order of importance)
 
 - [X] Alert farther monsters if player makes a big scuffle.
 - [X] Flash the HUD outline red when player is low on health.
 - [X] Implement training method for player skill tree.
 - [X] Create better graphics for player skill tree
+- [X] Allow monsters to open doors and travel out of their respective spawn-rooms
+- [X] Use Catacomb map generator (The only way to get satisfactory dungeon generation at this stage)
+- [] Make rooms handle monsters
+- [] Pull catacombs away from the wall.
+- [] Add BSP generaor and Procedural Build generator.
+- [] Convert races to YAML
 - [] Add hidden doors (placed at any dead-end corridors that but up with a room)
+- [] Add hidden rooms (rooms that can only be accessed through hidden doors)
 - [] Add searching action with probabilities based on class aptitudes.
 - [] Have poison making you confused
+- [] Add Drunkard's Walk map generator (for huge flavor)
 - [] Add more kinds of special monsters
 - [] Fix monster ranged attack
 - [] Allow closing doors
-- [] Fix door-placing algorithm
 - [] Improve skill tree, create more branches and interesting interactions.
 - [] Include mutually-esclusive training branches for skill tree.
 - [] Show skills as actual GUI tree.
@@ -18,4 +25,6 @@
 - [] Implement potion and staff system
 - [] Implement MR-based magic system.
 - [] Finish music system.
-- [] ANIMATE EVERYTHING!
+- [] Show health popups beside attacked enemies for a few seconds.
+- [] Change stairs to use key command
+- [] ANIMATE: Game startup (fade interface in), traps, magic, staffs and potions, leveling up.

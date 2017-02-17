@@ -10,6 +10,7 @@ def display_stat(name, obj):
     b = getattr(obj, name)
     return '%d/%d' % (b, a)
 
+fade = list(Color("red").range_to(Color(rgb=(0.1, 0.1, 0.1)), 20))
 def draw_stats(GS):
     console = GS['console']
     player = GS['player']
@@ -44,10 +45,15 @@ def draw_stats(GS):
                          bg=console.get_char(base+i, start+1)[2])
     
     # Hunger
+    if frame % len(fade) == 0:
+        fade.reverse()
+    color = fade[frame%len(fade)].rgb
+    rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
+    
     if player.hunger >= 60:
-        console.drawStr(base+bounds+13, start+1, 'Starving', fg=colors.red)
+        console.drawStr(base+bounds+13, start+1, 'Starving', fg=rgb_color)
     elif player.hunger >= 40:
-        console.drawStr(base+bounds+13, start+1, 'Near Starving', fg=colors.red)
+        console.drawStr(base+bounds+13, start+1, 'Near Starving', fg=rgb_color)
     elif player.hunger >= 20:
         console.drawStr(base+bounds+13, start+1, 'Hungry', fg=colors.yellow)
     elif player.hunger >= 15:
@@ -285,7 +291,7 @@ def draw_game_screen(GS, frame):
     GS['console'].blit(GS['map_console'], 0, 0, -1, -1, ox, oy)
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
-        if fov[m.pos] or not consts.FOV or consts.SHOW_MONSTERS:
+        if fov[m.pos] or consts.SHOW_MONSTERS:
             bg_color = GS['map_console'].get_char(m.pos[0], m.pos[1])[2]
             GS['console'].drawChar(m.pos[0]-ox, m.pos[1]-oy, m.char, fg=m.fg, bg=bg_color)
 
@@ -321,12 +327,7 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
             console.drawChar(x, y, items[-1].char,
                              fg=colors.tint(items[-1].fg, tint),
                              bg=back)
-    elif terrain_map.dungeon['decor'][pos] and terrain_map.get_type(pos) == 'STONE':
-        decor = terrain_map.dungeon['decor']
-        if decor[pos] == 'FM':
-            console.drawChar(x, y, '{', fg=colors.tint(colors.grey, tint),
-                             bg=colors.tint((0, 100, 0), tint))
-    elif terrain_map.dungeon['decor'][pos]:
+    elif pos in terrain_map.dungeon['decor']:
         decor = terrain_map.dungeon['decor']
         
         if decor[pos] == 'FM':
@@ -378,14 +379,14 @@ def draw_dungeon_tile(terrain_map, GS, console, pos, tint):
         area = terrain_map.in_area(pos)
         color = colors.tint(colors.darkmed_grey, tint)
         fg = colors.tint(colors.darken(colors.brown), tint)
-        char = chr(consts.TCOD_CHAR_BLOCK2)
+        char = chr(consts.TCOD_CHAR_BLOCK3)
         if area == 'Marble':
             color = colors.tint(colors.white, tint)
             fg = colors.tint(colors.darken(colors.white), tint)
-            char = chr(consts.TCOD_CHAR_BLOCK3)
+            char = chr(consts.TCOD_CHAR_BLOCK2)
         elif area == 'Cave':
             color = colors.tint(colors.brown, tint)
-            fg = colors.tint(colors.black, tint)
+            fg = colors.tint(colors.dark_brown, tint)
             char = chr(consts.TCOD_CHAR_BLOCK1)
         console.drawChar(x, y, char, bg=color, fg=fg)
 
@@ -449,7 +450,7 @@ def draw_square(GS, x, y, width, height, text='', spacing=2):
             fade.reverse()
         color = fade[frame%len(fade)].rgb
         rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
-    
+ 
     for i in range(1, height):
         console.drawChar(x, y+i, chr(consts.TCOD_CHAR_VLINE), fg=rgb_color)
         console.drawChar(width+x, y+i, chr(consts.TCOD_CHAR_VLINE), fg=rgb_color)

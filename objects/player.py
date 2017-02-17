@@ -65,7 +65,6 @@ class Player:
         return self.skill_tree[s]
     
     def can_use(self, x):
-        print(self.get_skill_with_item(x), x.probability)
         return self.get_skill_with_item(x)[0] <= x.probability
     
     def hands_left(self, x):
@@ -307,7 +306,7 @@ class Player:
             
         m = GS['terrain_map'].monster_at(new_pos)
         speed = self.speed
-        if utils.streight_line(self.prev_pos, new_pos) and self.light() and m:
+        if utils.adjacent(self.prev_pos, new_pos) and self.light() and m:
             GS['messages'].append("green: You gallantly charge the monster!")
             self.speed = 0
             

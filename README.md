@@ -12,3 +12,5 @@ magic system. For more information, visit the [wiki](https://github.com/christop
 * Python 3.5
 * python-tdl (and libtcod)
 * pyYAML
+* Colour (a Python 3.5 library)
+* Playsound (another Python 3.5 library)

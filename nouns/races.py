@@ -77,7 +77,7 @@ BERSERKER = Race({
     he is extremely skilled with weapons, and can use
     some spells, he doesn't have ranged combat skills.
     """,
-    'suggested_difficulty': 18
+    'suggested_difficulty': 19
 })
 BOWMAN = Race({
     'max_health': 18,
