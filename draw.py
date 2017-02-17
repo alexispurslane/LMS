@@ -291,7 +291,7 @@ def draw_game_screen(GS, frame):
     GS['console'].blit(GS['map_console'], 0, 0, -1, -1, ox, oy)
     for m in GS['terrain_map'].dungeon['monsters']:
         fov = GS['terrain_map'].dungeon['lighted'].fov
-        if fov[m.pos] or consts.SHOW_MONSTERS:
+        if GS['terrain_map'].on_map(m.pos) and fov[m.pos] or consts.SHOW_MONSTERS:
             bg_color = GS['map_console'].get_char(m.pos[0], m.pos[1])[2]
             GS['console'].drawChar(m.pos[0]-ox, m.pos[1]-oy, m.char, fg=m.fg, bg=bg_color)
 

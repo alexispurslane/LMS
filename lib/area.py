@@ -1,4 +1,4 @@
-import math, random, consts, items, utils
+import math, random, consts, items, utils, monsters, copy
 
 # Represents a stylistic area of the dungeon.
 class Area:
@@ -56,18 +56,10 @@ class Room(Area):
         ])
 
         # Room center.
-        if self.room_type == 'Square':
-            self.center = (math.floor((self.pos1[0] + self.pos2[0]) / 2),
-                           math.floor((self.pos1[1] + self.pos2[1]) / 2))
-        elif self.room_type == 'Sanctuary':
-            if w < 9:
-                self.room_type = 'Square'
-                
-            self.center = utils.tuple_add(self.pos1, (math.ceil(w/2),
-                                                      math.ceil(h/2)))
-        else:
-            self.center = utils.tuple_add(self.pos1, (math.ceil(w/2),
-                                                math.ceil(h/2)))
+        self.center = (math.floor((self.pos1[0] + self.w) / 2),
+                       math.floor((self.pos1[1] + self.h) / 2))
+        if self.room_type == 'Sanctuary' and w < 9:
+            self.room_type = 'Square'
 
     # Checks if a room intersects the other.
     def intersects(self, room):
@@ -83,6 +75,10 @@ class Room(Area):
 
         # Add decoration/fire and items.
         if not wall:
+            if random.randint(0, 100) < int(consts.DIFFICULTY / 3.5):
+                m = copy.copy(random.choice(monsters.select_by_difficulty(tmap.dungeon_level)))
+                m.pos = pos
+                tmap.dungeon['monsters'].append(m)
             decor = ['FM', None, None, None]
             if tmap.is_hell_level():
                 decor = ['FR', 'FL', None, None, None, None]

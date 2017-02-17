@@ -1,4 +1,4 @@
-import random, math, yaml, copy, os, time
+import random, math, yaml, copy, os, time, tdl
 import colors, utils, consts, items
 
 class Monster:
@@ -190,7 +190,10 @@ def filtch(self, GS, player):
             player.remove_inventory_item(item)
         
             GS['messages'].append('light_blue: The Imp steals your ' + item.name + ' and throws it.')
-            GS['terrain_map'].dungeon['items'][pos].append(item)
+            if isinstance(GS['terrain_map'].dungeon['items'][pos], list):
+                GS['terrain_map'].dungeon['items'][pos].append(item)
+            else:
+                GS['terrain_map'].dungeon['items'][pos] = [item]
     
 def poison(self, GS, player):
     if player.defence <= 5:

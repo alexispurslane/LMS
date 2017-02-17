@@ -42,17 +42,19 @@ class Walker:
         self.direction += random.random() * self.wiggle_max - (self.wiggle_max / 2)
 
 def generate_new_catacomb_map(self):
-    while len(self.dungeon['rooms']) < 7:
+    self.dungeon['rooms'] = []
+    while len(self.dungeon['rooms']) < 10:
         self.dungeon['rooms'] = []
         create_dungeon(self)
     self.dungeon['up_stairs'] = self.dungeon['rooms'][3].center
-    return self.dungeon['rooms'][3].center
+    return self.dungeon['rooms'][0].pos1
 
-def create_dungeon(self, walk_length=1200, has_stairs=True, walker=Walker()):
+def create_dungeon(self, walk_length=1300, has_stairs=True, walker=Walker()):
     while walk_length > 0:
         walk_length -= 1
-        
-        self.place_cell(walker.pos, is_wall=False)
+
+        if self.on_map(walker.pos):
+            self.place_cell(walker.pos, is_wall=False)
         walker.wander()
 
         if walk_length % 80 == 0:
@@ -75,5 +77,5 @@ def create_room(tmap, walker):
     height = random.randint(consts.MIN_ROOM_HEIGHT, consts.MAX_ROOM_SIZE)
 
     room = area.Room(walker.pos[0], walker.pos[1], width, height)
-    room.draw_into_map(0, tmap)
     tmap.dungeon['rooms'].append(room)
+    room.draw_into_map(0, tmap)

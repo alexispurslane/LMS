@@ -1,4 +1,4 @@
-import math, random, consts, items, colors
+import math, random, consts, items, colors, tdl
 
 # Calculate distance.
 def dist(p1, p2):
