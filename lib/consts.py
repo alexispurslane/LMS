@@ -8,7 +8,7 @@ WATER_LEVEL      = 0.0000049
 STONE_LEVEL      = 0.95
 WIDTH, HEIGHT    = int(1280/FONT_SIZE), int(800/FONT_SIZE)
 FOV              = True
-SHOW_MONSTERS    = False # Crashes
+SHOW_MONSTERS    = False # Crashes on true
 MUSIC            = False
 CUMULATE_FOV     = True
 MESSAGE_NUMBER   = 8
@@ -24,7 +24,7 @@ MAX_INVENTORY    = 12
 
 MIN_ROOM_WIDTH = 4
 MIN_ROOM_HEIGHT = 4
-MAX_ROOM_SIZE = math.floor(WIDTH/8.83)
+MAX_ROOM_SIZE = 8
 
 SOUTH = (0, 1)
 EAST  = (1, 0)

@@ -1,5 +1,5 @@
 import tdl
-import random, math
+import random, math, sys
 import monsters, colors, consts, utils, items, dungeons, forests, draw, area
 
 class TerrainMap:
@@ -97,7 +97,9 @@ class TerrainMap:
 
     # Checks if a point is on the map.
     def on_map(self, p):
-        return p[0] > 0 and p[1] > 0 and p[0] < self.width and p[1] < self.height
+        return p[0] >= 0 and p[1] >= 0 and p[0] < self.width and p[1] < self.height
+    def on_map_bordered(self, p):
+        return p[0] > 0 and p[1] > 0 and p[0] < self.width-1 and p[1] < self.height-1
 
     # Returns a monster at the given point.
     def monster_at(self, p):
@@ -169,19 +171,30 @@ class TerrainMap:
         self.reset_dungeon()
         self.dungeon['areas'] = self.generate_areas()
         
-        if self.is_forests():
-            if consts.DEBUG: print('LEVEL: FOREST')
-            return self.generate_new_forest_map()
-        elif self.is_dungeons():
-            if consts.DEBUG: print('LEVEL: DUNGEON')
-            return self.generate_new_dungeon_map()
+        if self.is_dungeons():
+            result = self.generate_new_dungeon_map()
         else:
-            if consts.DEBUG: print('LEVEL: FINAL')
-            return self.generate_final_level()
+            result = self.generate_final_level()
+
+        temp = self.dungeon['lighted']
+        self.dungeon['lighted'] = tdl.map.Map(self.width+3, self.height+3)
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                if self.dungeon['player_starting_pos'] == (x, y):
+                    sys.stdout.write('@')
+                elif temp.walkable[x, y]:
+                    sys.stdout.write('.')
+                else:
+                    sys.stdout.write('#')
+                    
+                self.dungeon['lighted'].walkable[x+1, y+1] = temp.walkable[x, y]
+                self.dungeon['lighted'].transparent[x+1, y+1] = temp.transparent[x, y]
+            print('')
+        return result
         
     # Adds cell to terrain map.
     def place_cell(self, p, is_wall=False):
-        pos = utils.clamp_point(p, maxs=(self.width, self.height))
+        pos = utils.clamp_point(p, maxs=(self.width-1, self.height-1))
 
         self.dungeon['lighted'].transparent[pos] = not is_wall
         self.dungeon['lighted'].walkable[pos] = not is_wall

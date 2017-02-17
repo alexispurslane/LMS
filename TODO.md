@@ -7,7 +7,7 @@
 - [X] Allow monsters to open doors and travel out of their respective spawn-rooms
 - [X] Use Catacomb map generator (The only way to get satisfactory dungeon generation at this stage)
 - [X] Make rooms handle monsters
-- [] Pull catacombs away from the edge.
+- [X] Pull catacombs away from the edge.
 - [] Add BBW generaor and Procedural Build generator.
 - [] Convert races to YAML
 - [] Add hidden doors (placed at any dead-end corridors that but up with a room)

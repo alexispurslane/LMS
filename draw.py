@@ -442,15 +442,15 @@ def draw_line(GS, a, b, color, char=None, start_char=None, end_char=None):
         console.drawChar(b[0], b[1], end_char, fg=colors.black, bg=colors.white)
     return result
 
-fade = list(Color("red").range_to(Color("white"), 25))
+fade_fast = list(Color("red").range_to(Color("white"), 25))
 def draw_square(GS, x, y, width, height, text='', spacing=2):
     console = GS['console']
     hp = math.floor(GS['player'].health/GS['player'].max_health*100)
     rgb_color = colors.white
     if hp < 40:
         if frame % len(fade) == 0:
-            fade.reverse()
-        color = fade[frame%len(fade)].rgb
+            fade_fast.reverse()
+        color = fade_fast[frame%len(fade)].rgb
         rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
  
     for i in range(1, height):
