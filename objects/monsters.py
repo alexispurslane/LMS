@@ -190,7 +190,7 @@ def filtch(self, GS, player):
             player.remove_inventory_item(item)
         
             GS['messages'].append('light_blue: The Imp steals your ' + item.name + ' and throws it.')
-            if isinstance(GS['terrain_map'].dungeon['items'][pos], list):
+            if pos in GS['terrain_map'].dungeon['items']:
                 GS['terrain_map'].dungeon['items'][pos].append(item)
             else:
                 GS['terrain_map'].dungeon['items'][pos] = [item]
