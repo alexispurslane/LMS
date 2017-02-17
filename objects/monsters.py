@@ -23,6 +23,7 @@ class Monster:
         self.path = []
         self.agressive = agressive
         self.ranged = ranged
+        self.player_spotted = False
         self.drops = [items.FOOD_RATION, items.TORCH]*8
         
         self.sight = int(self.speed/2)

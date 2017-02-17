@@ -42,6 +42,7 @@ class Room(Area):
         self.connected = False
         self.item_attempts = 0
         self.kills = 0
+        self.monster_cnt = 0
         
         # Circle dimentions
         self.radius = math.floor(w/2)
@@ -56,7 +57,7 @@ class Room(Area):
         ])
 
         # Room center.
-        self.center = (math.floor((self.pos1[0] + self.w) / 2),
+        self.center = (math.floor((self.pos1[0] - self.w) / 2),
                        math.floor((self.pos1[1] + self.h) / 2))
         if self.room_type == 'Sanctuary' and w < 9:
             self.room_type = 'Square'
@@ -75,7 +76,8 @@ class Room(Area):
 
         # Add decoration/fire and items.
         if not wall:
-            if random.randint(0, 100) < int(consts.DIFFICULTY / 3.5) and self.num != 0:
+            if random.randint(0, 100) < int(consts.DIFFICULTY / 3.5) and self.num != 0 and self.monster_cnt < consts.DIFFICULTY:
+                self.monster_cnt += 1
                 m = copy.copy(random.choice(monsters.select_by_difficulty(tmap.dungeon_level)))
                 m.pos = pos
                 tmap.dungeon['monsters'].append(m)
