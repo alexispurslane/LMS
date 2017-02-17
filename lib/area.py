@@ -75,7 +75,7 @@ class Room(Area):
 
         # Add decoration/fire and items.
         if not wall:
-            if random.randint(0, 100) < int(consts.DIFFICULTY / 3.5):
+            if random.randint(0, 100) < int(consts.DIFFICULTY / 3.5) and self.num != 0:
                 m = copy.copy(random.choice(monsters.select_by_difficulty(tmap.dungeon_level)))
                 m.pos = pos
                 tmap.dungeon['monsters'].append(m)
@@ -104,6 +104,7 @@ class Room(Area):
     # Draws the room into the supplied terrain map.
     def draw_into_map(self, i, tmap):
         spacing = random.randint(4, 31)
+        self.num = i
         
         if self.room_type == 'Square':
             for x in range(0, self.w):

@@ -88,6 +88,7 @@ class Monster:
 
     # Move monster according to choose() and deal with movement effects.
     def move(self, GS):
+        self.player_spotted = False
         if GS['turns'] % 20 == 0:
             GS['terrain_map'].dungeon['monsters_alerted'] = False
         sight = self.sight
@@ -95,6 +96,7 @@ class Monster:
             self.sight = 3
 
         if utils.dist(GS['player'].pos, self.pos) == 1:
+            self.player_spotted = False
             GS['messages'].append('red: The '+self.name+' attacks you.')
             (player_dead, monster_dead) = GS['player'].attack_monster(GS, self)
             if monster_dead:
@@ -105,6 +107,7 @@ class Monster:
                     GS['terrain_map'].dungeon['items'][self.pos].append(random.choice(self.drops))
         elif utils.LOS(GS['terrain_map'], self.pos, GS['player'].pos, self.sight)\
              or GS['terrain_map'].dungeon['monsters_alerted']:
+            self.player_spotted = True
             if self.ranged:
                 p = GS['player']
                 m = self

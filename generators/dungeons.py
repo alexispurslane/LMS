@@ -82,4 +82,4 @@ def create_room(tmap, walker):
 
     room = area.Room(walker.pos[0], walker.pos[1], width, height)
     tmap.dungeon['rooms'].append(room)
-    room.draw_into_map(0, tmap)
+    room.draw_into_map(len(tmap.dungeon['rooms'])-1, tmap)
