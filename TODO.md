@@ -8,13 +8,7 @@
 - [X] Use Catacomb map generator (The only way to get satisfactory dungeon generation at this stage)
 - [X] Make rooms handle monsters
 - [X] Pull catacombs away from the edge.
-- [] Add BBW generaor and Procedural Build generator.
-- [] Convert races to YAML
-- [] Add hidden doors (placed at any dead-end corridors that but up with a room)
-- [] Add hidden rooms (rooms that can only be accessed through hidden doors)
-- [] Add searching action with probabilities based on class aptitudes.
-- [] Have poison making you confused
-- [] Add Drunkard's Walk map generator (for huge flavor)
+- [X] Add BBW generaor
 - [] Add more kinds of special monsters
 - [] Fix monster ranged attack
 - [] Allow closing doors

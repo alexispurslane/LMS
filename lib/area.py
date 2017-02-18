@@ -1,4 +1,4 @@
-import math, random, consts, items, utils, monsters, copy
+import math, random, consts, items, utils, monsters, copy, tdl
 
 # Represents a stylistic area of the dungeon.
 class Area:
@@ -36,7 +36,7 @@ class Area:
 
 # Represents a dungeon room.
 class Room(Area):
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, rtype=None):
         super(Room, self).__init__(x, y, w, h)
         # Diagnostic: is this room connected according to the DGA?
         self.connected = False
@@ -48,7 +48,7 @@ class Room(Area):
         self.radius = math.floor(w/2)
 
         # Room type:
-        self.room_type = random.choice([
+        self.room_type = rtype or random.choice([
             'Square', 'Square',
             'Square', 'Round',
             'Round', 'Sanctuary',
@@ -62,6 +62,24 @@ class Room(Area):
         if self.room_type == 'Sanctuary' and w < 9:
             self.room_type = 'Square'
 
+    def add_corridor(self, tmap, other):
+        start_x = random.randint(self.pos1[0], self.pos2[0])
+        start_y = random.randint(self.pos1[1], self.pos2[1])
+        
+        goal_x = random.randint(other.pos1[0], other.pos2[0])
+        goal_y = random.randint(other.pos1[1], other.pos2[1])
+        
+        temp = tdl.map.Map(consts.WIDTH, consts.HEIGHT)
+        for x,y in temp:
+            temp.walkable[x,y] = True
+        p = temp.compute_path(
+            start_x, start_y,
+            goal_x, goal_y,
+            diagonal_cost=0
+        )
+        for i, point in enumerate(p):
+            tmap.place_cell(point, is_wall=False)
+                
     # Checks if a room intersects the other.
     def intersects(self, room):
         x1, y1 = self.pos1
