@@ -9,11 +9,8 @@
 - [X] Make rooms handle monsters
 - [X] Pull catacombs away from the edge.
 - [X] Add BBW generaor
-- [] Add more kinds of special monsters
+- [] *Convert LMS to C++*
 - [] Fix monster ranged attack
-- [] Allow closing doors
-- [] Improve skill tree, create more branches and interesting interactions.
-- [] Include mutually-esclusive training branches for skill tree.
 - [] Show skills as actual GUI tree.
 - [] Convert monster AI to finite state machine based setup.
 - [] Implement potion and staff system

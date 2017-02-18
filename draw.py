@@ -450,7 +450,7 @@ def draw_square(GS, x, y, width, height, text='', spacing=2):
     if hp < 40:
         if frame % len(fade) == 0:
             fade_fast.reverse()
-        color = fade_fast[frame%len(fade)].rgb
+        color = fade_fast[frame%len(fade_fast)].rgb
         rgb_color = (int(color[0]*255), int(color[1]*255), int(color[2]*255))
  
     for i in range(1, height):

@@ -47,8 +47,9 @@ def generate_new_catacomb_map(self):
     while len(self.dungeon['rooms']) < 10:
         self.dungeon['rooms'] = []
         create_dungeon(self)
-        self.dungeon['up_stairs'] = self.dungeon['rooms'][3].center
-        self.dungeon['player_starting_pos'] = self.dungeon['rooms'][0].pos1
+        
+    self.dungeon['up_stairs'] = self.dungeon['rooms'][3].center
+    self.dungeon['player_starting_pos'] = self.dungeon['rooms'][0].center
     return self.dungeon['player_starting_pos']
 
 def create_dungeon(self, walk_length=1600, has_stairs=True, walker=Walker()):
