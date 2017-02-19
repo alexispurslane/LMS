@@ -1,0 +1,96 @@
+monsters:
+- Fury:
+    char: f
+    color: yellow
+    speed: 1
+    health: 80
+    attack: 18
+    agressive: True
+
+- Wolf:
+    char: w
+    color: blue
+    speed: 4
+    health: 30
+    attack: 25
+    agressive: True
+
+- Dragon:
+    char: D
+    color: dark_red
+    health: 300
+    speed: 15
+    attack: 90
+
+- Goblin:
+    char: g
+    color: green
+    speed: 3
+    health: 26
+    attack: 22
+    agressive: True
+
+- Lesser Ice Giant:
+    char: G
+    color: dark_green
+    health: 50
+    speed: 20
+    attack: 35
+    agressive: True
+  
+- Slime:
+    char: s
+    color: (27, 226, 21)
+    health: 13
+    speed: 8
+    attack: 11
+    action: breed
+  
+- Dwarf:
+    char: i
+    color: light_blue
+    health: 13
+    speed: 4
+    attack: 17
+    action: filtch
+  
+- Snake:
+    char: S
+    color: green
+    health: 12
+    speed: 2
+    attack: 14
+    action: poison
+    agressive: True
+
+- Adder:
+    char: A
+    color: dark_red
+    health: 25
+    speed: 1
+    attack: 22
+    action: poison
+    ranged: True
+    agressive: True
+
+- Rat:
+    char: r
+    color: brown
+    health: 12
+    speed: 4
+    attack: 15
+
+- Wyvern:
+    char: W
+    color: grey
+    speed: 10
+    health: 80
+    attack: 17
+    agressive: True
+
+- FlyingDragon:
+    char: F
+    color: dark_yellow
+    speed: 6
+    health: 200
+    attack: 80

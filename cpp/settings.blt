@@ -1,0 +1,4 @@
+window.title = 'Last Man Standing';
+window.size = 106x66;
+font: assets/font/IBMCGA16x16_gs_ro.png, size=16x16, codepage=437;
+U+E000: assets/Tiles.png, size=32x32, align=top-left

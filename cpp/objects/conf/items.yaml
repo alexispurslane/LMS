@@ -1,0 +1,253 @@
+weapons:
+
+# Axe skill tree:
+  
+- Dane Axe:
+    char: '>'
+    weight: 23
+    attack: 41
+    probability: 5
+    handedness: 2
+    category: ['axe']
+
+- Double-Bladed Axe:
+    char: '>'
+    color: medium_blue
+    weight: 20
+    attack: 39
+    probability: 8
+    category: ['axe']
+    handedness: 2
+
+- Hand Axe:
+    weight: 15
+    char: '>'
+    handedness: 1
+    attack: 19
+    color: brown
+    category: ['axe']
+    probability: 12
+      
+- Hatchet:
+    char: '>'
+    weight: 10
+    attack: 15
+    color: grey
+    probability: 15
+    handedness: 1
+    category: ['axe']
+
+# Sword skill tree:
+- Claymoor:
+    char: '|'
+    weight: 10
+    attack: 21
+    category: ['sword', 'axe']
+    probability: 5
+    handedness: 2
+    
+- Long Sword:
+    char: '|'
+    color: medium_blue
+    weight: 6
+    attack: 16
+    probability: 8
+    category: ['sword']
+    handedness: 1
+
+- Short Sword:
+    char: '('
+    color: brown
+    attack: 12
+    weight: 4
+    probability: 12
+    category: ['sword']
+    handedness: 1
+
+- Long Daggar:
+    char: '!'
+    weight: 1
+    color: grey
+    attack: 6
+    probability: 15
+    handedness: 1
+    category: ['dagger', 'sword']
+
+armor:
+# Armor class
+- Knightly Armor:
+    char: '['
+    weight: 20
+    defence: 25
+    probability: 8
+    category: ['heavy armor']
+    
+- Lamellar Armor:
+    char: '['
+    color: red
+    defence: 10
+    weight: 10
+    probability: 10
+    category: ['heavy armor']
+    
+- Steel Mail:
+    char: '['
+    weight: 0
+    color: yellow
+    defence: 11
+    probability: 3
+    category: ['breastplate', 'heavy armor']
+
+- Leather Breastplate:
+    char: ']'
+    weight: 5
+    color: medium_blue
+    probability: 13
+    category: ['breastplate']
+
+- Gambeson:
+    char: ']'
+    color: brown
+    weight: 3
+    probability: 18
+    category: ['breastplate']
+    
+- Linothorax:
+    char: '^'
+    color: green
+    weight: 0
+    defence: 1
+    category: ['cloth', 'breastplate']
+    probability: 19
+    
+- Robe:
+    char: '^'
+    color: grey
+    weight: 0
+    defence: 1
+    category: ['cloth', 'breastplate']
+    probability: 20
+  
+# Sheild class
+- Kite Sheild:
+    char: '}'
+    weight: 6
+    probability: 10
+    category: ['sheild']
+
+- Wood Buckler:
+    char: '}'
+    color: brown
+    weight: 3
+    probability: 15
+    category: ['sheild']
+
+- Small Round Sheild:
+    char: 'o'
+    color: grey
+    weight: 2
+    probability: 20
+    category: ['sheild']
+
+# Helmet class
+
+- Viking Helmb:
+    char: '*'
+    weight: 3
+    probability: 15
+    category: ['helmet']
+    
+- Leather Cap:
+    char: '*'
+    color: grey
+    weight: 1
+    probability: 20
+    category: ['helmet']
+
+ranged weapons:
+- Yew Bow:
+    weight: 3
+    probability: 5
+    range: 13
+    load_speed: 0
+    category: ['bow']
+    char: ')'
+    
+- Ash Bow:
+    color: medium_blue
+    weight: 2
+    probability: 8
+    load_speed: 1
+    category: ['bow']
+    range: 10
+    char: ')'
+
+- Elm Bow:
+    color: brown
+    weight: 1
+    probability: 12
+    category: ['bow']
+    load_speed: 1
+    range: 7
+    char: ')'
+    
+- Crossbow:
+    char: '^'
+    weight: 5
+    probability: 15
+    range: 8
+    category: ['bow']
+    color: grey
+    load_speed: 2
+    missle_type: 'Bolt'
+
+missles:
+- Throwing Knife:
+    char: '!'
+    color: white
+    weight: 1
+    hit: 8
+    probability: 15
+
+- Iron Bolt:
+    weight: 1
+    hit: 10
+    char: '_'
+    probability: 10
+    
+- Wood Arrow:
+    weight: 0
+    hit: 5
+    char: '-'
+    probability: 15
+
+lights:
+- Fat Lamp:
+    char: '#'
+    weight: 2
+    radius: 13
+    lasts: 200
+    probability: 20
+
+- Torch:
+    char: ','
+    weight: 1
+    radius: 8
+    lasts: 500
+    probability: 25
+
+food:
+- Food Ration:
+    char: '%'
+    nutrition: 12
+    probability: 8
+
+- Bread:
+    char: '='
+    nutrition: 15
+    probability: 8
+
+- Hunk of Meat:
+    char: 'm'
+    nutrition: 20
+    probability: 7
