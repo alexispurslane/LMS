@@ -20,6 +20,11 @@ namespace utils {
 	Manual
     };
 
+    struct Point
+    {
+	int x, y;
+    };
+
     struct GlobalState
     {
 	ScreenState screen;
@@ -29,6 +34,7 @@ namespace utils {
 	terrain_map::TerrainMap map;
 	int currentselection = 0;
 	int turns = 0;
+	int message_offset = 0;
 	int difficulty = 18;
 	//std::vector<int> scores;
 	//std::vector<Animation> animations;

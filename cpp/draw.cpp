@@ -2,7 +2,7 @@
 
 namespace draw
 {
-    void draw_screen(GlobalState *gs)
+    void draw_screen(utils::GlobalState *gs)
     {
 	terminal_clear();
 
@@ -21,7 +21,7 @@ namespace draw
 	terminal_refresh();
     }
 
-    void draw_intro_screen(GlobalState *gs)
+    void draw_intro_screen(utils::GlobalState *gs)
     {
 	
     }

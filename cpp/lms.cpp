@@ -36,20 +36,20 @@ int main()
     auto tmap = terrain_map::TerrainMap(consts::WIDTH, consts::HEIGHT);
     auto player = character::Player(races::WARRIOR);
     
-    GlobalState gamestate;
-    gamestate.screen     = ScreenState.Intro;
-    gamestate.sidescreen = SideScreenState.HUD;
-    gamestate.map        = &tmap;
-    gamestate.player     = &player;
+    utils::GlobalState *gamestate;
+    gamestate->screen     = utils::Intro;
+    gamestate->sidescreen = utils::HUD;
+    gamestate->map        = &tmap;
+    gamestate->player     = &player;
 
     while (true)
     {
 	// Update Screen
-	if (player.health <= 0 && gamestate.screen != utils::Death)
+	if (player.health <= 0 && gamestate->screen != utils::Death)
 	{
-	    gamestate.screen = ScreenState.Death;
+	    gamestate->screen = utils::Death;
 	}
-	draw::draw_screen(&gamestate);
+	draw::draw_screen(gamestate);
 
 	// Handle Events
 	terminal_setf("input.filter = [keyboard, arrows, q, mouse]");
@@ -69,7 +69,7 @@ int main()
 
 		int map_x = std::max(0, player.loc.x-floor(consts::WIDTH / 4));
 		int map_y = std::max(0, player.loc.y-floor(consts::HEIGHT / 2));
-		auto cell = utils::Point(mx+map_x, my+map_y);
+		utils::Point cell = {mx+map_x, my+map_y};
 
 		auto m = tmap.get_monster_at(cell);
 		auto i = tmap.get_item_at(cell);
@@ -87,31 +87,31 @@ int main()
 		}
 		else if (d != NULL)
 		{
-		    id = "some " + decor.name;
+		    id = "some " + d.name;
 		}
 
-		gamestate.messages.push_back("You see " + id + " here.");
+		gamestate->messages.push_back("You see " + id + " here.");
 	    }
 	    else if (event == TK_MOUSE_SCROLL)
 	    {
-		gamestate.message_offset += mouse_scroll_step * terminal_state(TK_MOUSE_WHEEL);
+		gamestate->message_offset += mouse_scroll_step * terminal_state(TK_MOUSE_WHEEL);
 	    }
 	    else
 	    {
-		if (gamestate.sidescreen == utils::Inventory)
+		if (gamestate->sidescreen == utils::Inventory)
 		{
 		    switch (event)
 		    {
 		    case TK_UP:
-			gamestate.currentselection--;
-			gamestate.currentselection %= player.inventory.size();
+			gamestate->currentselection--;
+			gamestate->currentselection %= player.inventory.size();
 			break;
 		    case TK_DOWN:
-			gamestate.currentselection++;
-			gamestate.currentselection %= player.inventory.size();
+			gamestate->currentselection++;
+			gamestate->currentselection %= player.inventory.size();
 			break;
 		    case TK_D:
-			auto item = player.inventory[gamestate.currentselection];
+			auto item = player.inventory[gamestate->currentselection];
 			item.count--;
 
 			auto single_item = Item(item);
@@ -120,52 +120,52 @@ int main()
 			tmap.dungeon.items[player.loc.y][player.loc.x].push_back(single_item);
 			break;
 		    case TK_RETURN:
-			player.inventory[gamestate.currentselection].equip(player);
+			player.inventory[gamestate->currentselection].equip(player);
 			break;
 		    case TK_ESCAPE:
-			player.inventory[gamestate.currentselection].dequip(player);
+			player.inventory[gamestate->currentselection].dequip(player);
 			break;
 		    case TK_I:
-			gamestate.sidescreen = SideScreenState.HUD;
+			gamestate->sidescreen = utils::HUD;
 			break;
 		    default:
 			break;
 		    }
 		}
-		else if (gamestate.screen == utils::Intro)
+		else if (gamestate->screen == utils::Intro)
 		{
-		    gamestate.screen == utils::CharacterSelection;
+		    gamestate->screen = utils::CharacterSelection;
 		}
-		else if (gamestate.screen == utils::CharacterSelection)
+		else if (gamestate->screen == utils::CharacterSelection)
 		{
 		    switch (event)
 		    {
 		    case TK_UP:
-			gamestate.currentselection--;
-			gamestate.currentselection %= races::RACES.size();
+			gamestate->currentselection--;
+			gamestate->currentselection %= races::RACES.size();
 			break;
 		    case TK_DOWN:
-			gamestate.currentselection++;
-			gamestate.currentselection %= races::RACES.size();
+			gamestate->currentselection++;
+			gamestate->currentselection %= races::RACES.size();
 			break;
 		    case TK_RETURN:
-			auto racen = gamestate.currentselection-1;
+			auto racen = gamestate->currentselection-1;
 			auto race = races::RACES[racen];
-			gamestate.player = character::Player(race);
-			gamestate.difficulty = race.suggested_difficulty;
+			gamestate->player = character::Player(race);
+			gamestate->difficulty = race.suggested_difficulty;
 			player.loc = tmap.generate_new_map();
-			gamestate.screen = ScreenState.Game;
+			gamestate->screen = utils::Game;
 			break;
 		    }
 		}
-		else if (gamestate.screen = utils::Game)
+		else if (gamestate->screen == utils::Game)
 		{
 		    player.handle_event(terminal_check(TK_CHAR));
 		}
 	    }
 
-	    monsters::monster_turns(&gamestate);
-	    gamestate.turns++;
+	    monsters::monster_turns(gamestate);
+	    gamestate->turns++;
 	}	
     }
     terminal_close();
