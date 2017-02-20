@@ -1,3 +1,10 @@
+build: lms.cpp
+	c++ -I./include -I./ -L./lib/ -I./lib/ -I./generators/ -I./objects/ -I./nouns/ -lBearLibTerminal -std=c++11 -o lms lms.cpp
+
 run: lms.cpp
-	c++ -I/Users/christopherdumas/include -I./ -I./lib/ -I./generators/ -I./objects/ -I./nouns/ -L/Users/christopherdumas/lib -lBearLibTerminal -std=c++11 -o lms lms.cpp
+	make build
 	./lms
+
+install: lms.cpp
+	make build
+	cp lms /usr/local/bin/
