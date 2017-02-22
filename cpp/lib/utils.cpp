@@ -1,6 +1,8 @@
 #include <cstdio>
+#include "BearLibTerminal.h"
 #include <iostream>
 #include <memory>
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -22,26 +24,15 @@ std::string exec(const char* cmd)
     return result;
 }
 
-template<typename Out>
-void split(const std::string &s, char delim, Out result) {
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        *(result++) = item;
-    }
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-
-std::vector<color_t> fade_colors(color_t a, color_t b)
+std::vector<color_t> fade_colors(color_t a, color_t b, int steps)
 {
     color_t *current = &a;
     color_t *color2 = &b;
+    
+    int step_a = abs(current[0] - color2[0]) / steps;
+    int step_r = abs(current[1] - color2[1]) / steps;
+    int step_g = abs(current[2] - color2[2]) / steps;
+    int step_b = abs(current[3] - color2[3]) / steps;
 
     vector<color_t> vec();
     while (vec.back() != b)
@@ -51,41 +42,41 @@ std::vector<color_t> fade_colors(color_t a, color_t b)
 	/* alpha channel */
 	if (current[0] < color2[0])
 	{
-	    current[0]--;
+	    current[0] -= step_a;
 	}
 	else if (current[0] > color2[0])
 	{
-	    current[0]++;
+	    current[0] += step_a;
 	}
 
 	/* red channel */
 	if (current[1] < color2[1])
 	{
-	    current[1]--;
+	    current[1] -= step_r;
 	}
 	else if (current[1] > color2[1])
 	{
-	    current[1]++;
+	    current[1] += step_r;
 	}
 
         /* green channel */
 	if (current[2] < color2[2])
 	{
-	    current[2]--;
+	    current[2] -= step_g;
 	}
 	else if (current[2] > color2[2])
 	{
-	    current[2]++;
+	    current[2] += step_g;
 	}
 
 	/* blue channel */
 	if (current[3] < color2[3])
 	{
-	    current[3]--;
+	    current[3] -= step_b;
 	}
 	else if (current[3] > color2[3])
 	{
-	    current[3]++;
+	    current[3] += step_b;
 	}
     }
 
@@ -96,4 +87,21 @@ std::string to_upper(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
+}
+
+std::vector<std::string> split_string(const std::string& str,
+				      const std::string& delimiter)
+{
+    std::vector<std::string> strings;
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos)
+    {
+	strings.push_back(str.substr(prev, pos - prev));
+	prev = pos + 1;
+    }
+
+    // To get the last substring (or only, if delimiter is not found)
+    strings.push_back(str.substr(prev));
+    return strings;
 }

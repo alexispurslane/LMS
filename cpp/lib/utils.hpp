@@ -1,13 +1,52 @@
 #include <vector>
+#include <variant>
 #include "../objects/player.hpp"
 #include "../terrain_map.hpp"
+#include "../objects/monsters.hpp"
+#include "../objects/items.hpp"
 #include "BearLibTerminal.h"
 
 #pragma once
 namespace utils {
     enum ScreenState { Intro, Game, CharacterSelection, Death };
     enum SideScreenState { HUD, Skills, Inventory };
-    struct Point { int x, y; };
+    enum StaticMapElement { Water,  Fire, GeneralObject, Door };
+    enum AreaType { Marble, Dirt, Stone };
+    
+    typedef std::variant<StaticMapElement, items::Item, monsters::Monster> MapElement;
+    
+    struct Point
+    {
+	int x;
+	int y;
+    };
+
+    struct Area 
+    {
+	Point start_pos;
+	Point end_pos;
+	uint width;
+	uint height;
+    }
+    
+    template <typename T>
+    struct BoundedValue
+    {
+	T value;
+	T max;
+    };
+
+    struct Dungeon
+    {
+	std::vector<monsters::Monster> monsters;
+	bool alerted;
+	Area areas[];
+	MapElement map[][];
+	std::set<Point> remembered;
+	Point player_start;
+	Point down_stairs;
+	Point up_stairs;
+    };
 
     struct GlobalState
     {
@@ -23,10 +62,9 @@ namespace utils {
 	int difficulty = 18;
     };
 
-    template<typename Out>
     std::string exec(const char* cmd);
-    void split(const std::string &s, char delim, Out result);
-    std::vector<std::string> split(const std::string &s, char delim);
     std::string to_upper(std::string str);
     std::vector<color_t> fade_colors(color_t a, color_t b);
+    std::vector<std::string> split_string(const std::string& str,
+					  const std::string& delimiter);
 }

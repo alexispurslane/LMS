@@ -8,3 +8,6 @@ run: lms.cpp
 install: lms.cpp
 	make build
 	cp lms /usr/local/bin/
+
+check: lms.cpp
+	scan-build -o ./tmp/ make build

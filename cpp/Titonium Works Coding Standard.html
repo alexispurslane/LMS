@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>Your Customized Coding Standard</title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1504.81">
+  <style type="text/css">
+    p.p4 {margin: 0.0px 0.0px 6.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000; min-height: 14.0px}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
+    p.p7 {margin: 0.0px 0.0px 12.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #000000; -webkit-text-stroke: #000000; min-height: 14.0px}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Courier; color: #000000; -webkit-text-stroke: #000000}
+    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Courier; color: #000000; -webkit-text-stroke: #000000; min-height: 14.0px}
+    li.li3 {margin: 0.0px 0.0px 0.0px 0.0px; line-height: 14.0px; font: 12.0px Times; color: #0000ee; -webkit-text-stroke: #0000ee}
+    span.s1 {font-kerning: none}
+    span.s2 {-webkit-text-stroke: 0px #000000}
+    span.s3 {text-decoration: underline ; font-kerning: none}
+    span.s4 {font-kerning: none; color: #000000; -webkit-text-stroke: 0px #000000}
+    span.s5 {font: 12.0px Courier; text-decoration: underline ; font-kerning: none}
+    span.s6 {font: 12.0px Courier; font-kerning: none}
+    span.s7 {font: 14.0px Courier; font-kerning: none}
+    span.s8 {font: 12.0px Times; text-decoration: underline ; font-kerning: none; color: #0000ee; -webkit-text-stroke: 0px #0000ee}
+    td.td1 {width: 20.0px; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td2 {width: 100.8px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td3 {width: 50.4px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td4 {width: 79.2px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td5 {width: 72.0px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td6 {width: 136.8px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td7 {width: 280.9px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td8 {width: 331.3px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    td.td9 {width: 180.0px; background-color: #eeeeee; margin: 5.0px 5.0px 5.0px 5.0px; padding: 5.0px 5.0px 5.0px 5.0px}
+    ul.ul1 {list-style-type: disc}
+  </style>
+</head>
+<body>
+<h1 style="margin: 0.0px 0.0px 16.1px 0.0px; line-height: 28.0px; font: 24.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>C++ Coding Standard for Titonium Works</b></span></h1>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Entity Naming</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#nncase"><span class="s3">Names shall begin with an upper case letter, shall be lower case and words shall begin with an upper case letter.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#nvcase"><span class="s3">Variables shall begin with a lower case letter and words shall be separated by underscore (_).</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#nconstcase"><span class="s3">Constants shall begin with an upper case letter and shall be upper case.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#nfuncase"><span class="s3">Functions shall begin with a lower case letter and words shall be separated by underscore (_).</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#ntdeftype"><span class="s3">Typedefs shall have a suffix to describe its type.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#nmacrocase"><span class="s3">Macros shall be upper case.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Names</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#NameSensible"><span class="s3">Use sensible, descriptive names.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#NameEnglish"><span class="s3">Only use english names.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#NameLength"><span class="s3">Variables with a large scope shall have long names, variables with a small scope can have short names.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#UseNamespace"><span class="s3">Use namespaces for identifiers declared in different modules</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Indentation and Spacing</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#BracesExdented"><span class="s3">Braces shall follow "Exdented Style".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#IndentLevel"><span class="s3">Braces shall be indented 4 columns to the right of the starting position of the enclosing statement or declaration.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#BracesLoop"><span class="s3">Loop and conditional statements shall always have brace enclosed sub-statements.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#BracesEmpty"><span class="s3">Braces without any contents may be placed on the same line.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#StmtPerLine"><span class="s3">Each statement shall be placed on a line on its own.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#ObjectPerDecl"><span class="s3">Declare each variable in a separate declaration.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#OperSpace"><span class="s3">All binary arithmetic, bitwise and assignment operators and the ternary conditional operator (?:) shall be surrounded by spaces; the comma operator shall be followed by a space but not preceded; all other operators shall not be used with spaces.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#LineLength"><span class="s3">Lines shall not exceed 79 characters.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#TabsAvoid"><span class="s3">Do not use tabs.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Comments</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CommentEnglish"><span class="s3">Comments shall be written in english</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CommentCpp"><span class="s3">Comments shall use the C++-style.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CommentPlacement"><span class="s3">All comments shall be placed above the line the comment describes, indented identically.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Files</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#OneVisibleClass"><span class="s3">There shall only be one externally visible class defined in each header file.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#FileNameCase"><span class="s3">File name shall be treated as case sensitive.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CFileExt"><span class="s3">C source files shall have extension "</span><span class="s5">.c</span><span class="s3">".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CHeaderExt"><span class="s3">C header files shall have extension "</span><span class="s5">.h</span><span class="s3">".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CppFileExt"><span class="s3">C++ source files shall have extension "</span><span class="s5">.cpp</span><span class="s3">".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CppHeaderExt"><span class="s3">C++ header files shall have extension "</span><span class="s5">.hpp</span><span class="s3">".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#CppInlineExt"><span class="s3">Inline definition files shall have extension "</span><span class="s5">.inl</span><span class="s3">".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#InlineFunctionDefineSeparate"><span class="s3">Inline functions shall be declared in header files and defined in inline definition files.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#HeaderIncludeGuard"><span class="s3">Header files must have include guards.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#IncludeGuardName"><span class="s3">The name of the macro used in the include guard shall have the same name as the file (excluding the extension) followed by the suffix "_H".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#HeaderSelfContained"><span class="s3">Header files shall be self-contained</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#HeaderSystemUser"><span class="s3">System header files shall be included with &lt;&gt; and project headers with "".</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#IncludeFirst"><span class="s3">Put </span><span class="s5">#include</span><span class="s3"> directives at the top of files.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#IncludeAbsoluteAvoid"><span class="s3">Do not use absolute directory names in </span><span class="s5">#include</span><span class="s3"> directives.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Declarations</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#FunctionParameterNames"><span class="s3">Provide names of parameters in function declarations.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#FunctionPointerTypedef"><span class="s3">Use a typedef to define a pointer to a function.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#ExceptionSpecificationAvoid"><span class="s3">Do not use exception specifications.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#UseVirtual"><span class="s3">Declare inherited functions </span><span class="s5">virtual</span><span class="s3">.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#GlobalVarAvoid"><span class="s3">Do not use global variables.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#UsingDeclHeaderAvoid"><span class="s3">Do not use global using declarations and using directives in headers.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#UsingDirAvoid"><span class="s3">Do not use using directives.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#AccessOrder"><span class="s3">The parts of a class definition must be </span><span class="s5">public</span><span class="s3">, </span><span class="s5">protected</span><span class="s3"> and </span><span class="s5">private</span><span class="s3">.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#PrivateData"><span class="s3">Declare class data private.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#StructAsPodOnly"><span class="s3">Only use the keyword </span><span class="s5">struct</span><span class="s3"> for C-style structs.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Statements</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#GotoForbid"><span class="s3">Never use gotos.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#ContinueAvoid"><span class="s3">Do not use </span><span class="s5">continue</span><span class="s3"> in loops.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#DoWhileAvoid"><span class="s3">Do not use </span><span class="s5">do-while</span><span class="s3"> loops.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Other Typographical Issues</b></span></h3>
+<ul class="ul1">
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#MacrosAvoid"><span class="s3">Avoid macros.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#ConditionsExplicitBool"><span class="s3">Do not rely on implicit conversion to bool in conditions.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+  <li class="li3"><span class="s2"><a href="http://www.rosvall.ie/cgi-bin/genCodeStd.pl#NewCastOps"><span class="s3">Use the new cast operators.</span></a></span><span class="s4"><span class="Apple-converted-space"> </span></span></li>
+</ul>
+<p class="p4"><span class="s1"></span><br></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Entity Naming</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Names shall begin with an upper case letter, shall be lower case and words shall begin with an upper case letter.</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Variables shall begin with a lower case letter and words shall be separated by underscore (_).</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Constants shall begin with an upper case letter and shall be upper case.</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Functions shall begin with a lower case letter and words shall be separated by underscore (_).</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Typedefs shall have a suffix to describe its type.</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Macros shall be upper case.</b></span></h3>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Names</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Use sensible, descriptive names.</b></span></h3>
+<p class="p6"><span class="s1">Do not use short cryptic names or names based on internal jokes. It shall be easy to type a name without looking up how it is spelt.</span></p>
+<p class="p7"><span class="s1">Exception: Loop variables and variables with a small scope (less than 20 lines) may have short names to save space if the purpose of that variable is obvious.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Only use english names.</b></span></h3>
+<p class="p6"><span class="s1">It is confusing when mixing languages for names. English is the preferred language because of its spread in the software market and because most libraries used already use english.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Variables with a large scope shall have long names, variables with a small scope can have short names.</b></span></h3>
+<p class="p6"><span class="s1">Scratch variables used for temporary storage or indices are best kept short. A programmer reading such variables shall be able to assume that its value is not used outside a few lines of code. Common scratch variables for integers are </span><span class="s6">i</span><span class="s1">, </span><span class="s6">j</span><span class="s1">, </span><span class="s6">k</span><span class="s1">, </span><span class="s6">m</span><span class="s1">, </span><span class="s6">n</span><span class="s1"> and for characters </span><span class="s6">c</span><span class="s1"> and </span><span class="s6">d</span><span class="s1">.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Use namespaces for identifiers declared in different modules</b></span></h3>
+<p class="p6"><span class="s1">This avoids name clashes.</span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Indentation and Spacing</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Braces shall follow "Exdented Style".</b></span></h3>
+<p class="p6"><span class="s1">The Exdented Bracing Style means that the curly brace pair are lined up with the surrounding statement. Statements and declarations between the braces are indented relative to the braces.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Braces shall be indented 4 columns to the right of the starting position of the enclosing statement or declaration.</b></span></h3>
+<p class="p6"><span class="s1">Example:</span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td2">
+        <p class="p9"><span class="s1">void f(int a)</span></p>
+        <p class="p9"><span class="s1">{</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>int i;</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>if (a &gt; 0)</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>{</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">        </span>i = a;</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>else</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>{</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">        </span>i = a;</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+        <p class="p9"><span class="s1">}</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td3">
+        <p class="p9"><span class="s1">class A</span></p>
+        <p class="p9"><span class="s1">{</span></p>
+        <p class="p9"><span class="s1">};</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Loop and conditional statements shall always have brace enclosed sub-statements.</b></span></h3>
+<p class="p6"><span class="s1">The code looks more consistent if all conditional and loop statements have braces.</span></p>
+<p class="p7"><span class="s1">Even if there is only a single statement after the condition or loop statement today, there might be a need for more code in the future.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Braces without any contents may be placed on the same line.</b></span></h3>
+<p class="p6"><span class="s1">The only time when two braces can occur on the same line is when they do not contain any code.</span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td4">
+        <p class="p9"><span class="s1">while (...)</span></p>
+        <p class="p9"><span class="s1">{}</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Each statement shall be placed on a line on its own.</b></span></h3>
+<p class="p6"><span class="s1">There is no need to make code compact. Putting several statements on the same line only makes the code cryptic to read.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Declare each variable in a separate declaration.</b></span></h3>
+<p class="p6"><span class="s1">This makes it easier to see all variables. It also avoids the problem of knowing which variables are pointers.</span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td5">
+        <p class="p9"><span class="s1">int* p, i;</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p class="p6"><span class="s1">It is easy to forget that the star belongs to the declared name, not the type, and look at this and say that the type is "pointer to int" and both </span><span class="s6">p</span><span class="s1"> and </span><span class="s6">i</span><span class="s1"> are declared to this type.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>All binary arithmetic, bitwise and assignment operators and the ternary conditional operator (?:) shall be surrounded by spaces; the comma operator shall be followed by a space but not preceded; all other operators shall not be used with spaces.</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Lines shall not exceed 79 characters.</b></span></h3>
+<p class="p6"><span class="s1">Even if your editor handles long lines, other people may have set up their editors differently. Long lines in the code may also cause problems for other programs and printers.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use tabs.</b></span></h3>
+<p class="p6"><span class="s1">Tabs make the source code difficult to read where different programs treat the tabs differently. The same code can look very differently in different views.</span></p>
+<p class="p7"><span class="s1">Avoid using tabs in your source code to avoid this problem. Use spaces instead.<span class="Apple-converted-space"> </span></span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Comments</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Comments shall be written in english</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Comments shall use the C++-style.</b></span></h3>
+<p class="p6"><span class="s1">Be consistent and use the </span><span class="s6">// ...</span><span class="s1"> style comments.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>All comments shall be placed above the line the comment describes, indented identically.</b></span></h3>
+<p class="p6"><span class="s1">Being consistent on placement of comments removes any question on what the comment refers to.</span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Files</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>There shall only be one externally visible class defined in each header file.</b></span></h3>
+<p class="p6"><span class="s1">Having as few declarations as possible in a header file reduces header dependencies.</span></p>
+<p class="p7"><span class="s1">The header file shall have the same name as the class plus extension </span><span class="s6">hpp</span><span class="s1">.<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">External non-member functions that belong to the class interface may also be declared in the same header file.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>File name shall be treated as case sensitive.</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>C source files shall have extension "</b></span><span class="s7"><b>.c</b></span><span class="s1"><b>".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>C header files shall have extension "</b></span><span class="s7"><b>.h</b></span><span class="s1"><b>".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>C++ source files shall have extension "</b></span><span class="s7"><b>.cpp</b></span><span class="s1"><b>".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>C++ header files shall have extension "</b></span><span class="s7"><b>.hpp</b></span><span class="s1"><b>".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Inline definition files shall have extension "</b></span><span class="s7"><b>.inl</b></span><span class="s1"><b>".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Inline functions shall be declared in header files and defined in inline definition files.</b></span></h3>
+<p class="p6"><span class="s1">The keyword </span><span class="s6">inline</span><span class="s1"> shall be used in both places.</span></p>
+<p class="p7"><span class="s1">Using a separate inline file is useful to keep the header files clean and small. The separation is also useful where the inlining is disabled in debug builds. The inline file is then included from the source file instead of the header file to reduce compile time.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Header files must have include guards.</b></span></h3>
+<p class="p6"><span class="s1">The include guard protects against the header file being included multiple times.</span></p>
+<p class="p7"><span class="s1">Example:<span class="Apple-converted-space"> </span></span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td2">
+        <p class="p9"><span class="s1">#ifndef FILE_H</span></p>
+        <p class="p9"><span class="s1">#define FILE_H</span></p>
+        <p class="p9"><span class="s1">...</span></p>
+        <p class="p9"><span class="s1">#endif</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>The name of the macro used in the include guard shall have the same name as the file (excluding the extension) followed by the suffix "_H".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Header files shall be self-contained</b></span></h3>
+<p class="p6"><span class="s1">When a header is included, there shall not be a need to include any other headers first.</span></p>
+<p class="p7"><span class="s1">A simple way to make sure that a header file does not have any dependencies is to include it first in the corresponding source file. Example:<span class="Apple-converted-space"> </span></span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td6">
+        <p class="p9"><span class="s1">/* foobar.h */</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">#include "foobar.h"</span></p>
+        <p class="p9"><span class="s1">#include &lt;stdio.h&gt;</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">...</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>System header files shall be included with &lt;&gt; and project headers with "".</b></span></h3>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Put </b></span><span class="s7"><b>#include</b></span><span class="s1"><b> directives at the top of files.</b></span></h3>
+<p class="p6"><span class="s1">Having all </span><span class="s6">#include</span><span class="s1"> directives in one place makes it easy to find them.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use absolute directory names in </b></span><span class="s7"><b>#include</b></span><span class="s1"><b> directives.</b></span></h3>
+<p class="p6"><span class="s1">The directory structure may be different on other systems.</span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Declarations</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Provide names of parameters in function declarations.</b></span></h3>
+<p class="p6"><span class="s1">Parameter names are useful to document what the parameter is used for.</span></p>
+<p class="p7"><span class="s1">The parameter names shall be the same in all declarations and definitions of the function.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Use a typedef to define a pointer to a function.</b></span></h3>
+<p class="p6"><span class="s1">Pointers to functions have a strange syntax. The code becomes much clearer if you use a typedef for the pointer to function type. This typedef name can then be used to declare variables etc.</span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td7">
+        <p class="p9"><span class="s1">double sin(double arg);</span></p>
+        <p class="p9"><span class="s1">typedef double (*TrigFunc)(double arg);</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">/* Usage examples */</span></p>
+        <p class="p9"><span class="s1">TrigFunc my_func = sin;</span></p>
+        <p class="p9"><span class="s1">void call_func(TrigFunc callback);</span></p>
+        <p class="p9"><span class="s1">TrigFunc func_table[10];</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use exception specifications.</b></span></h3>
+<p class="p6"><span class="s1">Exception specifications in C++ are not as useful as they look. The compiler does not make the code more efficient. On the contrary, the compiler has to insert code to check that called functions do not violate the specified exception specification at runtime.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Declare inherited functions </b></span><span class="s7"><b>virtual</b></span><span class="s1"><b>.</b></span></h3>
+<p class="p6"><span class="s1">An inherited function is implicitly </span><span class="s6">virtual</span><span class="s1"> if it is declared </span><span class="s6">virtual</span><span class="s1"> in the base class. Repeat the </span><span class="s6">virtual</span><span class="s1"> keyword when declaring an inherited function in a derived class to make it clear that this function is </span><span class="s6">virtual</span><span class="s1">.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use global variables.</b></span></h3>
+<p class="p6"><span class="s1">Use singleton objects instead.</span></p>
+<p class="p7"><span class="s1">Global variables are initialised when the program starts whether it will be used or not. A singleton object is only initialised when the object is used the first time.<span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="s1">If global variables are using other global variables for their initialisation there may be a problem if the dependent variables are not initialised yet. The initialisation order of global variables in different object files is not defined. Singleton objects do not have this problem as the dependent object will be initialised when it is used. However, watch out for cyclic dependencies in singleton object initialisations.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use global using declarations and using directives in headers.</b></span></h3>
+<p class="p6"><span class="s1">Bringing in names from a namespace to the global namespace may cause conflicts with other headers. The author of a header does not know in which context the header is used and should avoid polluting the global namespace. Instead, only use using declarations in the source files.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use using directives.</b></span></h3>
+<p class="p6"><span class="s1">Bringing in names from a namespace can cause all sorts of problems as the namespace might contain more names than you would expect.</span></p>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td8">
+        <p class="p9"><span class="s1">#include &lt;iostream&gt;</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">// Bring in names from the std namespace.</span></p>
+        <p class="p9"><span class="s1">using namespace std;</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">// Declaring an object with the same name as</span></p>
+        <p class="p9"><span class="s1">// a function in the std namespace.</span></p>
+        <p class="p9"><span class="s1">int dec(int);</span></p>
+        <p class="p10"><span class="s1"></span><br></p>
+        <p class="p9"><span class="s1">void f()</span></p>
+        <p class="p9"><span class="s1">{</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>// Now we can use iostream names lazily.</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>cout &lt;&lt; "Hello world." &lt;&lt; endl;</span></p>
+        <p class="p10"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>// Error: Ambiguous reference to dec.</span></p>
+        <p class="p9"><span class="s1"><span class="Apple-converted-space">    </span>cout &lt;&lt; "Decimal base is " &lt;&lt; dec &lt;&lt; endl;</span></p>
+        <p class="p9"><span class="s1">}</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>The parts of a class definition must be </b></span><span class="s7"><b>public</b></span><span class="s1"><b>, </b></span><span class="s7"><b>protected</b></span><span class="s1"><b> and </b></span><span class="s7"><b>private</b></span><span class="s1"><b>.</b></span></h3>
+<p class="p6"><span class="s1">This makes it easy to read the class definition as the </span><span class="s6">public</span><span class="s1"> interface is of interest to most readers.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Declare class data private.</b></span></h3>
+<p class="p6"><span class="s1">Classes shall encapsulate their data and only provide access to this data by member functions to ensure that data in class objects are consistent.</span></p>
+<p class="p7"><span class="s1">The exception to the rule is C type </span><span class="s6">struct</span><span class="s1"> that only contains data members.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Only use the keyword </b></span><span class="s7"><b>struct</b></span><span class="s1"><b> for C-style structs.</b></span></h3>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Statements</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Never use gotos.</b></span></h3>
+<p class="p6"><span class="s1">Gotos break structured coding.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use </b></span><span class="s7"><b>continue</b></span><span class="s1"><b> in loops.</b></span></h3>
+<p class="p6"><span class="s1">A </span><span class="s6">continue</span><span class="s1"> statement is a goto statement in disguise and makes code less readable.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not use </b></span><span class="s7"><b>do-while</b></span><span class="s1"><b> loops.</b></span></h3>
+<p class="p6"><span class="s6">do-while</span><span class="s1"> loops are less readable than ordinary while loops and for loops since the conditional is at the bottom of the loop. The reader must scan the entire loop in order to understand the scope of the loop.</span></p>
+<p class="p7"><span class="s1">In addition, do-while loops are not needed. Any do-while loop can easily be rewritten into a while loop or a for loop. Reducing the number of constructs used enhance readability.<span class="Apple-converted-space"> </span></span></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; line-height: 22.0px; font: 18.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Other Typographical Issues</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Avoid macros.</b></span></h3>
+<p class="p6"><span class="s1">Most macros can be replaced by constants, enumerations or inline functions.</span></p>
+<p class="p7"><span class="s1">As macros are not part of the C++ language, they do not provide type safety and debugger support.<span class="Apple-converted-space"> </span></span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Do not rely on implicit conversion to bool in conditions.</b></span></h3>
+<table cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p8"><span class="s1"></span><br></p>
+      </td>
+      <td valign="middle" class="td9">
+        <p class="p9"><span class="s1">if (ptr) <span class="Apple-converted-space">        </span>// wrong</span></p>
+        <p class="p9"><span class="s1">if (ptr != NULL) // ok</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; line-height: 17.0px; font: 14.0px Times; color: #000000; -webkit-text-stroke: #000000"><span class="s1"><b>Use the new cast operators.</b></span></h3>
+<p class="p6"><span class="s1">Use </span><span class="s6">dynamic_cast</span><span class="s1">, </span><span class="s6">const_cast</span><span class="s1">, </span><span class="s6">reinterpret_cast</span><span class="s1"> and </span><span class="s6">static_cast</span><span class="s1"> instead of the traditional C cast notation. These document better what is being performed.</span></p>
+<p class="p4"><span class="s1"></span><br></p>
+<p class="p6"><span class="s1"><i>Generated 2017-02-21 by </i><a href="http://www.rosvall.ie/CSG"><span class="s8"><i>Coding Standard Generator</i></span></a><i> version 1.13.</i><span class="Apple-converted-space"> </span></span></p>
+</body>
+</html>

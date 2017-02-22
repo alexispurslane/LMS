@@ -24,6 +24,5 @@ namespace draw
     void draw_game_screen(utils::GlobalState *gs);
 
     /* Utilities */
-    void add_line(utils::GlobalState *gs);
-    void add_square(utils::GlobalState *gs);
+    void add_square(utils::GlobalState *gs, uint x, uint y, uint width, uint height, std::string text, uint spacing = 2);
 }

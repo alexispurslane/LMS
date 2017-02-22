@@ -1,5 +1,7 @@
 #include "BearLibTerminal.h"
+#include "objects/items.hpp"
 #include <algorithm>
+#include <map>
 
 #pragma once
 namespace draw
@@ -48,7 +50,7 @@ namespace draw
 	{
 	    scores += std::to_string(score)+"\n";
 	}
-	draw_square(gs, consts.WIDTH/2-7, 21, 14, 20, "TOP 20 SCORES\n"+scores, 1);
+	add_square(gs, consts.WIDTH/2-7, 21, 14, 20, "TOP 20 SCORES\n"+scores, 1);
     }
 
     void draw_charsel_screen(utils::GlobalState *gs)
@@ -57,16 +59,14 @@ namespace draw
 	for (int i=0; i < races::RACES.size(); i++)
 	{
 	    auto race = races::RACES[i];
-	    auto color = "black";
 	    
-	    if (i + 1 == gs.currentselection)
+	    if (i + 1 == gs->currentselection)
 	    {
 		selected_race = race;
-		color = "red";
+		terminal_bkcolor("red");
 	    }
 
-	    terminal_print(consts::WIDTH/2-28, i*2+5,
-			   "[bkcolor="+color+"]"+std::to_string(i+1)+") "+race->name);
+	    terminal_print(consts::WIDTH/2-28, i*2+5, std::to_string(i+1)+") "+race->name);
 	}
 
 	if (selected_race != nullptr)
@@ -87,7 +87,7 @@ namespace draw
 		    selected_race->starting.strength,
 		    selected_race->starting.max_health,
 		    selected_race->description);
-	    draw_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(race_display));
+	    add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(race_display));
 	}
     }
 
@@ -107,15 +107,15 @@ namespace draw
 		player->score(gs),
 		player->kills,
 		player->exp);
-	draw_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(endgame_stats));
+	add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(endgame_stats));
     }
 
     void draw_game_screen(utils::GlobalState *gs)
     {
-	gs->terrain_map->draw_map(gs);
-	for (monsters::Monster m : gs->terrain_map->dungeon->monsters)
+	gs->map->draw_map(gs, frame);
+	for (monsters::Monster m : gs->map->dungeon->monsters)
 	{
-	    auto v = gs->terrain_map->dungeon->calculate_fov(gs->player->loc)
+	    auto v = gs->map->calculate_fov(*gs->player->loc)
 	    if (std::find(v.begin(), v.end(), m->loc) != v.end())
 	    {
 		terminal_color(m->color_fg);
@@ -152,18 +152,10 @@ namespace draw
 
     void draw_stats(utils::GlobalState *gs)
     {
-	auto player = gs->player;
-	
-	vector<color_t> fade = utils::fade_colors(color_from_name("red"), color_from_argb(1, 25, 25, 25));
-	if (frame % fade.size() == 0 && frame / fade.size() % 2 == 0)
-	{
-	    std::reverse(fade.begin(), fade.end());
-	}
-	color_t current_color = fade.at(frame % fade.size());
+	auto player = gs->player;	
 	int bounds = 9;
 	int start - consts::MESSAGE_NUMBER+1;
-	terminal_color(current_color);
-	draw_square(gs, consts::EDGE_POS-1, start, consts::WIDTH-base-2, 11,
+	add_square(gs, consts::EDGE_POS-1, start, consts::WIDTH-base-2, 11,
 		    utils::to_upper(player->race->name+"("+player->attributes()+")"));
 
 	/*
@@ -240,9 +232,9 @@ namespace draw
 	/*
 	 * Dungeon Level + LOS Distance
 	 */
-	auto nm = gs->dungeon->monsters.size();
+	auto nm = gs->map->dungeon->monsters.size();
 	terminal_print(base, start+2, "LOS Dist: "+std::to_string(nm));
-	terminal_print(base+bounds+4, start+2, 'Dungeon: '+std::to_string(gs->terrain_map->level));
+	terminal_print(base+bounds+4, start+2, 'Dungeon: '+std::to_string(gs->map->level));
 
 	/*
 	 * Player Level
@@ -294,5 +286,144 @@ namespace draw
 	 */
 	terminal_print(base, start+10, "Turn: "+std::to_string(gs->turns));
 	terminal_print(base+bounds+4, start+10, "Score: "+std::to_string(player->score(gs)));
+    }
+
+    void draw_messages(utils::GlobalState *gs)
+    {
+	std::vector<std::string> ms;
+	if (gs->messages.size() >= consts::MESSAGE_NUMBER)
+	{
+	    ms = std::vector(gs->messages.end() - consts::MESSAGE_NUMBER,
+					gs->messages.end());
+	}
+	else
+	{
+	    ms = gs->messages;
+	}
+
+	ms.insert("MESSAGES");
+	
+	std::string message_text = "";
+	for (auto message : ms)
+	{
+	    message_text += message+"\n";
+	}
+	add_square(gs, consts::EDGE_POS-1, 0, consts::WIDTH-consts::EDGE_POS-2,
+		   consts::MESSAGE_NUMBER, message_text, 1);
+    }
+
+    void draw_inventory(utils::GlobalState *gs)
+    {
+	int placing = 1;
+	add_square(gs, consts::EDGE_POS, 0, floor(consts::WIDTH/2)-4,
+		   consts::HEIGHT-1, "INVENTORY (HANDS FREE: "+std::to_string(gs->player->hands_free)+")");
+	for (int i=0; i < player->inventory.size(); i++)
+	{
+	    items::Item a = player->inventory.at(i);
+	    if (a.equipped)
+	    {
+		color_t color = utils::skill_color(gs->player->skill_with_item(a).value);
+		terminal_bkcolor(color);
+		terminal_color(color);
+	    }
+	    else if (gs->currentselection == i)
+	    {
+		color_t color = color_from_name("red");
+		terminal_bkcolor(color);
+		terminal_color(color);
+	    }
+	    if (header_bg_color == color_from_name("white"))
+	    {
+		teminal_color(color_from_name("grey"));
+	    }
+	    terminal_print(consts::EDGE_POS+1, placing, std::to_string(i+1)+") "+a.name+"("+a.chr+")");
+	    std::string str = a.format();
+	    for (auto line : utils::split(str, "\n"))
+	    {
+		placing++;
+		terminal_print(consts::EDGE_POS+5, placing, line);
+	    }
+	    placing += 2;
+	}
+    }
+
+    void draw_skills(utils::GlobalState *gs)
+    {
+	std::string text{""};
+	auto skill_tree = gs->player->skill_tree;
+	int pos = 1;
+
+	std::map<std::string, utils::BoundedValue>::iterator iter = skill_tree.begin();
+	while(iter != skill_tree.end())
+	{
+	    std::string skill = iter->first();
+	    int progress = iter->second();
+	    int bar_base_x = ceil((skill.size()+1) / 2);
+	    for (int i = 1; i < progress->max - progress->value; i++)
+	    {
+		terminal_bkcolor(utils::skill_color(progress->value));
+		terminal_put(pos + bar_base_x, consts::HEIGHT-(i+4), '   ');
+
+		add_square(gs, pos, consts::HEIGHT-4, skill.size()+1, 1, "\n"+utils::to_upper(skill), 1);
+		pos += skill.size()+2;
+	    }
+	    
+	    iter++;
+	}
+
+	add_square(gs, 0, 0, consts::WIDTH-1, consts::HEIGHT-1,
+		   "SKILLS (LEARNING "+std::to_tring(skill_tree.size())+")");
+    }
+
+    /*
+     * Draw Utilities
+     */
+    void add_square(utils::GlobalState *gs, uint x, uint y, uint width, uint height, std::string text, uint spacing = 2)
+    {
+	terminal_clear_area(x, y, width, height);
+	vector<color_t> fade = utils::fade_colors(color_from_name("red"), color_from_argb(1, 25, 25, 25), 25);
+	if (frame % fade.size() == 0 && frame / fade.size() % 2 == 0)
+	{
+	    std::reverse(fade.begin(), fade.end());
+	}
+	color_t current_color = fade.at(frame % fade.size());
+	terminal_color(current_color);
+
+	// Top
+	for (int i=0; i < width; i++)
+	{
+	    terminal_put(x+i, y, consts::CHAR_DHLINE);
+	}
+
+	// Left
+	for (int i=0; i < height; i++)
+	{
+	    terminal_put(x, y+i, consts::CHAR_DVLINE);
+	}
+
+	// Bottom
+	for (int i=0; i < width; i++)
+	{
+	    terminal_put(x+i, y+height-1, consts::CHAR_DHLINE);
+	}
+
+	// Right
+	for (int i=0; i < height; i++)
+	{
+	    terminal_put(x+width-1, y+i, consts::CHAR_DVLINE);
+	}
+
+	// Corners
+	terminal_put(x, y, consts::CHAR_DSE);
+	
+	terminal_put(x+width-1, y, consts::CHAR_DSW);
+	terminal_put(x, y+height-1, consts::CHAR_DNE);
+	
+	terminal_put(x+width-1, y+height-1, consts::CHAR_DNW);
+
+	for (auto line : text)
+	{
+	    terminal_print(x+1, y+i*spacing, line);
+	}
     }
 }
