@@ -7,8 +7,10 @@
 #include <map>
 #include <cmath>
 #include <random>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 #include "lib/area.hpp"
 #include "lib/colors.hpp"
@@ -32,20 +34,20 @@ int main()
 
     terminal_set(("window.title='"+consts::TITLE+"';").c_str());
     terminal_set(("window.size="+std::to_string(consts::WIDTH)+"x"+std::to_string(consts::HEIGHT)+";").c_str());
-    terminal_set("font: assets/font/IBMCGA16x16_gs_ro.png, size=16x16, codepage=437;");
+    terminal_set("font: assets/font/IBMCGA16x16_gamestate_ro.png, size=16x16, codepage=437;");
     terminal_set("U+E000: assets/tileset8x8.png, size=8x8, align=top-left;");
     terminal_set("stone font: ../Media/Aesomatica_16x16_437.png, size=16x16, codepage=437, spacing=2x1, transparent=#FF00FF;");
     terminal_set("huge font: assets/font/VeraMono.ttf, size=20x40, spacing=2x2");
     terminal_composition(TK_ON);
 
-    terrain_map::TerrainMap tmap{consts::WIDTH, consts::HEIGHT};
-    character::Player player{races::WARRIOR};
+    auto tmap = std::make_shared<terrain_map::TerrainMap>(consts::WIDTH, consts::HEIGHT);
+    auto player = std::make_shared<character::Player>(races::WARRIOR);
     
-    utils::GlobalState *gamestate;
-    gamestate->screen     = utils::Intro;
-    gamestate->sidescreen = utils::HUD;
-    gamestate->map        = &tmap;
-    gamestate->player     = &player;
+    std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap>> gamestate;
+    gamestate->screen     = utils::ScreenState::Intro;
+    gamestate->sidescreen = utils::SideScreenState::HUD;
+    gamestate->map        = tmap;
+    gamestate->player     = player;
 
     std::ifstream infile(".gamescores");
     std::string line;
@@ -60,9 +62,9 @@ int main()
     while (true)
     {
 	// Update Screen
-	if (player->health <= 0 && gamestate->screen != utils::Death)
+	if (player->health <= 0 && gamestate->screen != utils::ScreenState::Death)
 	{
-	    gamestate->screen = utils::Death;
+	    gamestate->screen = utils::ScreenState::Death;
 	}
 	draw::draw_screen(gamestate);
 
@@ -84,25 +86,18 @@ int main()
 
 		int map_x = std::max(0, player->loc.x-floor(consts::WIDTH / 4));
 		int map_y = std::max(0, player->loc.y-floor(consts::HEIGHT / 2));
-		utils::Point cell{mx+map_x, my+map_y};
+		area::Point cell{mx+map_x, my+map_y};
 
-		auto m = tmap.get_monster_at(cell);
-		auto i = tmap.get_item_at(cell);
-		auto d = tmap.get_decor_at(cell);
-		auto t = tmap.get_cell_type(cell);
+		auto e = tmap->element_at(cell);
 
-		std::string id = terrain_map::TERRAIN_TO_STRING[t];
-		if (m != nullptr)
+		auto id = "some " + e.sme;
+		if (e.i != nullptr)
 		{
-		    id = "a " + m.name;
+		    id = "an " + e.i->name;
 		}
-		else if (i != nullptr)
+		else if (e.m != nullptr)
 		{
-		    id = "an " + i.name;
-		}
-		else if (d != nullptr)
-		{
-		    id = "some " + d.name;
+		    id = "a " + e.m->name;
 		}
 
 		gamestate->messages.push_back("You see " + id + " here.");
@@ -113,7 +108,7 @@ int main()
 	    }
 	    else
 	    {
-		if (gamestate->sidescreen == utils::Inventory)
+		if (gamestate->sidescreen == utils::SideScreenState::Inventory)
 		{
 		    switch (event)
 		    {
@@ -129,10 +124,10 @@ int main()
 			auto item = player->inventory[gamestate->currentselection];
 			item.count--;
 
-			auto single_item = Item(item);
+			auto single_item = items::Item(item);
 			single_item.count = 1;
 		    
-			tmap.dungeon.items[player->loc.y][player->loc.x].push_back(single_item);
+			tmap->dungeon->map[player->loc.y][player->loc.x].push_back(single_item);
 			break;
 		    case TK_RETURN:
 			player->inventory[gamestate->currentselection].equip(player);
@@ -141,17 +136,17 @@ int main()
 			player->inventory[gamestate->currentselection].dequip(player);
 			break;
 		    case TK_I:
-			gamestate->sidescreen = utils::HUD;
+			gamestate->sidescreen = utils::SideScreenState::HUD;
 			break;
 		    default:
 			break;
 		    }
 		}
-		else if (gamestate->screen == utils::Intro)
+		else if (gamestate->screen == utils::ScreenState::Intro)
 		{
-		    gamestate->screen = utils::CharacterSelection;
+		    gamestate->screen = utils::ScreenState::CharacterSelection;
 		}
-		else if (gamestate->screen == utils::CharacterSelection)
+		else if (gamestate->screen == utils::ScreenState::CharacterSelection)
 		{
 		    switch (event)
 		    {
@@ -168,14 +163,47 @@ int main()
 			auto race = races::RACES[racen];
 			gamestate->player = character::Player(race);
 			gamestate->difficulty = race.suggested_difficulty;
-			player->loc = tmap.generate_new_map();
-			gamestate->screen = utils::Game;
+			player->loc = tmap->generate_new_map();
+			gamestate->screen = utils::ScreenState::Game;
 			break;
 		    }
 		}
-		else if (gamestate->screen == utils::Game)
+		else if (gamestate->screen == utils::ScreenState::Game)
 		{
-		    player->handle_event(terminal_check(TK_CHAR));
+		    auto b = consts::PLAYER_HANDLE.begin();
+		    auto e = consts::PLAYER_HANDLE.end();
+		    if (std::find_if(b, e, [](char x) { return x == terminal_check(TK_CHAR); }) != e)
+		    {
+			player->handle_event(terminal_check(TK_CHAR));
+		    }
+		    else
+		    {
+			switch (terminal_check(TK_CHAR))
+			{
+			case 'i':
+			    if (gamestate->sidescreen == utils::SideScreenState::Inventory)
+			    {
+				gamestate->sidescreen = utils::SideScreenState::HUD;
+			    }
+			    else
+			    {
+				gamestate->sidescreen = utils::SideScreenState::Inventory;
+			    }
+			    break;
+			case 'm':
+			    if (gamestate->sidescreen == utils::SideScreenState::Skills)
+			    {
+				gamestate->sidescreen = utils::SideScreenState::HUD;
+			    }
+			    else
+			    {
+				gamestate->sidescreen = utils::SideScreenState::Skills;
+			    }
+			    break;
+			default:
+			    break;
+			}
+		    }
 		}
 	    }
 

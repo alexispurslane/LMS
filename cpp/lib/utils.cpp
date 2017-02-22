@@ -26,8 +26,8 @@ std::string exec(const char* cmd)
 
 std::vector<color_t> fade_colors(color_t a, color_t b, int steps)
 {
-    color_t *current = &a;
-    color_t *color2 = &b;
+    std::unique_ptr<color_t> current = &a;
+    std::unique_ptr<color_t> color2 = &b;
     
     int step_a = abs(current[0] - color2[0]) / steps;
     int step_r = abs(current[1] - color2[1]) / steps;

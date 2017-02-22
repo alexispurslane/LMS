@@ -1,4 +1,7 @@
-#include<string>
+#include <string>
+#include <vector>
+
+#pragma once
 namespace consts
 {
     const int WIDTH = 106;
@@ -6,6 +9,7 @@ namespace consts
     const std::string TITLE = "Last Man Standing";
     const int EDGE_POS = WIDTH/2+2;
     const int MESSAGE_NUMBER = 7;
+    const std::vector<char> PLAYER_HANDLE{';', '.', 'f', 'h', 'k', 'l', 'j', 'y', 'u', 'b', 'n'};
     // CONST CHAR CONSTANTS
     const char CHAR_HLINE = 196;   // (HorzLine)
     const char CHAR_VLINE = 179;   // (VertLine)

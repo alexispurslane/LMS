@@ -10,7 +10,7 @@ namespace draw
     /*
      * Game Screen Drawing Functions
      */
-    void draw_screen(utils::GlobalState *gs)
+    void draw_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	frame++;
 	terminal_clear();
@@ -35,7 +35,7 @@ namespace draw
 	terminal_refresh();
     }
 
-    void draw_intro_screen(utils::GlobalState *gs)
+    void draw_intro_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	auto text = utils::exec(("figlet -f gothic -m packed '"+consts::TITLE+"'").c_str());
 	auto lines = utils::split(text, "\n");
@@ -53,7 +53,7 @@ namespace draw
 	add_square(gs, consts.WIDTH/2-7, 21, 14, 20, "TOP 20 SCORES\n"+scores, 1);
     }
 
-    void draw_charsel_screen(utils::GlobalState *gs)
+    void draw_charsel_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	races::Race selected_race;
 	for (int i=0; i < races::RACES.size(); i++)
@@ -87,11 +87,15 @@ namespace draw
 		    selected_race->starting.strength,
 		    selected_race->starting.max_health,
 		    selected_race->description);
-	    add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(race_display));
+	    add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(buffer));
+
+	    // FIXME: Possible use-after-delete bug.
+	    delete[] race_display;
+	    delete[] buffer;
 	}
     }
 
-    void draw_death_screen(utils::GlobalState *gs)
+    void draw_death_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	auto player = gs->player;
 
@@ -107,15 +111,20 @@ namespace draw
 		player->score(gs),
 		player->kills,
 		player->exp);
-	add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(endgame_stats));
+	add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(buffer));
+
+	// FIXME: Possible use-after delete bug.
+	delete[] endgame_stats;
+	delete[] buffer;
     }
 
-    void draw_game_screen(utils::GlobalState *gs)
+    void draw_game_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	gs->map->draw_map(gs, frame);
 	for (monsters::Monster m : gs->map->dungeon->monsters)
 	{
-	    auto v = gs->map->calculate_fov(*gs->player->loc)
+	    auto v = gs->map->fov;
+	    
 	    if (std::find(v.begin(), v.end(), m->loc) != v.end())
 	    {
 		terminal_color(m->color_fg);
@@ -133,7 +142,7 @@ namespace draw
     /*
      * Overlay Screen Drawing Functions
      */
-    void draw_screen_overlay(utils::GlobalState *gs)
+    void draw_screen_overlay(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	switch (gs->sidescreen)
 	{
@@ -150,7 +159,7 @@ namespace draw
 	}
     }
 
-    void draw_stats(utils::GlobalState *gs)
+    void draw_stats(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	auto player = gs->player;	
 	int bounds = 9;
@@ -288,7 +297,7 @@ namespace draw
 	terminal_print(base+bounds+4, start+10, "Score: "+std::to_string(player->score(gs)));
     }
 
-    void draw_messages(utils::GlobalState *gs)
+    void draw_messages(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	std::vector<std::string> ms;
 	if (gs->messages.size() >= consts::MESSAGE_NUMBER)
@@ -312,7 +321,7 @@ namespace draw
 		   consts::MESSAGE_NUMBER, message_text, 1);
     }
 
-    void draw_inventory(utils::GlobalState *gs)
+    void draw_inventory(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	int placing = 1;
 	add_square(gs, consts::EDGE_POS, 0, floor(consts::WIDTH/2)-4,
@@ -347,13 +356,13 @@ namespace draw
 	}
     }
 
-    void draw_skills(utils::GlobalState *gs)
+    void draw_skills(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
 	std::string text{""};
 	auto skill_tree = gs->player->skill_tree;
 	int pos = 1;
 
-	std::map<std::string, utils::BoundedValue>::iterator iter = skill_tree.begin();
+	auto iter = skill_tree.begin(); // std::map<std::string, utils::BoundedValue>::iterator
 	while(iter != skill_tree.end())
 	{
 	    std::string skill = iter->first();
@@ -378,8 +387,9 @@ namespace draw
     /*
      * Draw Utilities
      */
-    void add_square(utils::GlobalState *gs, uint x, uint y, uint width, uint height, std::string text, uint spacing = 2)
+    void add_square(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs, uint x, uint y, uint width, uint height, std::string text, uint spacing = 2)
     {
+	// FIXME: Possibly off-kilter
 	terminal_clear_area(x, y, width, height);
 	vector<color_t> fade = utils::fade_colors(color_from_name("red"), color_from_argb(1, 25, 25, 25), 25);
 	if (frame % fade.size() == 0 && frame / fade.size() % 2 == 0)
