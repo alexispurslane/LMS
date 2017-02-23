@@ -4,6 +4,7 @@
 #pragma once
 namespace area
 {
+    enum class AreaType { Marble, Dirt, Stone };
     struct Point
     {
 	int x;
@@ -17,6 +18,8 @@ namespace area
 	Point end_pos;
 	int width;
 	int height;
+	AreaType type;
+	
 	Area(int x, int y, int w, int h) : width(w), height(h)
 	{
 	    start_pos = {x,y};

@@ -90,14 +90,48 @@ int main()
 
 		auto e = tmap->element_at(cell);
 
-		auto id = "some " + e.sme;
-		if (e.i != nullptr)
+		std::string id;
+		switch (e.sme)
 		{
-		    id = "an " + e.i->name;
-		}
-		else if (e.m != nullptr)
-		{
-		    id = "a " + e.m->name;
+		case dungeons::StaticMapElement::Floor:
+		    id = "the floor";
+		    break;
+		case dungeons::StaticMapElement::Water:
+		    id = "water";
+		    break;
+		case dungeons::StaticMapElement::Fire:
+		    id = "flames";
+		    break;
+		case dungeons::StaticMapElement::GeneralObject:
+		    if (e.i != nullptr)
+		    {
+			id = "an " + e.i->name;
+		    }
+		    else if (e.m != nullptr)
+		    {
+			id = "a " + e.m->name;
+		    }
+		    break;
+		case dungeons::StaticMapElement::OpenDoor:
+		    id = "an open door";
+		    break;
+		case dungeons::StaticMapElement::ClosedDoor:
+		    id = "a closed door";
+		    break;
+		case dungeons::StaticMapElement::Wall:
+		    switch (gamestate->map->area_at(cell).type)
+		    {
+		    case area::AreaType::Marble:
+			id = "a beautiful marble slab wall";
+			break;
+		    case area::AreaType::Dirt:
+			id = "a loose packed dirt wall";
+			break;
+		    case area::AreaType::Stone:
+			id = "a moldy, lichen covered stone wall";
+			break;
+		    }
+		    break;
 		}
 
 		gamestate->messages.push_back("You see " + id + " here.");

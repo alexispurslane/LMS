@@ -1,4 +1,5 @@
 #include "lib/utils.hpp"
+#include "generators/dungeons.hpp"
 #include "lib/area.hpp"
 #include <memory>
 #include <vector>
@@ -6,23 +7,11 @@
 
 #pragma once
 namespace terrain_map
-{
-    struct Dungeon
-    {
-	std::vector<monsters::Monster> monsters;
-	bool alerted;
-	area::Area areas[6];
-	std::vector<std::vector<utils::MapElement> > map;
-	std::set<area::Point> remembered;
-	area::Point player_start;
-	area::Point down_stairs;
-	area::Point up_stairs;
-    };
-    
+{    
     class TerrainMap
     {
     private:
-	std::vector<std::unique_ptr<Dungeon> > dungeons;
+	std::vector<std::unique_ptr<dungeons::Dungeon> > dungeons;
 	uint width;
 	uint height;
 
@@ -30,7 +19,7 @@ namespace terrain_map
 	bool restore_dungeon(int n);
 	
     public:
-	std::unique_ptr<Dungeon> dungeon;
+	std::unique_ptr<dungeons::Dungeon> dungeon;
 	uint level;
 	std::set<area::Point> fov;
 	
@@ -45,9 +34,9 @@ namespace terrain_map
 
 	// Constant Functions
 	void draw_map(std::shared_ptr<utils::GlobalState<TerrainMap>> gs, uint frame) const;
-	utils::MapElement element_at(area::Point p) const;
+	dungeons::MapElement element_at(area::Point p) const;
 	bool on_map(area::Point x, bool bordered) const;
-	utils::AreaType area_at(area::Point p) const;
+	area::AreaType area_at(area::Point p) const;
 	bool walkable(area::Point p) const;
 	std::vector<area::Area> generate_areas() const;
     };

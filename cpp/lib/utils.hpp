@@ -9,15 +9,6 @@
 namespace utils {
     enum class ScreenState { Intro, Game, CharacterSelection, Death };
     enum class SideScreenState { HUD, Skills, Inventory };
-    enum class StaticMapElement { Floor, Water,  Fire, GeneralObject, OpenDoor, ClosedDoor, Wall };
-    enum class AreaType { Marble, Dirt, Stone };
-    
-    union MapElement
-    {
-	StaticMapElement sme;
-	std::shared_ptr<items::Item> i;
-	std::shared_ptr<monsters::Monster> m;
-    };
     
     template <typename T>
     struct BoundedValue

@@ -1,4 +1,5 @@
 #include <cstdio>
+#include "area.hpp"
 #include "BearLibTerminal.h"
 #include <iostream>
 #include <memory>
@@ -104,4 +105,28 @@ std::vector<std::string> split_string(const std::string& str,
     // To get the last substring (or only, if delimiter is not found)
     strings.push_back(str.substr(prev));
     return strings;
+}
+
+std::vector<area::Point> bresenham(area::Point start, area::Point end)
+{
+    std::vector<area::Point> line;
+    double dx = end.x - start.x;
+    double dy = end.x - start.y;
+    double derr = abs(dy / dx);
+    double err = 0;
+
+    int y = start.y;
+    for (int x=start.x; x <= end.x; x++)
+    {
+	line.push_back({x,y});
+	err += derr;
+
+	if (err >= 0.5)
+	{
+	    y++;
+	    err -= 1.0;
+	}
+    }
+
+    return line;
 }
