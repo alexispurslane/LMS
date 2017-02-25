@@ -1,5 +1,4 @@
 #include <vector>
-#include "../objects/player.hpp"
 #include "../objects/monsters.hpp"
 #include "../objects/items.hpp"
 #include "area.hpp"
@@ -17,7 +16,7 @@ namespace utils {
 	T max;
     };
 
-    template<class T>
+    template<class X, class Y>
     struct GlobalState
     {
 	ScreenState screen;
@@ -26,8 +25,8 @@ namespace utils {
 	std::vector<std::string> messages;
 	std::vector<int> scores;
 	
-	std::unique_ptr<T> map;
-	std::unique_ptr<character::Player> player;
+	std::unique_ptr<X> map;
+	std::unique_ptr<Y> player;
 	
 	int currentselection = 0;
 	int turns = 0;

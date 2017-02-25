@@ -1,5 +1,6 @@
 #include <vector>
 #include <cstdlib>
+#include <random>
 
 #pragma once
 namespace area
@@ -20,18 +21,10 @@ namespace area
 	int height;
 	AreaType type;
 	
-	Area(int x, int y, int w, int h) : width(w), height(h)
-	{
-	    start_pos = {x,y};
-	    end_pos = {x+w, y+h};
-	}
+	Area(int x, int y, int w, int h);
+	Area(Point maxpos, int minsize, int maxsize);
 	
-	inline bool intersects(Point p) const
-	{
-	    return p.x >= start_pos.x && p.y >= start_pos.y &&
-		p.x <= end_pos.x && p.y <= end_pos.y;
-	}
-
+	bool intersects(Point p) const;
 	std::vector<Point> edge_points() const;
     };
 

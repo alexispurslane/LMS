@@ -31,7 +31,7 @@ namespace dungeons
     {
 	std::vector<monsters::Monster> monsters{};
 	bool alerted = false;
-	std::vector<area::Area> areas{};
+	std::set<area::Area> areas{};
 	MapElement map[consts::HEIGHT][consts::WIDTH]{};
 	std::set<area::Point> remembered{};
 	area::Point player_start{-1, -1};

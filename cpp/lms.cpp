@@ -43,7 +43,7 @@ int main()
     std::unique_ptr<terrain_map::TerrainMap> tmap{new terrain_map::TerrainMap(consts::WIDTH, consts::HEIGHT)};
     std::unique_ptr<character::Player> player{new character::Player(races::WARRIOR)};
     
-    std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap>> gamestate;
+    std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, character::Player> > gamestate;
     gamestate->screen     = utils::ScreenState::Intro;
     gamestate->sidescreen = utils::SideScreenState::HUD;
     gamestate->map        = std::move(tmap);

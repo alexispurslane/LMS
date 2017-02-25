@@ -26,7 +26,6 @@ namespace terrain_map
 	uint level;
 	std::set<area::Point> fov;
 	
-	TerrainMap() = default;
 	TerrainMap(uint w, uint h) : width(w), height(h)
 	{
 	    dungeons::reset_dungeon();
@@ -61,6 +60,7 @@ namespace terrain_map
 	    
 	    dungeon = std::make_shared<dungeons::Dungeon>(dungeons::generate_new());
 	    dungeons.push_back(dungeon);
+	    level++;
 	}
 	
 	void put_cell(area::Point p, dungeons::MapElement el)
@@ -169,23 +169,25 @@ namespace terrain_map
 	
 	area::Area area_at(area::Point p) const
 	{
-	    for (Area a : dungeon->areas)
-	    {
-		if (a.includes(p))
-		{
-		    return a;
-		}
-	    }
+	    return std::find_if(dungeon->areas.begin(),
+				dungeon->areas.end(),
+				[=](area::Area a) { return a.includes(p); });
 	}
 	
 	bool walkable(area::Point p) const
 	{
-	    return dungeon->map[p.y][p.x].sme != dungeons::StaticMapElement::ClosedDoor &&
-		dungeon->map[p.y][p.x].sme != dungeons::StaticMapElement::Wall &&
-		!(dungeon->map[p.y][p.x].sme == dungeons::StaticMapElement::GeneralObject &&
-		  dungeon->map[p.y][p.x].m != nullptr);
+	    return this[p].sme != dungeons::StaticMapElement::ClosedDoor &&
+		this[p].sme != dungeons::StaticMapElement::Wall &&
+		!(this[p].sme == dungeons::StaticMapElement::GeneralObject &&
+		  this[p].m != nullptr);
 	}
-	area::Area[] generate_areas() const;
+	area::Area[] generate_areas() const
+	{
+	    for (int i=0; i < 6; i++)
+	    {
+		dungeon->areas.push_back(area::Area());
+	    }
+	}
     };
 }
 

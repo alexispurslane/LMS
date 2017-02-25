@@ -21,10 +21,10 @@ namespace terrain_map
     public:
 	std::unique_ptr<dungeons::Dungeon> dungeon;
 	uint level;
-	std::unordered_set<area::Point> fov;
+	std::set<area::Point> fov;
 	
 	TerrainMap() = default;
-	TerrainMap(uint w, uint h) : width(w), height(h) {}
+	TerrainMap(uint w, uint h);
 
 	// Mutating Functions
 	void calculate_fov(area::Point p);
