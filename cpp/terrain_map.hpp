@@ -7,7 +7,7 @@
 
 #pragma once
 namespace terrain_map
-{    
+{
     class TerrainMap
     {
     private:
@@ -33,7 +33,7 @@ namespace terrain_map
 	void put_cell(area::Point p, dungeons::MapElement el);
 
 	// Constant Functions
-	void draw_map(std::shared_ptr<utils::GlobalState<TerrainMap>> gs, uint frame) const;
+	void draw_map(std::shared_ptr<utils::GlobalState<TerrainMap, character::Player> > gs, uint frame) const;
 	dungeons::MapElement operator[](area::Point p) const;
 	bool contains(area::Point x, bool bordered) const;
 	area::Area area_at(area::Point p) const;

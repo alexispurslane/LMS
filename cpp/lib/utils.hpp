@@ -1,6 +1,4 @@
 #include <vector>
-#include "../objects/monsters.hpp"
-#include "../objects/items.hpp"
 #include "area.hpp"
 #include "BearLibTerminal.h"
 
@@ -14,6 +12,15 @@ namespace utils {
     {
 	T value;
 	T max;
+	
+	bool operator==(T v) { return value == v; }
+	bool operator=(T v)  { return value = v; }
+	
+	bool operator<(T v) { return value < v; }
+	bool operator>(T v) { return value > v; }
+	
+	bool operator<=(T v) { return value <= v; }
+	bool operator>=(T v) { return value >= v; }
     };
 
     template<class X, class Y>

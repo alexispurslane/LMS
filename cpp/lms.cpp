@@ -84,11 +84,11 @@ int main()
 		int mx = terminal_check(TK_MOUSE_X);
 		int my = terminal_check(TK_MOUSE_Y);
 
-		int map_x = std::max(0, gamestate->player->loc.x-floor(consts::WIDTH / 4));
-		int map_y = std::max(0, gamestate->player->loc.y-floor(consts::HEIGHT / 2));
+		int map_x = std::max((double)0, gamestate->player->loc.x-floor(consts::WIDTH / 4));
+		int map_y = std::max((double)0, gamestate->player->loc.y-floor(consts::HEIGHT / 2));
 		area::Point cell{mx+map_x, my+map_y};
 
-		auto e = gamestate->tmap[cell];
+		auto e = (*gamestate->map)[cell];
 
 		std::string id = "";
 		switch (e.sme)
@@ -103,17 +103,23 @@ int main()
 		    id = "flames";
 		    break;
 		case dungeons::StaticMapElement::GeneralObject:
-		    if (e.i != nullptr)
+		    if (!e.i.empty())
 		    {
-			id = "an " + e.i->name;
+			id = "an " + e.i.front()->name;
 		    }
-		    else if (e.m != nullptr)
+		    else if (!e.m.empty())
 		    {
-			id = "a " + e.m->name;
+			id = "a " + e.m.front()->name;
 		    }
 		    break;
 		case dungeons::StaticMapElement::OpenDoor:
 		    id = "an open door";
+		    break;
+		case dungeons::StaticMapElement::UpStairs:
+		    id = "stairs leading up";
+		    break;
+		case dungeons::StaticMapElement::DownStairs:
+		    id = "stairs leading down";
 		    break;
 		case dungeons::StaticMapElement::ClosedDoor:
 		    id = "a closed door";
@@ -144,6 +150,11 @@ int main()
 	    {
 		if (gamestate->sidescreen == utils::SideScreenState::Inventory)
 		{
+
+		    // Because...You can't define variables in a switch statement
+		    auto item = gamestate->player->inventory[gamestate->currentselection];
+		    auto single_item = items::Item(item);
+		    
 		    switch (event)
 		    {
 		    case TK_UP:
@@ -155,13 +166,9 @@ int main()
 			gamestate->currentselection %= gamestate->player->inventory.size();
 			break;
 		    case TK_D:
-			auto item = gamestate->player->inventory[gamestate->currentselection];
 			item.count--;
-
-			auto single_item = items::Item(item);
 			single_item.count = 1;
-		    
-			gamestate->map->dungeon->map[gamestate->player->loc.y][gamestate->player->loc.x].push_back(single_item);
+			gamestate->map[gamestate->player->loc]->i.push_back(single_item);
 			break;
 		    case TK_RETURN:
 			gamestate->player->inventory[gamestate->currentselection].equip(player);
@@ -171,8 +178,6 @@ int main()
 			break;
 		    case TK_I:
 			gamestate->sidescreen = utils::SideScreenState::HUD;
-			break;
-		    default:
 			break;
 		    }
 		}
@@ -186,18 +191,19 @@ int main()
 		    {
 		    case TK_UP:
 			gamestate->currentselection--;
-			gamestate->currentselection %= races::RACES.size();
+			gamestate->currentselection %= 3;
 			break;
 		    case TK_DOWN:
 			gamestate->currentselection++;
-			gamestate->currentselection %= races::RACES.size();
+			gamestate->currentselection %= 3;
 			break;
 		    case TK_RETURN:
 			auto racen = gamestate->currentselection-1;
 			auto race = races::RACES[racen];
-			gamestate->gamestate->player->race = race;
+			gamestate->player->race = race;
 			gamestate->difficulty = race.suggested_difficulty;
-			gamestate->player->loc = gamestate->tmap->generate_new_map();
+			gamestate->map->generate_new_map();
+			gamestate->player->loc = gamestate->map->dungeon->player_start;
 			gamestate->screen = utils::ScreenState::Game;
 			break;
 		    }

@@ -24,15 +24,15 @@ namespace dungeons
     struct MapElement
     {
 	StaticMapElement sme;
-	std::shared_ptr<items::Item> i;
-	std::shared_ptr<monsters::Monster> m;
+	std::vector<std::shared_ptr<items::Item> > i;
+	std::vector<std::shared_ptr<monsters::Monster> > m;
     };
     struct Dungeon
     {
 	std::vector<monsters::Monster> monsters{};
 	bool alerted = false;
 	std::set<area::Area> areas{};
-	MapElement map[consts::HEIGHT][consts::WIDTH]{};
+	std::shared_ptr<MapElement> map[consts::HEIGHT][consts::WIDTH]{};
 	std::set<area::Point> remembered{};
 	area::Point player_start{-1, -1};
     };

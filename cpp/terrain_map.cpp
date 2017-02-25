@@ -65,11 +65,11 @@ namespace terrain_map
 	
 	void put_cell(area::Point p, dungeons::MapElement el)
 	{
-	    dungeon->map[p.y][p.x] = el;
+	    dungeon->map[p.y][p.x] = std::make_shared<dungeons::MapElement>(el);
 	}
 
 	// Constant Functions
-	void draw_map(std::shared_ptr<utils::GlobalState> gs, uint frame) const
+	void draw_map(GS gs, uint frame) const
 	{
 	    for (int y=0; y < consts::HEIGHT; y++)
 	    {
@@ -127,12 +127,12 @@ namespace terrain_map
 			case dungeons::StaticMapElement::GeneralObject:
 			    if (t.i != nullptr)
 			    {
-				x += t.i.tile_code;
+				x += t->i.front->tile_code;
 			    }
 			    if (t.m != nullptr)
 			    {
-				c = t.m.color_fg;
-				x += t.m.tile_code;
+				x += t->m.front->color_fg;
+				x += t->m.front->tile_code;
 			    }
 			}
 		    }
