@@ -1,6 +1,7 @@
 #include "../lib/utils.hpp"
 #include "../lib/area.hpp"
 #include "../objects/player.hpp"
+#include "../lib/consts.hpp"
 #include <memory>
 #include <set>
 
@@ -10,12 +11,14 @@ namespace dungeons
     enum class StaticMapElement
     {
 	Floor,
-	Water,
 	Fire,
+	Water,
 	GeneralObject,
 	OpenDoor,
 	ClosedDoor,
-	Wall
+	Wall,
+	UpStairs,
+	DownStairs
     };
     
     struct MapElement
@@ -29,11 +32,9 @@ namespace dungeons
 	std::vector<monsters::Monster> monsters{};
 	bool alerted = false;
 	std::vector<area::Area> areas{};
-	std::vector<std::vector<MapElement> > map{};
+	MapElement map[consts::HEIGHT][consts::WIDTH]{};
 	std::set<area::Point> remembered{};
 	area::Point player_start{-1, -1};
-	area::Point down_stairs{-1, -1};
-	area::Point up_stairs{-1, -1};
     };
 
     template <class T>

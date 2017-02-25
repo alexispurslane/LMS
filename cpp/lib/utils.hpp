@@ -22,10 +22,13 @@ namespace utils {
     {
 	ScreenState screen;
 	SideScreenState sidescreen;
-	std::shared_ptr<character::Player> player;
+	
 	std::vector<std::string> messages;
 	std::vector<int> scores;
-	std::shared_ptr<T> map;
+	
+	std::unique_ptr<T> map;
+	std::unique_ptr<character::Player> player;
+	
 	int currentselection = 0;
 	int turns = 0;
 	int message_offset = 0;

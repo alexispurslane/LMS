@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "area.hpp"
+#include "utils.hpp"
 #include "BearLibTerminal.h"
 #include <iostream>
 #include <memory>

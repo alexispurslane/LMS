@@ -1,4 +1,5 @@
 #include "lib/utils.hpp"
+#include "BearLibTerminal.h"
 #include "objects/monsters.hpp"
 #include "lib/area.hpp"
 #include <memory>
@@ -43,7 +44,7 @@ namespace terrain_map
 		std::vector<area::Point> line = utils::bresenham(p, outer);
 		for (auto p : line)
 		{
-		    if (element_at(p) == ClosedDoor || element_at(p) == Wall)
+		    if (this[p] == ClosedDoor || this[p] == Wall)
 		    {
 			break;
 		    }
@@ -62,23 +63,99 @@ namespace terrain_map
 	    dungeons.push_back(dungeon);
 	}
 	
-	void put_cell(area::Point p, bool solid)
+	void put_cell(area::Point p, dungeons::MapElement el)
 	{
-
+	    dungeon->map[p.y][p.x] = el;
 	}
 
 	// Constant Functions
 	void draw_map(std::shared_ptr<utils::GlobalState> gs, uint frame) const
 	{
-
+	    for (int y=0; y < consts::HEIGHT; y++)
+	    {
+		for (int x=0; x < consts::WIDTH; x++)
+		{
+		    if (std::find(fov.begin(), fov.end(), area::Point(x, y)) != v.end())
+		    {
+			char x = 0xE000;
+			auto c = color_from_name("white");
+			auto t = dungeon->map[y][x];
+		    
+			switch (t.sme)
+			{
+			case dungeons::StaticMapElement::Water:
+			    x += 5;
+			    c = color_from_name("sea");
+			    break;
+			case dungeons::StaticMapElement::Fire:
+			    x += 5;
+			    c = color_from_name("flame");
+			    break;
+			case dungeons::StaticMapElement::OpenDoor:
+			    x += 4;
+			    c = color_from_name("#966F33");
+			    break;
+			case dungeons::StaticMapElement::ClosedDoor:
+			    x += 3;
+			    c = color_from_name("#966F33");
+			    break;
+			case dungeons::StaticMapElement::Wall:
+			    auto a = area_at({x,y}, false);
+			    switch (a.type)
+			    {
+			    case Marble:
+				x += 1;
+				c = color_from_name("white");
+				break;
+			    case Stone:
+				x += 2;
+				c = color_from_name("darker white");
+				break;
+			    case Dirt:
+				x += 32;
+				c = color_from_name("darker #966F33");
+				break;
+			    }
+			case dungeons::StaticMapElement::UpStairs:
+			    x += 13;
+			    c = color_from_name("dark white");
+			    break;
+			case dungeons::StaticMapElement::DownStairs:
+			    x += 12;
+			    c = color_from_name("darkest white");
+			    break;
+			case dungeons::StaticMapElement::GeneralObject:
+			    if (t.i != nullptr)
+			    {
+				x += t.i.tile_code;
+			    }
+			    if (t.m != nullptr)
+			    {
+				c = t.m.color_fg;
+				x += t.m.tile_code;
+			    }
+			}
+		    }
+		}
+	    }
 	}
 
-	dungeons::MapElement element_at(area::Point p) const
+	dungeons::MapElement operator[](area::Point p) const
 	{
+	    return dungeon->map[p.y][p.x];
+	}
 
+	bool operator>(area::Point p) const
+	{
+	    return contains(p, true);
 	}
 	
-	bool on_map(area::Point p, bool bordered) const
+	bool operator>=(area::Point p) const
+	{
+	    return contains(p, false);
+	}
+	
+	bool contains(area::Point p, bool bordered) const
 	{
 	    if (bordered)
 	    {
@@ -90,18 +167,23 @@ namespace terrain_map
 	    }
 	}
 	
-	area::AreaType area_at(area::Point p) const
+	area::Area area_at(area::Point p) const
 	{
 	    for (Area a : dungeon->areas)
 	    {
-		
+		if (a.includes(p))
+		{
+		    return a;
+		}
 	    }
 	}
 	
 	bool walkable(area::Point p) const
 	{
-	    return dungeon->map[p.y][p.x] != utils::ClosedDoor &&
-		dungeon->map[p.y][p.x] != utils::Wall;
+	    return dungeon->map[p.y][p.x].sme != dungeons::StaticMapElement::ClosedDoor &&
+		dungeon->map[p.y][p.x].sme != dungeons::StaticMapElement::Wall &&
+		!(dungeon->map[p.y][p.x].sme == dungeons::StaticMapElement::GeneralObject &&
+		  dungeon->map[p.y][p.x].m != nullptr);
 	}
 	area::Area[] generate_areas() const;
     };

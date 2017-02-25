@@ -40,14 +40,14 @@ int main()
     terminal_set("huge font: assets/font/VeraMono.ttf, size=20x40, spacing=2x2");
     terminal_composition(TK_ON);
 
-    auto tmap = std::make_shared<terrain_map::TerrainMap>(consts::WIDTH, consts::HEIGHT);
-    auto player = std::make_shared<character::Player>(races::WARRIOR);
+    std::unique_ptr<terrain_map::TerrainMap> tmap{new terrain_map::TerrainMap(consts::WIDTH, consts::HEIGHT)};
+    std::unique_ptr<character::Player> player{new character::Player(races::WARRIOR)};
     
     std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap>> gamestate;
     gamestate->screen     = utils::ScreenState::Intro;
     gamestate->sidescreen = utils::SideScreenState::HUD;
-    gamestate->map        = tmap;
-    gamestate->player     = player;
+    gamestate->map        = std::move(tmap);
+    gamestate->player     = std::move(player);
 
     std::ifstream infile(".gamescores");
     std::string line;
@@ -62,7 +62,7 @@ int main()
     while (true)
     {
 	// Update Screen
-	if (player->health <= 0 && gamestate->screen != utils::ScreenState::Death)
+	if (gamestate->player->health <= 0 && gamestate->screen != utils::ScreenState::Death)
 	{
 	    gamestate->screen = utils::ScreenState::Death;
 	}
@@ -84,13 +84,13 @@ int main()
 		int mx = terminal_check(TK_MOUSE_X);
 		int my = terminal_check(TK_MOUSE_Y);
 
-		int map_x = std::max(0, player->loc.x-floor(consts::WIDTH / 4));
-		int map_y = std::max(0, player->loc.y-floor(consts::HEIGHT / 2));
+		int map_x = std::max(0, gamestate->player->loc.x-floor(consts::WIDTH / 4));
+		int map_y = std::max(0, gamestate->player->loc.y-floor(consts::HEIGHT / 2));
 		area::Point cell{mx+map_x, my+map_y};
 
-		auto e = tmap->element_at(cell);
+		auto e = gamestate->tmap[cell];
 
-		std::string id;
+		std::string id = "";
 		switch (e.sme)
 		{
 		case dungeons::StaticMapElement::Floor:
@@ -148,26 +148,26 @@ int main()
 		    {
 		    case TK_UP:
 			gamestate->currentselection--;
-			gamestate->currentselection %= player->inventory.size();
+			gamestate->currentselection %= gamestate->player->inventory.size();
 			break;
 		    case TK_DOWN:
 			gamestate->currentselection++;
-			gamestate->currentselection %= player->inventory.size();
+			gamestate->currentselection %= gamestate->player->inventory.size();
 			break;
 		    case TK_D:
-			auto item = player->inventory[gamestate->currentselection];
+			auto item = gamestate->player->inventory[gamestate->currentselection];
 			item.count--;
 
 			auto single_item = items::Item(item);
 			single_item.count = 1;
 		    
-			tmap->dungeon->map[player->loc.y][player->loc.x].push_back(single_item);
+			gamestate->map->dungeon->map[gamestate->player->loc.y][gamestate->player->loc.x].push_back(single_item);
 			break;
 		    case TK_RETURN:
-			player->inventory[gamestate->currentselection].equip(player);
+			gamestate->player->inventory[gamestate->currentselection].equip(player);
 			break;
 		    case TK_ESCAPE:
-			player->inventory[gamestate->currentselection].dequip(player);
+			gamestate->player->inventory[gamestate->currentselection].dequip(player);
 			break;
 		    case TK_I:
 			gamestate->sidescreen = utils::SideScreenState::HUD;
@@ -195,9 +195,9 @@ int main()
 		    case TK_RETURN:
 			auto racen = gamestate->currentselection-1;
 			auto race = races::RACES[racen];
-			gamestate->player = character::Player(race);
+			gamestate->gamestate->player->race = race;
 			gamestate->difficulty = race.suggested_difficulty;
-			player->loc = tmap->generate_new_map();
+			gamestate->player->loc = gamestate->tmap->generate_new_map();
 			gamestate->screen = utils::ScreenState::Game;
 			break;
 		    }
@@ -208,7 +208,7 @@ int main()
 		    auto e = consts::PLAYER_HANDLE.end();
 		    if (std::find_if(b, e, [](char x) { return x == terminal_check(TK_CHAR); }) != e)
 		    {
-			player->handle_event(terminal_check(TK_CHAR));
+			gamestate->player->handle_event(terminal_check(TK_CHAR));
 		    }
 		    else
 		    {

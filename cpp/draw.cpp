@@ -120,20 +120,9 @@ namespace draw
 
     void draw_game_screen(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
+	terminal_layer(0);
 	gs->map->draw_map(gs, frame);
-	for (monsters::Monster m : gs->map->dungeon->monsters)
-	{
-	    auto v = gs->map->fov;
-	    
-	    if (std::find(v.begin(), v.end(), m->loc) != v.end())
-	    {
-		terminal_color(m->color_fg);
-		terminal_put(m->loc->x + gs->offset->x,
-			     m->loc->y + gs->offset->y,
-			     0xE100+m->tile_code);
-	    }
-	}
-
+	
 	terminal_put(gs->player->loc->x + gs->offset->x,
 		     gs->player->loc->y + gs->offset->y,
 		     0xE100 + gs->player->tile_code);
@@ -144,6 +133,7 @@ namespace draw
      */
     void draw_screen_overlay(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
     {
+	terminal_layer(2);
 	switch (gs->sidescreen)
 	{
 	case utils::HUD:
@@ -157,6 +147,7 @@ namespace draw
 	    draw_inventory(gs);
 	    break;
 	}
+	terminal_layer(0);
     }
 
     void draw_stats(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap> > gs)
@@ -177,33 +168,33 @@ namespace draw
 	int hp = floor(player->health->value / player->health->max);
 	if (hp >= 90)
 	{
-	    terminal_bkcolor(color_from_name("green"));
+	    terminal_color(color_from_name("green"));
 	}
 	else if (hp >= 40)
 	{
-	    terminal_bkcolor(color_from_name("yellow"));
+	    terminal_color(color_from_name("yellow"));
 	}
 	else
 	{
-	    terminal_bkcolor(color_from_name("red"));
+	    terminal_color(color_from_name("red"));
 	}
 
 	double ratio = 12 / player->health->max;
 	
-	std::string bar{floor(ratio * player->health->value), ' '};
+	std::string bar{floor(ratio * player->health->value), consts::CHAR_BLOCK3};
 	terminal_print(base+bounds-3, start+1, bar);
 
 	if (player->poisoned)
 	{
-	    terminal_bkcolor("lime");
+	    terminal_color("lime");
 	}
 	else
 	{
-	    terminal_bkcolor("grey");
+	    terminal_color("grey");
 	}
 
-	std::string filling{ceil(ratio * (player->health->max - player->health->value))};
-	terminal_print(base+bounds-3, start+1, underbar);
+	std::string filling{ceil(ratio * (player->health->max - player->health->value)), consts::CHAR_BLOCK3};
+	terminal_print(base+bounds-3, start+1, filling);
 
 	auto str = "Stuffed";
 	if (player->hunger >= 60)

@@ -21,7 +21,7 @@ namespace terrain_map
     public:
 	std::unique_ptr<dungeons::Dungeon> dungeon;
 	uint level;
-	std::set<area::Point> fov;
+	std::unordered_set<area::Point> fov;
 	
 	TerrainMap() = default;
 	TerrainMap(uint w, uint h) : width(w), height(h) {}
@@ -30,14 +30,16 @@ namespace terrain_map
 	void calculate_fov(area::Point p);
 	void generate_dungeon_map();
 	void generate_new_map();
-	void put_cell(area::Point p, bool solid);
+	void put_cell(area::Point p, dungeons::MapElement el);
 
 	// Constant Functions
 	void draw_map(std::shared_ptr<utils::GlobalState<TerrainMap>> gs, uint frame) const;
-	dungeons::MapElement element_at(area::Point p) const;
-	bool on_map(area::Point x, bool bordered) const;
-	area::AreaType area_at(area::Point p) const;
+	dungeons::MapElement operator[](area::Point p) const;
+	bool contains(area::Point x, bool bordered) const;
+	area::Area area_at(area::Point p) const;
 	bool walkable(area::Point p) const;
 	std::vector<area::Area> generate_areas() const;
+	bool operator>(area::Point p) const;
+	bool operator>=(area::Point p) const;
     };
 }
