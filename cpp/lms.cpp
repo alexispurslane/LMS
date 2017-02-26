@@ -168,7 +168,7 @@ int main()
 		    case TK_D:
 			item.count--;
 			single_item.count = 1;
-			gamestate->map[gamestate->player->loc]->i.push_back(single_item);
+			(*gamestate->map)[gamestate->player->loc].i.push_back(std::make_shared<items::Item>(single_item));
 			break;
 		    case TK_RETURN:
 			gamestate->player->inventory[gamestate->currentselection].equip(player);

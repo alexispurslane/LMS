@@ -92,11 +92,10 @@ namespace terrain_map
 			    c = color_from_name("flame");
 			    break;
 			case dungeons::StaticMapElement::OpenDoor:
-			    x += 4;
 			    c = color_from_name("#966F33");
 			    break;
 			case dungeons::StaticMapElement::ClosedDoor:
-			    x += 3;
+			    x += 14;
 			    c = color_from_name("#966F33");
 			    break;
 			case dungeons::StaticMapElement::Wall:
@@ -115,6 +114,17 @@ namespace terrain_map
 				x += 32;
 				c = color_from_name("darker #966F33");
 				break;
+			    }
+			    std::set<dungeons::MapElement> adj
+			    {
+				this[{x-1, y}], this[{x, y-1}], this[{x+1, y}], this[{x, y+1}],
+			    };
+			    
+			    if (std::find_if(adj.begin(), adj.end(),
+					     [](dungeons::MapElement x) { return x.sme == t.sme; })
+				== adj.end())
+			    {
+				x = 0xE020;
 			    }
 			case dungeons::StaticMapElement::UpStairs:
 			    x += 13;

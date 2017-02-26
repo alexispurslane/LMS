@@ -14,7 +14,6 @@ namespace utils {
 	T max;
 	
 	bool operator==(T v) { return value == v; }
-	bool operator=(T v)  { return value = v; }
 	
 	bool operator<(T v) { return value < v; }
 	bool operator>(T v) { return value > v; }
