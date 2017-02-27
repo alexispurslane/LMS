@@ -14,11 +14,9 @@ namespace terrain_map
 	std::vector<std::unique_ptr<dungeons::Dungeon> > dungeons;
 	uint width;
 	uint height;
-
-	void reset_dungeon();
-	bool restore_dungeon(int n);
 	
     public:
+	bool restore_dungeon(int n);
 	std::unique_ptr<dungeons::Dungeon> dungeon;
 	uint level;
 	std::set<area::Point> fov;
@@ -33,7 +31,9 @@ namespace terrain_map
 	void put_cell(area::Point p, dungeons::MapElement el);
 
 	// Constant Functions
-	void draw_map(std::shared_ptr<utils::GlobalState<TerrainMap, character::Player> > gs, uint frame) const;
+	template <class T>
+	void draw_map(std::shared_ptr<T> gs, uint frame) const;
+	
 	dungeons::MapElement operator[](area::Point p) const;
 	bool contains(area::Point x, bool bordered) const;
 	area::Area area_at(area::Point p) const;

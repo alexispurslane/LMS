@@ -1,6 +1,5 @@
 #include "../lib/utils.hpp"
 #include "../lib/area.hpp"
-#include "../objects/player.hpp"
 #include "../lib/consts.hpp"
 #include <memory>
 #include <set>

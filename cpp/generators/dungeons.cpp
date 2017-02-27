@@ -2,20 +2,16 @@
 #include "../lib/area.hpp"
 #include <memory>
 
-#pragma once
-namespace dungeons
-{
-    template <class T>
-    Dungeon generate_new(std::unique_ptr<T>) {}
+template <class T>
+Dungeon dungeons::generate_new(std::unique_ptr<T>) {}
  
-    template <class T>
-    Dungeon generate_bsp(std::unique_ptr<T>) {}
+template <class T>
+Dungeon dungeons::generate_bsp(std::unique_ptr<T>) {}
     
-    template <class T>
-    Dungeon generate_walker(std::unique_ptr<T>) {}
+template <class T>
+Dungeon dungeons::generate_walker(std::unique_ptr<T>) {}
     
-    Dungeon empty_dungeon()
-    {
-	return new Dungeon;
-    }
+Dungeon dungeons::empty_dungeon()
+{
+    return new Dungeon;
 }

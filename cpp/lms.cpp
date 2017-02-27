@@ -212,13 +212,15 @@ int main()
 		{
 		    auto b = consts::PLAYER_HANDLE.begin();
 		    auto e = consts::PLAYER_HANDLE.end();
-		    if (std::find_if(b, e, [](char x) { return x == terminal_check(TK_CHAR); }) != e)
+		    char c = terminal_check(TK_CHAR);
+		    
+		    if (std::find_if(b, e, [=](const char x) { return x == c; }) != e)
 		    {
-			gamestate->player->handle_event(terminal_check(TK_CHAR));
+			gamestate->player->handle_event(gamestate, c);
 		    }
 		    else
 		    {
-			switch (terminal_check(TK_CHAR))
+			switch (c)
 			{
 			case 'i':
 			    if (gamestate->sidescreen == utils::SideScreenState::Inventory)

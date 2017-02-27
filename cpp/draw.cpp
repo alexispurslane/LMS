@@ -2,6 +2,7 @@
 #include "objects/items.hpp"
 #include <algorithm>
 #include <map>
+#include <tuple>
 
 #pragma once
 namespace draw
@@ -162,8 +163,7 @@ namespace draw
 	 * Health
 	 */
 	terminal_print(base, start+1,
-		       "Health: "+std::to_string(player->health->value)+
-		       "/"+std::string(player->health->value));
+		       "Health: "+std::to_string(player->health));
 	
 	int hp = floor(player->health->value / player->health->max);
 	if (hp >= 90)
@@ -184,7 +184,7 @@ namespace draw
 	std::string bar{floor(ratio * player->health->value), consts::CHAR_BLOCK3};
 	terminal_print(base+bounds-3, start+1, bar);
 
-	if (player->poisoned)
+	if (player->poisoned > 0)
 	{
 	    terminal_color("lime");
 	}
@@ -239,7 +239,9 @@ namespace draw
 	/*
 	 * Player Level
 	 */
-	auto lvl = floor(player->level / player->race->levels);
+	auto l = player->level->value;
+	auto ml = player->level->max;
+	auto lvl = floor(l/ml);
 	if (lvl <= 50)
 	{
 	    terminal_color(color_from_name("orange"));
@@ -248,28 +250,22 @@ namespace draw
 	{
 	    terminal_color(color_from_name("blue"));
 	}
-	terminal_print(base, start+4, 'LVL: '+std::to_string(player->level)+"/"+std::to_string(player->race->levels));
+	terminal_print(base, start+4, 'LVL: '+std::to_string(player->level));
 
 	/*
 	 * Player Stats
 	 */
-	struct Stat
+	std::vector<std::tuple<std::string, utils::BoundedValue<int>, std::string> > stats
 	{
-	    std::string name;
-	    int stat;
-	    std::string color;
-	};
-	std::vector<Stat> stats
-	{
-	    { "Strength", player->strength, "green" },
-	    { "Speed",    player->speed,    "blue"  },
-	    { "Attack",   player->attack,   "red"   },
-	    { "Armor",    player->armor,    "grey"  },
+	    std::make_tuple("Strength", player->strength, "green"),
+	    std::make_tuple("Speed", player->speed, "blue"),
+	    std::make_tuple("Attack", player->attack, "red"),
+	    std::make_tuple("Armor", player->armor, "grey")
 	}
 	for (auto stat : stats)
 	{
-	    terminal_color(color_from_name(stat.color));
-	    terminal_print(base, start+i, stat.name+": "+std::to_string(stat.stat));
+	    terminal_color(color_from_name(std::get<2>(stat)));
+	    terminal_print(base, start+i, std::string(std::get<0>(stat)));
 	}
 
 	/*

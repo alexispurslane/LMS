@@ -13,13 +13,16 @@ namespace utils {
 	T value;
 	T max;
 	
-	bool operator==(T v) { return value == v; }
-	
-	bool operator<(T v) { return value < v; }
-	bool operator>(T v) { return value > v; }
-	
-	bool operator<=(T v) { return value <= v; }
-	bool operator>=(T v) { return value >= v; }
+	bool operator==(T v) const { return value == v; }
+	bool operator<(T v)  const { return value < v;  }
+	bool operator>(T v)  const { return value > v;  }
+	bool operator<=(T v) const { return value <= v; }
+	bool operator>=(T v) const { return value >= v; }
+
+	operator std::string() const
+	{
+	    return std::string(value)+"/"+std::string(max);
+	}
     };
 
     template<class X, class Y>
