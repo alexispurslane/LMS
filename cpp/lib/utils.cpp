@@ -5,13 +5,15 @@
 #include <iostream>
 #include <memory>
 #include <cmath>
+#include <functional>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <array>
 
-std::string exec(const char* cmd) 
+std::string utils::exec(const char* cmd) 
 {
     std::array<char, 128> buffer;
     std::string result;
@@ -26,7 +28,7 @@ std::string exec(const char* cmd)
     return result;
 }
 
-std::vector<color_t> fade_colors(color_t a, color_t b, int steps)
+std::vector<color_t> utils::fade_colors(color_t a, color_t b, int steps)
 {
     std::unique_ptr<color_t> current = &a;
     std::unique_ptr<color_t> color2 = &b;
@@ -85,27 +87,10 @@ std::vector<color_t> fade_colors(color_t a, color_t b, int steps)
     return vec;
 }
 
-std::string to_upper(std::string str)
+std::string utils::to_upper(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
-}
-
-std::vector<std::string> split_string(const std::string& str,
-				      const std::string& delimiter)
-{
-    std::vector<std::string> strings;
-    std::string::size_type pos = 0;
-    std::string::size_type prev = 0;
-    while ((pos = str.find(delimiter, prev)) != std::string::npos)
-    {
-	strings.push_back(str.substr(prev, pos - prev));
-	prev = pos + 1;
-    }
-
-    // To get the last substring (or only, if delimiter is not found)
-    strings.push_back(str.substr(prev));
-    return strings;
 }
 
 std::vector<area::Point> bresenham(area::Point start, area::Point end)
@@ -130,4 +115,38 @@ std::vector<area::Point> bresenham(area::Point start, area::Point end)
     }
 
     return line;
+}
+
+std::vector<std::string> utils::split_string(const std::string& str,
+					     const std::string& delimiter)
+{
+    std::vector<std::string> strings;
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos)
+    {
+	strings.push_back(str.substr(prev, pos - prev));
+	prev = pos + 1;
+    }
+
+    // To get the last substring (or only, if delimiter is not found)
+    strings.push_back(str.substr(prev));
+    return strings;
+}
+
+template <class T>
+std::string utils::join_string(const std::vector<T> v)
+{
+    std::string result = "";
+    for (T e : v)
+    {
+	result += std::string(e);
+	
+	if (e != v.back())
+	{
+	    result += ", ";
+	}
+    }
+
+    return result;
 }

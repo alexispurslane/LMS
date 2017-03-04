@@ -11,13 +11,13 @@ namespace terrain_map
     class TerrainMap
     {
     private:
-	std::vector<std::unique_ptr<dungeons::Dungeon> > dungeons;
+	std::vector<dungeons::Dungeon> dungeons;
 	uint width;
 	uint height;
 	
     public:
 	bool restore_dungeon(int n);
-	std::unique_ptr<dungeons::Dungeon> dungeon;
+	dungeons::Dungeon dungeon;
 	uint level;
 	std::set<area::Point> fov;
 	

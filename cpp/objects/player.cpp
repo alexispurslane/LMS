@@ -29,7 +29,10 @@ public character::Player::Player(races::Race r)
     // Inventory
     inventory = r.starting_inventory;
     std::vector<items::Item> food(8, items::ITEMS[items::FOOD_RATION]);
-    std::for_each(food, [](auto x) { x.equip(this); })
+    for (auto x : food)
+    {
+	food.equip(this);
+    }
     inventory.insert(inventory.end(), food.begin(), food.end());
 }
 
@@ -43,9 +46,8 @@ public void character::Player::handle_event(GS gs, char c);
 	{
 	    i.dequip(this);
 	    gs->messages.push_back("[color=yellow]Your "+i.name+" flickers out.");
-	    dequip_queue.erase(std::remove(dequip_queue.begin(),
-					   dequip_queue.end(), i),
-			       dequip_queue.end());
+	    dequip_queue.erase(std::find(dequip_queue.begin(),
+					 dequip_queue.end(), item));
 	}
     }
 
@@ -55,14 +57,14 @@ public void character::Player::handle_event(GS gs, char c);
 	if (poisoned > 0)
 	{
 	    poisoned--;
-	    health->value--;
+	    health.value--;
 	}
     }
     else if (gs->turns % 3 == 0)
     {
-	if (health->value < health->max)
+	if (health.value < health.max)
 	{
-	    health->value++;
+	    health.value++;
 	}
 	if (hunger > 20)
 	{
@@ -86,7 +88,7 @@ public void character::Player::handle_event(GS gs, char c);
     move(gs, c);
 }
 
-public utils::Bounde->value<int> character::Player::skill_with_item(items::Item a)
+public utils::Bounde.value<int> character::Player::skill_with_item(items::Item a)
 {
     std::string type{a.broad_catagory};
     int baseline = 0;
@@ -106,7 +108,7 @@ public utils::Bounde->value<int> character::Player::skill_with_item(items::Item 
     }
     if (type == "Weapon" || type == "RangedWeapon" || type == "Armor")
     {
-	utils::Bounde->value<int> best_applicable_skill{99999,99999};
+	utils::Bounde.value<int> best_applicable_skill{99999,99999};
 	for (auto s : a.categories)
 	{
 	    if (skill_tree.find(s) == skill_tree.end())
@@ -140,17 +142,17 @@ public bool character::Player::has(items::Item x)
 
 public int character::Player::score()
 {
-    return exp*(level->value + kills + defence->value);
+    return exp*(level.value + kills + defence.value);
 }
 
 public void character::Player::learn(GS gs, monsters::Monster m);
 {
     exp += floor(m.attack);
-    auto s = floor(exp/((75-level->max)+level->value*5));
+    auto s = floor(exp/((75-level.max)+level.value*5));
 
-    if (s >= 1 && s <= level->max && level->value < s)
+    if (s >= 1 && s <= level.max && level.value < s)
     {
-	level->value = s;
+	level.value = s;
 	level_up(gs, s);
     }
 }
@@ -159,11 +161,11 @@ public void character::Player::level_up(GS gs, int s)
 {
     gs->messages->insert("[color=green] You have leveled up!");
 
-    double ratio = health->value / health->max;
-    health->max += race.level_up_bonus;
-    health->value = health->max * ratio;
+    double ratio = health.value / health.max;
+    health.max += race.level_up_bonus;
+    health.value = health.max * ratio;
     
-    strength->value = strength->max += floor(race_level_up_bonus / 10);
+    strength.value = strength.max += floor(race_level_up_bonus / 10);
 
     for (auto i : inventory)
     {
@@ -185,7 +187,7 @@ public void character::Player::rest()
 
 public std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
 {
-    health += min(health->max - health->value, defence);
+    health += min(health.max - health.value, defence);
     auto skill = race.inate_skills.weapon;
     std::mt19937 rng;
     rng.seed(std::random_device()());
@@ -194,9 +196,9 @@ public std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
     if (m.speed < speed)
     {
 	m->attack_other(this, gs);
-	if (health->value > 0 && chance(rng) <= exp * skill + 10)
+	if (health.value > 0 && chance(rng) <= exp * skill + 10)
 	{
-	    m->health -= attack->value;
+	    m->health -= attack.value;
 	    gs->messages->insert(gs->messages->begin(),
 				 "[color=yellow]You hit the monster.");
 	    gs->messages->insert(gs->messages->begin(),
@@ -210,7 +212,7 @@ public std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
     }
     else
     {
-	m->health -= attack->value;
+	m->health -= attack.value;
 	if (m.health > 0)
 	{
 	    m->attack_other(this, gs);
@@ -231,11 +233,7 @@ public bool character::Player::add_inventory_item(items::Item item)
     if (inventory.size() < consts::MAX_INVENTORY)
     {
 	inventory.push_back(items::Item(item));
-	std::vector<int> calculate_weights;
-	std::transform(inventory.begin(), inventory.end(),
-		       calculate_weights.begin(),
-		       std::bind(std::minus<int>(), _1, strength->value));
-	speed->value = std::accumulate(calculated_weights);
+	speed.value = weight();	
 
 	if (item.broad_catagory == "Missle")
 	{
@@ -243,4 +241,75 @@ public bool character::Player::add_inventory_item(items::Item item)
 	}
 	return true;
     }
+}
+
+public bool character::Player::remove_inventory_item(items::Item item)
+{
+    if (std::find(inventory.begin(), inventory.end(), item) != inventory.end())
+    {
+	item.dequip(this);
+	inventory.erase(std::find(inventory.begin(),
+				  inventory.end(), item));
+	return true;
+    }
+    return false;
+}
+
+public int character::Player::weight()
+{
+    std::vector<int> calculate_weights;
+    std::transform(inventory.begin(), inventory.end(),
+		   calculate_weights.begin(),
+		   [strength](const auto x) { return x.weight-strength; });
+    return std::accumulate(calculated_weights);
+}
+
+public bool character::Player::light()
+{
+    return weight() < 4;
+}
+
+public bool character::Player::fast()
+{
+    return speed < 5;
+}
+
+public bool character::Player::noisy()
+{
+    auto armor_count = std::count_if(inventory.begin(), inventory.end(),
+				     [](const auto i) { return i.broad_catagory == "Armor"; });
+    auto weapon_count = std::count_if(inventory.begin(), inventory.end(),
+				      [](const auto i) { return i.broad_catagory == "Weapon"; });
+
+    if (race.name == "Bowman")
+    {
+	return armor_count <= 4 && weapon_count <= 3;
+    }
+    else
+    {
+	return armor_count <= 3 && weapon_count <= 3;
+    }
+}
+
+public std::string character::Player::attributes()
+{
+    std::vector<std::string> attributes;
+    if (noisy)
+    {
+	attributes.push_back("noisy");
+    }
+    if (light)
+    {
+	attributes.push_back("light");
+    }
+    if (fast)
+    {
+	attributes.push_back("fast");
+    }
+    return utils::join_string(attributes);
+}
+
+public void character::Player::move(GS gs, char direction)
+{
+    
 }

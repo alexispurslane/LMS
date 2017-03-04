@@ -44,11 +44,11 @@ namespace utils {
 	ScreenState screen;
 	SideScreenState sidescreen;
 	
-	std::unique_ptr<std::vector<std::string> > messages;
+	std::vector<std::string> messages;
 	std::vector<int> scores;
 	
-	std::unique_ptr<X> map;
-	std::unique_ptr<Y> player;
+	X map;
+	Y player;
 	
 	int currentselection = 0;
 	int turns = 0;
@@ -61,4 +61,6 @@ namespace utils {
     std::vector<color_t> fade_colors(color_t a, color_t b);
     std::vector<std::string> split_string(const std::string& str,
 					  const std::string& delimiter);
+    template <class T>
+    std::string join_string(const std::vector<T> v);
 }

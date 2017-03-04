@@ -50,8 +50,10 @@ namespace draw
 	terminal_print(consts::WIDTH/2-12, 18, "[bkcolor=red]press any key to continue");
 
 	std::string scores = "";
-	std::for_each(gs->scores,
-		      [scores](auto score) { scores += std::to_string(score)+"\n"; })
+	for (auto s : gs->scores)
+	{
+	    scores += std::to_string(score)+"\n";
+	}
 	add_square(gs, consts.WIDTH/2-7, 21, 14, 20, "TOP 20 SCORES\n"+scores, 1);
     }
 

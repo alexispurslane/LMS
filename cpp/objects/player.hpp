@@ -37,12 +37,12 @@ namespace character
 
 	// Attributes
 	races::Race race;
-	std::unique_ptr<utils::BoundedValue<int> > health;
-	std::unique_ptr<utils::BoundedValue<int> > speed;
-	std::unique_ptr<utils::BoundedValue<int> > level;
-	std::unique_ptr<utils::BoundedValue<int> > strength;
-	std::unique_ptr<utils::BoundedValue<int> > attack;
-	std::unique_ptr<utils::BoundedValue<int> > defence;
+	utils::BoundedValue<int> health;
+	utils::BoundedValue<int> speed;
+	utils::BoundedValue<int> level;
+	utils::BoundedValue<int> strength;
+	utils::BoundedValue<int> attack;
+	utils::BoundedValue<int> defence;
 
 	// Inventory
 	std::vector<items::Item> inventory;
@@ -61,10 +61,11 @@ namespace character
 	void rest();
 	std::tuple<bool, bool> attack_other(GS gs, monsters::Monster m);
 	bool add_inventory_item(items::Item item);
-	void remove_inventory_item(items::Item item);
+	bool remove_inventory_item(items::Item item);
 	int weight();
 	bool light();
 	bool fast();
+	bool noisy();
 	std::string attributes();
 	void move(GS gs, char d);
     };
