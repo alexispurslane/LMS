@@ -20,16 +20,12 @@ public void terrain_map::TerrainMap::calculate_fov(area::Point p, int rad)
     for (int deg=0; deg <= 360; deg++)
     {
 	area::Point outer{p.x + rad*cos(deg), p.y + rad*sin(deg)};
-	std::vector<area::Point> line = utils::bresenham(p, outer);
-	for (auto p : line)
+	for (auto p : utils::bresenham(p, outer))
 	{
+	    fov.insert(p);
 	    if (this[p] == ClosedDoor || this[p] == Wall)
 	    {
 		break;
-	    }
-	    else
-	    {
-		fov.insert(p);
 	    }
 	}
     }

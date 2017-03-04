@@ -1,0 +1,2 @@
+-I./include -I./ -L./lib/ -I./lib/ -I./generators/ -I./objects/ -I./nouns/ -lBearLibTerminal
+

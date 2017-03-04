@@ -1,8 +1,11 @@
 #include "BearLibTerminal.h"
 #include "objects/items.hpp"
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <tuple>
+
+using namespace std::placeholders;
 
 #pragma once
 namespace draw
@@ -40,27 +43,23 @@ namespace draw
     {
 	auto text = utils::exec(("figlet -f gothic -m packed '"+consts::TITLE+"'").c_str());
 	auto lines = utils::split(text, "\n");
-	for (int i=0; i < lines.size(); i++)
+	for (auto line : lines)
 	{
-	    terminal_print(consts::WIDTH/2-1, i+1, ("[color=red]"+lines[i]).c_str());
+	    terminal_print(consts::WIDTH/2-1, i+1, ("[color=red]"+line).c_str());
 	}
 	terminal_print(consts::WIDTH/2-12, 18, "[bkcolor=red]press any key to continue");
 
 	std::string scores = "";
-	for (auto score : gs->scores)
-	{
-	    scores += std::to_string(score)+"\n";
-	}
+	std::for_each(gs->scores,
+		      [scores](auto score) { scores += std::to_string(score)+"\n"; })
 	add_square(gs, consts.WIDTH/2-7, 21, 14, 20, "TOP 20 SCORES\n"+scores, 1);
     }
 
     void draw_charsel_screen(GS gs)
     {
 	races::Race selected_race;
-	for (int i=0; i < races::RACES.size(); i++)
+	for (auto race : races::RACES)
 	{
-	    auto race = races::RACES[i];
-	    
 	    if (i + 1 == gs->currentselection)
 	    {
 		selected_race = race;
@@ -109,7 +108,7 @@ namespace draw
 	char *buffer = new char[strlen(endgame_stats)+24];
 	sprintf(buffer, endgame_stats,
 		gs->turns,
-		player->score(gs),
+		player->score(),
 		player->kills,
 		player->exp);
 	add_square(gs, consts::WIDTH/2-27, 30, 54, 30, std::string(buffer));
@@ -193,7 +192,9 @@ namespace draw
 	    terminal_color("grey");
 	}
 
-	std::string filling{ceil(ratio * (player->health->max - player->health->value)), consts::CHAR_BLOCK3};
+	std::string filling{ceil(ratio * (player->health->max -
+					  player->health->value)),
+		consts::CHAR_BLOCK3};
 	terminal_print(base+bounds-3, start+1, filling);
 
 	auto str = "Stuffed";
@@ -274,7 +275,8 @@ namespace draw
 	if (player->ranged_weapon != nullptr)
 	{
 	    terminal_print(base, start+9, "RW: "+player->ranged_weapon->name);
-	    terminal_print(base+bounds+4, start+9, "Missle #: "+std::to_string(player->missles->size()));
+	    terminal_print(base+bounds+4, start+9, "Missle #: "+
+			   std::to_string(player->missles->size()));
 	}
 
 	/*
@@ -290,7 +292,7 @@ namespace draw
 	if (gs->messages.size() >= consts::MESSAGE_NUMBER)
 	{
 	    ms = std::vector(gs->messages.end() - consts::MESSAGE_NUMBER,
-					gs->messages.end());
+			     gs->messages.end());
 	}
 	else
 	{
@@ -312,10 +314,10 @@ namespace draw
     {
 	int placing = 1;
 	add_square(gs, consts::EDGE_POS, 0, floor(consts::WIDTH/2)-4,
-		   consts::HEIGHT-1, "INVENTORY (HANDS FREE: "+std::to_string(gs->player->hands_free)+")");
-	for (int i=0; i < player->inventory.size(); i++)
+		   consts::HEIGHT-1,
+		   "INVENTORY (HANDS FREE: "+std::to_string(gs->player->hands_free)+")");
+	for (auto a : player->inventory)
 	{
-	    items::Item a = player->inventory.at(i);
 	    if (a.equipped)
 	    {
 		color_t color = utils::skill_color(gs->player->skill_with_item(a).value);
@@ -332,9 +334,11 @@ namespace draw
 	    {
 		teminal_color(color_from_name("grey"));
 	    }
-	    terminal_print(consts::EDGE_POS+1, placing, std::to_string(i+1)+") "+a.name+"("+a.chr+")");
-	    std::string str = a.format();
-	    for (auto line : utils::split(str, "\n"))
+	    terminal_print(consts::EDGE_POS+1,
+			   placing,
+			   std::to_string(i+1)+") "+a.name+"("+a.chr+")");
+	    
+	    for (auto line : utils::split(a.format(), "\n"))
 	    {
 		placing++;
 		terminal_print(consts::EDGE_POS+5, placing, line);
@@ -424,6 +428,7 @@ namespace draw
 	for (auto line : text)
 	{
 	    terminal_print(x+1, y+i*spacing, line);
+	    terminal_color(color_from_name("white"));
 	}
     }
 }

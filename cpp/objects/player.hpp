@@ -13,6 +13,9 @@
 #pragma once
 namespace character
 {
+    class Player;
+    typedef std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > GS;
+    
     class Player
     {
     private:
@@ -34,12 +37,12 @@ namespace character
 
 	// Attributes
 	races::Race race;
-	utils::BoundedValue<int> health;
-	utils::BoundedValue<int> speed;
-	utils::BoundedValue<int> level;
-	utils::BoundedValue<int> strength;
-	utils::BoundedValue<int> attack;
-	utils::BoundedValue<int> defence;
+	std::unique_ptr<utils::BoundedValue<int> > health;
+	std::unique_ptr<utils::BoundedValue<int> > speed;
+	std::unique_ptr<utils::BoundedValue<int> > level;
+	std::unique_ptr<utils::BoundedValue<int> > strength;
+	std::unique_ptr<utils::BoundedValue<int> > attack;
+	std::unique_ptr<utils::BoundedValue<int> > defence;
 
 	// Inventory
 	std::vector<items::Item> inventory;
@@ -48,22 +51,21 @@ namespace character
 	std::vector<items::Missle> missles;
 
 	Player(races::Race r);
-	void handle_event(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > gs, char c);
+	void handle_event(GS gs, char c);
 	utils::BoundedValue<int> skill_with_item(items::Item a);
 	bool can_use(items::Item a);
-	bool enough_hands(items::Item a);
-	void update_inventory();
 	bool has(items::Item x);
-	int score(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > gs);
-	void learn(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > gs, monsters::Monster m);
+	int score();
+	void learn(GS gs, monsters::Monster m);
+	void level_up(GS gs, int s);
 	void rest();
-	std::tuple<bool, bool> attack_monster(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > gs, monsters::Monster m);
+	std::tuple<bool, bool> attack_other(GS gs, monsters::Monster m);
 	bool add_inventory_item(items::Item item);
 	void remove_inventory_item(items::Item item);
 	int weight();
 	bool light();
 	bool fast();
 	std::string attributes();
-	void move(std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > gs, char d);
+	void move(GS gs, char d);
     };
 }

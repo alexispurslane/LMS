@@ -10,6 +10,8 @@ namespace consts
     const int EDGE_POS = WIDTH/2+2;
     const int MESSAGE_NUMBER = 7;
     const std::vector<char> PLAYER_HANDLE{';', '.', 'f', 'h', 'k', 'l', 'j', 'y', 'u', 'b', 'n'};
+    const int MAX_INVENTORY = 12;
+    
     // CONST CHAR CONSTANTS
     const char CHAR_HLINE = 196;   // (HorzLine)
     const char CHAR_VLINE = 179;   // (VertLine)

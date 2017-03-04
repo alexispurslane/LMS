@@ -1,4 +1,5 @@
 #include <vector>
+#include <cmath>
 #include "area.hpp"
 #include "BearLibTerminal.h"
 
@@ -18,6 +19,18 @@ namespace utils {
 	bool operator>(T v)  const { return value > v;  }
 	bool operator<=(T v) const { return value <= v; }
 	bool operator>=(T v) const { return value >= v; }
+	
+	BoundedValue<T> & operator+=(T v) const
+	{
+	    value = min(max, value + v);
+	    return *this;
+	}
+	
+	BoundedValue<T> & operator-=(T v) const
+	{
+	    value = max(0, value - v);
+	    return *this;
+	}
 
 	operator std::string() const
 	{
@@ -31,7 +44,7 @@ namespace utils {
 	ScreenState screen;
 	SideScreenState sidescreen;
 	
-	std::vector<std::string> messages;
+	std::unique_ptr<std::vector<std::string> > messages;
 	std::vector<int> scores;
 	
 	std::unique_ptr<X> map;

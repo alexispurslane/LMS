@@ -140,7 +140,8 @@ int main()
 		    break;
 		}
 
-		gamestate->messages.push_back("You see " + id + " here.");
+		gamestate->messages->insert(gamestate->messages->begin(),
+					    "You see " + id + " here.");
 	    }
 	    else if (event == TK_MOUSE_SCROLL)
 	    {
