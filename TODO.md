@@ -15,7 +15,13 @@
 - [] Convert monster AI to finite state machine based setup.
 - [] Implement potion and staff system
 - [] Implement MR-based magic system.
-- [] Finish music system.
 - [] Show health popups beside attacked enemies for a few seconds.
 - [] Change stairs to use key command
-- [] ANIMATE: Game startup (fade interface in), traps, magic, staffs and potions, leveling up.
+- [] Animate traps, magic, staffs and potions, leveling up.
+
+# LMS TODO LIST FOR BETA RELEASE (in no particular order)
+- [] Add maze-type level generaor
+- [] Fade tiles as the get farther away from LOS
+- [] Work on code structure and bugfixes + memory management if needed
+- [] Create demo video and better manual
+- [] Find ways to market
