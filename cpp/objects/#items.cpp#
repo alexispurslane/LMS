@@ -3,35 +3,20 @@
 #include <stdio.h>
 #include <stdexcept>
 
-enum class ItemValType
-{
-    String, StringVector, Integer, Empty
-};
-
-struct ItemVal
-{
-    ItemValType type;
-    std::string str;
-    std::vector<std::string> strv;
-    int i = 0;
-};
-
-typedef std::map<std::string,  ItemVal> ItemMap;
-
 int items::load_items()
 {
-    FILE *fh = fopen("/Users/christopherdumas/AlchemySphere/cpp/objects/conf/items.yaml", "r");
+    FILE *fh = fopen("conf/items.yaml", "r");
     yaml_parser_t parser;
     yaml_event_t  event;   /* New variable */
 
     /* Initialize parser */
     if(!yaml_parser_initialize(&parser))
     {
-        fputs("Failed to initialize parser!\n", stderr);
+        throw runtime_error("Failed to initialize parser.");
     }
     if(fh == NULL)
     {
-        fputs("Failed to open file!\n", stderr);
+        throw runtime_error("Failed to open file.");
     }
 
     /* Set input file */
@@ -172,72 +157,30 @@ int items::load_items()
     }
     while(event.type != YAML_STREAM_END_EVENT);
 
-    for (auto item_map : items)
+    for (auto item : items)
     {
-        Item item;
-
-        IBC ibc = IBC::Light; // Random, doesn't matter.
-        if (item_map["broad_category"].str == "weapon")
+        for (auto map : item)
         {
-            ibc = IBC::Weapon;
+            auto key = map.first;
+            auto val = map.second;
+
+            printf("%s: ", key.c_str());
+            switch (val.type)
+            {
+            case ItemValType::String:
+                printf("%s\n", val.str.c_str());
+                break;
+            case ItemValType::StringVector:
+                printf("[%s]\n", join_string(val.strv).c_str());
+                break;
+            case ItemValType::Integer:
+                printf("%d\n", val.i);
+                break;
+            default:
+                printf("[%s]\n", join_string(val.strv).c_str());
+                break;
+            }
         }
-        else if (item_map["broad_category"].str == "armor")
-        {
-            ibc = IBC::Armor;
-        }
-        else if (item_map["broad_category"].str == "ranged weapon")
-        {
-            ibc = IBC::RangedWeapon;
-        }
-        else if (item_map["broad_category"].str == "missle")
-        {
-            ibc = IBC::Missle;
-        }
-        else if (item_map["broad_category"].str == "light")
-        {
-            ibc = IBC::Light;
-        }
-
-        // All Items have these properties
-        item.name = item_map["name"].str;
-        item.categories = item_map["category"].strv;
-        item.c = item_map["char"].str.c_str()[0];
-        item.color = item_map["color"].str;
-        item.weight = item_map["weight"].i;
-        item.probability = item_map["probability"].i;
-        item.broad_category = ibc;
-
-        switch (ibc)
-        {
-        case IBC::Weapon:
-            item.handedness = item_map["handedness"].i;
-            item.attack = item_map["attack"].i;
-            break;
-
-        case IBC::Armor:
-            item.defence = item_map["defence"].i;
-            break;
-
-        case IBC::RangedWeapon:
-            item.range = item_map["range"].i;
-            item.load_speed = item_map["load_speed"].i;
-            break;
-
-        case IBC::Missle:
-            item.hit = item_map["hit"].i;
-            item.accuracy = item_map["accuracy"].i;
-            break;
-
-        case IBC::Light:
-            item.radius = item_map["radius"].i;
-            item.lasts = item_map["lasts"].i;
-            break;
-
-        case IBC::Food:
-            item.nutrition = item_map["nutrition"].i;
-            break;
-        }
-        ITEMS[item_map["name"].str] = item;
     }
 
     yaml_event_delete(&event);
@@ -246,4 +189,5 @@ int items::load_items()
     /* Cleanup */
     yaml_parser_delete(&parser);
     fclose(fh);
+    return 0;
 }

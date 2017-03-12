@@ -11,35 +11,35 @@ namespace terrain_map
     class TerrainMap
     {
     private:
-	std::vector<dungeons::Dungeon> dungeons;
-	uint width;
-	uint height;
-	
+        std::vector<dungeons::Dungeon> dungeons;
+        uint width;
+        uint height;
+
     public:
-	bool restore_dungeon(int n);
-	dungeons::Dungeon dungeon;
-	uint level;
-	std::set<area::Point> fov;
-	
-	TerrainMap() = default;
-	TerrainMap(uint w, uint h);
+        bool restore_dungeon(int n);
+        dungeons::Dungeon dungeon;
+        uint level;
+        std::set<area::Point> fov;
 
-	// Mutating Functions
-	void calculate_fov(area::Point p);
-	void generate_dungeon_map();
-	void generate_new_map();
-	void put_cell(area::Point p, dungeons::MapElement el);
+        TerrainMap() = default;
+        TerrainMap(uint w, uint h);
 
-	// Constant Functions
-	template <class T>
-	void draw_map(std::shared_ptr<T> gs, uint frame) const;
-	
-	dungeons::MapElement operator[](area::Point p) const;
-	bool contains(area::Point x, bool bordered) const;
-	area::Area area_at(area::Point p) const;
-	bool walkable(area::Point p) const;
-	std::vector<area::Area> generate_areas() const;
-	bool operator>(area::Point p) const;
-	bool operator>=(area::Point p) const;
+        // Mutating Functions
+        void calculate_fov(area::Point p);
+        void generate_dungeon_map();
+        bool generate_new_map();
+        void put_cell(area::Point p, dungeons::MapElement el);
+
+        // Constant Functions
+        template <class T>
+        void draw_map(std::shared_ptr<T> gs, uint frame) const;
+
+        dungeons::MapElement& operator[](area::Point p) const;
+        bool contains(area::Point x, bool bordered) const;
+        area::Area area_at(area::Point p) const;
+        bool walkable(area::Point p) const;
+        std::vector<area::Area> generate_areas() const;
+        bool operator>(area::Point p) const;
+        bool operator>=(area::Point p) const;
     };
 }

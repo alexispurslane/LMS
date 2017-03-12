@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <tuple>
 
 #pragma once
 namespace consts
@@ -9,9 +10,25 @@ namespace consts
     const std::string TITLE = "Last Man Standing";
     const int EDGE_POS = WIDTH/2+2;
     const int MESSAGE_NUMBER = 7;
-    const std::vector<char> PLAYER_HANDLE{';', '.', 'f', 'h', 'k', 'l', 'j', 'y', 'u', 'b', 'n'};
+    const std::tuple<int, int>SOUTH{0, 1};
+    const std::tuple<int, int>SOUTH_EAST{1, 1};
+    const std::tuple<int, int>SOUTH_WEST{-1, 1};
+
+    const std::tuple<int, int>NORTH{0, -1};
+    const std::tuple<int, int>NORTH_EAST{1, -1};
+    const std::tuple<int, int>NORTH_WEST{-1, -1};
+
+    const std::tuple<int, int>EAST{1, 0};
+    const std::tuple<int, int>WEST{-1, 0};
+    /*
+      u k i
+      h  .  l
+      b j m*/
+    const std::vector<char> PLAYER_HANDLE{';', '<', '>', '.', 'f', 'h', 'k', 'l', 'j', 'y', 'u', 'b', 'n'};
+    const std::vector<char> PLAYER_MOVEMENT{'h', 'k', 'l', 'j', 'y', 'u', 'b', 'n'};
     const int MAX_INVENTORY = 12;
-    
+    const int DUNGEONS = 8;
+
     // CONST CHAR CONSTANTS
     const char CHAR_HLINE = 196;   // (HorzLine)
     const char CHAR_VLINE = 179;   // (VertLine)

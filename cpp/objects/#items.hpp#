@@ -8,7 +8,7 @@
 namespace items
 {
     void load_items();
-    enum class WBC
+    enum class IBC
     {
         Weapon,
         Armor,
@@ -24,7 +24,7 @@ namespace items
         std::vector<std::string> categories;
         char c;
         color_t color;
-        WBC broad_category;
+        IBC broad_category;
         int weight;
         int probability;
 

@@ -1,5 +1,5 @@
 build: lms.cpp
-	c++ -I./include -I./ -L./lib/ -I./lib/ -I./generators/ -I./objects/ -I./nouns/ -lBearLibTerminal -std=c++14 -o lms lms.cpp
+	c++ -I./include -I./ -L./lib/ -I./lib/ -I./generators/ -I./objects/ -I./nouns/ -lBearLibTerminal -lyaml -std=c++14 -o lms lms.cpp
 
 run: lms.cpp
 	make build

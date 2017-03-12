@@ -8,7 +8,6 @@
 using namespace std::placeholders;
 
 #pragma once
-namespace draw
 {
 	int frame = 0;
 	/*

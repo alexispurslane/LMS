@@ -9,31 +9,34 @@ namespace dungeons
 {
     enum class StaticMapElement
     {
-	Floor,
-	Fire,
-	Water,
-	GeneralObject,
-	OpenDoor,
-	ClosedDoor,
-	Wall,
-	UpStairs,
-	DownStairs
+        Floor,
+        Fire,
+        Water,
+        GeneralObject,
+        OpenDoor,
+        ClosedDoor,
+        Wall,
+        UpStairs,
+        DownStairs,
+        TeleportTrap,
+        FreeseTrap,
+        TrapDoorTrap
     };
-    
+
     struct MapElement
     {
-	StaticMapElement sme;
-	std::vector<std::shared_ptr<items::Item> > i;
-	std::vector<std::shared_ptr<monsters::Monster> > m;
+        StaticMapElement sme;
+        std::vector<std::shared_ptr<items::Item> > i;
+        std::vector<std::shared_ptr<monsters::Monster> > m;
     };
     struct Dungeon
     {
-	std::vector<monsters::Monster> monsters{};
-	bool alerted = false;
-	std::set<area::Area> areas{};
-	MapElement map[consts::HEIGHT][consts::WIDTH]{};
-	std::set<area::Point> remembered{};
-	area::Point player_start{-1, -1};
+        std::vector<monsters::Monster> monsters{};
+        bool alerted = false;
+        std::set<area::Area> areas{};
+        MapElement map[consts::HEIGHT][consts::WIDTH]{};
+        std::set<area::Point> remembered{};
+        area::Point player_start{-1, -1};
     };
 
     template <class T>

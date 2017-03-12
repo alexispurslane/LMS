@@ -1,0 +1,6 @@
+((nil . ((company-clang-arguments . ("-I/Users/christopherdumas/AlchemySphere/include"
+                                     "-I/Users/christopherdumas/AlchemySphere/lib"
+                                     "-L/Users/christopherdumas/AlchemySphere/lib"
+                                     "-I/Users/christopherdumas/AlchemySphere/generators"
+                                     "-I/Users/christopherdumas/AlchemySphere/objects"
+                                     "-I/Users/christopherdumas/AlchemySphere/nouns")))))

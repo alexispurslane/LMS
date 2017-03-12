@@ -1,7 +1,34 @@
-#include "items.hpp"
-#include <yaml.h>
 #include <stdio.h>
-#include <stdexcept>
+#include <yaml.h>
+#include <vector>
+#include <string>
+#include <map>
+#include <string>
+#include <sstream>
+#include <iostream>
+
+template <class T>
+std::string join_string(const std::vector<T> v)
+{
+    std::string result = "";
+    for (T e : v)
+    {
+        result += std::string(e);
+
+        if (e != v.back())
+        {
+            result += ", ";
+        }
+    }
+
+    return result;
+}
+
+bool is_number(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+                                      s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
 
 enum class ItemValType
 {
@@ -16,9 +43,53 @@ struct ItemVal
     int i = 0;
 };
 
+enum class IBC
+{
+    Weapon,
+    Armor,
+    RangedWeapon,
+    Missle,
+    Light,
+    Food
+};
+
+struct Item
+{
+    std::string name;
+    std::vector<std::string> categories;
+    char c;
+    std::string color;
+    IBC broad_category;
+    int weight;
+    int probability;
+
+    // Weapon
+    int handedness;
+    int attack;
+
+    // Armor
+    int defence;
+
+    // Ranged Weapon
+    int range;
+    int load_speed;
+
+    // Missle
+    int hit;
+    int accuracy;
+
+    // Light
+    int radius;
+    int lasts;
+
+    // Food
+    int nutrition;
+};
+std::map<std::string, Item> ITEMS;
+
 typedef std::map<std::string,  ItemVal> ItemMap;
 
-int items::load_items()
+int main(void)
 {
     FILE *fh = fopen("/Users/christopherdumas/AlchemySphere/cpp/objects/conf/items.yaml", "r");
     yaml_parser_t parser;
@@ -246,4 +317,5 @@ int items::load_items()
     /* Cleanup */
     yaml_parser_delete(&parser);
     fclose(fh);
+    return 0;
 }

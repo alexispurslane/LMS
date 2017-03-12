@@ -11,13 +11,9 @@
 #include <set>
 
 using namespace std::placeholders;
-
 typedef std::shared_ptr<utils::GlobalState<terrain_map::TerrainMap, Player> > GS;
-
-public character::Player::Player(races::Race r)
+character::Player::Player(races::Race r) : race(r), inventory(r.starting_inventory)
 {
-    race = r;
-
     // Starting Stats
     health = r.health;
     speed = r.speed;
@@ -27,165 +23,208 @@ public character::Player::Player(races::Race r)
     level = r.level;
 
     // Inventory
-    inventory = r.starting_inventory;
-    std::vector<items::Item> food(8, items::ITEMS[items::FOOD_RATION]);
+    std::vector<items::Item> food(8, items::Item(items::ITEMS["FOOD_RATION"]));
     for (auto x : food)
     {
-	food.equip(this);
+        food.equip(this);
     }
     inventory.insert(inventory.end(), food.begin(), food.end());
 }
 
-public void character::Player::handle_event(GS gs, char c);
+void character::Player::handle_event(GS gs, char c);
 {
     // Dequip used lights
     for (auto i : dequip_queue)
     {
-	i.lasts--;
-	if (i.lasts <= 0)
-	{
-	    i.dequip(this);
-	    gs->messages.push_back("[color=yellow]Your "+i.name+" flickers out.");
-	    dequip_queue.erase(std::find(dequip_queue.begin(),
-					 dequip_queue.end(), item));
-	}
+        i.lasts--;
+        if (i.lasts <= 0)
+        {
+            i.dequip(this);
+            gs->messages.push_back("[color=yellow]Your "+i.name+" flickers out.");
+            dequip_queue.erase(std::find(dequip_queue.begin(),
+                                         dequip_queue.end(), item));
+        }
     }
 
-    // Sechduler
+    // Scheduler
     if (gs->turns % 2 == 0)
     {
-	if (poisoned > 0)
-	{
-	    poisoned--;
-	    health.value--;
-	}
+        if (poisoned > 0)
+        {
+            poisoned--;
+            health.value--;
+        }
+        if (frozen > 0)
+        {
+            frozen--;
+        }
     }
     else if (gs->turns % 3 == 0)
     {
-	if (health.value < health.max)
-	{
-	    health.value++;
-	}
-	if (hunger > 20)
-	{
-	    auto desc = "hungry";
-	    if (hunger > 60)
-	    {
-		desc = "starving";
-	    }
-	    else if (hunger > 40)
-	    {
-		desc = "ravinous";
-	    }
-	    gs->messages.push_back("[color=red]You feel "+desc);
-	}
+        if (health.value < health.max)
+        {
+            health.value++;
+        }
+        if (hunger > 20)
+        {
+            auto desc = "hungry";
+            if (hunger > 60)
+            {
+                desc = "starving";
+            }
+            else if (hunger > 40)
+            {
+                desc = "ravinous";
+            }
+            gs->messages.push_back("[color=red]You feel "+desc);
+        }
     }
     else if (gs->turns % 4 == 0)
     {
-	hunger += 1;
+        hunger += 1;
     }
 
-    move(gs, c);
+    if (std::find(consts::PLAYER_MOVEMENT.begin(),
+                  consts::PLAYER_MOVEMENT.end(),
+                  d) != consts::PLAYER_MOVEMENT.end())
+    {
+        move(gs, c);
+    }
+    else
+    {
+        switch (c)
+        {
+        case ';': // Autorest
+            for (int i=0; i < std::floor(health->max/2); i++)
+            {
+                rest();
+            }
+            break;
+        case '<': // Go downstairs
+            if (gs->map[loc] == dungeons::StaticMapElement::DownStairs)
+            {
+                gs->map.generate_new_map();
+                loc = gs->map->dungeon->player_start;
+            }
+            break;
+        case '>': // Go upstairs
+            if (gs->map[loc] == dungeons::StaticMapElement::UpStairs)
+            {
+                gs->map.restore_dungeon(gs->map.level-1);
+                loc = gs->map->dungeon->player_start;
+            }
+            break;
+        case ',':
+            if (!gs->map[loc].i.empty())
+            {
+                inventory.push_back(gs->map[loc].i.back());
+                gs->map[loc].i.pop_back();
+            }
+        case '.': // Rest
+            rest();
+            break;
+        }
+    }
 }
 
-public utils::Bounde.value<int> character::Player::skill_with_item(items::Item a)
+utils::BoundedValue<int> character::Player::skill_with_item(items::Item a)
 {
-    std::string type{a.broad_catagory};
+    std::string type{a.broad_category};
     int baseline = 0;
 
     switch (type)
     {
-    case "Weapon":
-    case "RangedWeapon":
-	baseline = 15;
+    case "weapon":
+    case "ranged_weapon":
+        baseline = 15;
     break;
-    case "Armor":
-	baseline = 20;
-	break;
+    case "armor":
+        baseline = 20;
+        break;
     default:
-	baseline = 0;
-	break;
+        baseline = 0;
+        break;
     }
-    if (type == "Weapon" || type == "RangedWeapon" || type == "Armor")
+    if (type == "weapon" || type == "ranged_weapon" || type == "armor")
     {
-	utils::Bounde.value<int> best_applicable_skill{99999,99999};
-	for (auto s : a.categories)
-	{
-	    if (skill_tree.find(s) == skill_tree.end())
-	    {
-		skill_tree[s] = {baseline, 0};
-	    }
-	    if (skill_tree[s] < best_applicable_skill)
-	    {
-		best_applicable_skill = skill_tree[s];
-	    }
-	}
+        utils::BoundedValue<int> best_applicable_skill{99999,99999};
+        for (auto s : a.categories)
+        {
+            if (skill_tree.find(s) == skill_tree.end())
+            {
+                skill_tree[s] = {baseline, 0};
+            }
+            if (skill_tree[s] < best_applicable_skill)
+            {
+                best_applicable_skill = skill_tree[s];
+            }
+        }
 
-	return best_applicable_skill;
+        return best_applicable_skill;
     }
 
     return {8,0};
 }
 
-public bool character::Player::can_use(items::Item a)
+bool character::Player::can_use(items::Item a)
 {
     return skill_with_item(a) <= a.probability && hands >= a.handedness;
 }
 
-public bool character::Player::has(items::Item x)
+bool character::Player::has(items::Item x)
 {
     return std::find_if(inventory.begin(), inventory.end(),
-			[=](const items::Item i) {
-			    return i.equipped && i.tile_code == x.tile_code;
-			}) != inventory.end();
+                        [=](const items::Item i) {
+                            return i.equipped && i.tile_code == x.tile_code;
+                        }) != inventory.end();
 }
 
-public int character::Player::score()
+int character::Player::score()
 {
     return exp*(level.value + kills + defence.value);
 }
 
-public void character::Player::learn(GS gs, monsters::Monster m);
+void character::Player::learn(GS gs, monsters::Monster m);
 {
     exp += floor(m.attack);
     auto s = floor(exp/((75-level.max)+level.value*5));
 
     if (s >= 1 && s <= level.max && level.value < s)
     {
-	level.value = s;
-	level_up(gs, s);
+        level.value = s;
+        level_up(gs, s);
     }
 }
 
-public void character::Player::level_up(GS gs, int s)
+void character::Player::level_up(GS gs, int s)
 {
     gs->messages->insert("[color=green] You have leveled up!");
 
     double ratio = health.value / health.max;
     health.max += race.level_up_bonus;
     health.value = health.max * ratio;
-    
+
     strength.value = strength.max += floor(race_level_up_bonus / 10);
 
     for (auto i : inventory)
     {
-	if (i.equipped && (i.broad_category == "Armor" ||
-			   i.broad_catagory == "Weapon"))
-	{
-	    for (auto c : i.categories)
-	    {
-		skill_tree[c] -= 2;
-	    }
-	}
+        if (i.equipped && (i.broad_category == "armor" ||
+                           i.broad_category == "weapon"))
+        {
+            for (auto c : i.categories)
+            {
+                skill_tree[c] -= 2;
+            }
+        }
     }
 }
 
-public void character::Player::rest()
+void character::Player::rest()
 {
     health += 1;
 }
 
-public std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
+std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
 {
     health += min(health.max - health.value, defence);
     auto skill = race.inate_skills.weapon;
@@ -195,121 +234,231 @@ public std::tuple<bool, bool> attack_other(GS gs, monsters::Monster &m)
 
     if (m.speed < speed)
     {
-	m->attack_other(this, gs);
-	if (health.value > 0 && chance(rng) <= exp * skill + 10)
-	{
-	    m->health -= attack.value;
-	    gs->messages->insert(gs->messages->begin(),
-				 "[color=yellow]You hit the monster.");
-	    gs->messages->insert(gs->messages->begin(),
-				 "[color=yellow]The monster's health is " + std::string(m.health));
-	}
-	else
-	{
-	    gs->messages->insert(gs->messages->begin(),
-				 "[color=red]You miss the monster.");
-	}
+        m->attack_other(this, gs);
+        if (health.value > 0 && chance(rng) <= exp * skill + 10)
+        {
+            m->health -= attack.value;
+            gs->messages->insert(gs->messages->begin(),
+                                 "[color=yellow]You hit the monster.");
+            gs->messages->insert(gs->messages->begin(),
+                                 "[color=yellow]The monster's health is " + std::string(m.health));
+        }
+        else
+        {
+            gs->messages->insert(gs->messages->begin(),
+                                 "[color=red]You miss the monster.");
+        }
     }
     else
     {
-	m->health -= attack.value;
-	if (m.health > 0)
-	{
-	    m->attack_other(this, gs);
-	}
+        m->health -= attack.value;
+        if (m.health > 0)
+        {
+            m->attack_other(this, gs);
+        }
     }
 
     if (health > 0 && m.health <= 0)
     {
-	learn(gs, m);
-	kills++;
+        learn(gs, m);
+        kills++;
     }
 
     return std::make_tuple(health <= 0, m->health <= 0);
 }
 
-public bool character::Player::add_inventory_item(items::Item item)
+bool character::Player::add_inventory_item(items::Item item)
 {
     if (inventory.size() < consts::MAX_INVENTORY)
     {
-	inventory.push_back(items::Item(item));
-	speed.value = weight();	
+        inventory.push_back(items::Item(item));
+        speed.value = weight();
 
-	if (item.broad_catagory == "Missle")
-	{
-	    item.equip(this);
-	}
-	return true;
+        if (item.broad_category == "missle")
+        {
+            item.equip(this);
+        }
+        return true;
     }
 }
 
-public bool character::Player::remove_inventory_item(items::Item item)
+bool character::Player::remove_inventory_item(items::Item item)
 {
     if (std::find(inventory.begin(), inventory.end(), item) != inventory.end())
     {
-	item.dequip(this);
-	inventory.erase(std::find(inventory.begin(),
-				  inventory.end(), item));
-	return true;
+        item.dequip(this);
+        inventory.erase(std::find(inventory.begin(),
+                                  inventory.end(), item));
+        return true;
     }
     return false;
 }
 
-public int character::Player::weight()
+int character::Player::weight()
 {
     std::vector<int> calculate_weights;
     std::transform(inventory.begin(), inventory.end(),
-		   calculate_weights.begin(),
-		   [strength](const auto x) { return x.weight-strength; });
+                   calculate_weights.begin(),
+                   [strength](const auto x) { return x.weight-strength; });
     return std::accumulate(calculated_weights);
 }
 
-public bool character::Player::light()
+bool character::Player::light()
 {
     return weight() < 4;
 }
 
-public bool character::Player::fast()
+bool character::Player::fast()
 {
     return speed < 5;
 }
 
-public bool character::Player::noisy()
+bool character::Player::noisy()
 {
     auto armor_count = std::count_if(inventory.begin(), inventory.end(),
-				     [](const auto i) { return i.broad_catagory == "Armor"; });
+                                     [](const auto i) { return i.broad_category == "armor"; });
     auto weapon_count = std::count_if(inventory.begin(), inventory.end(),
-				      [](const auto i) { return i.broad_catagory == "Weapon"; });
+                                      [](const auto i) { return i.broad_category == "weapon"; });
 
     if (race.name == "Bowman")
     {
-	return armor_count <= 4 && weapon_count <= 3;
+        return armor_count <= 4 && weapon_count <= 3;
     }
     else
     {
-	return armor_count <= 3 && weapon_count <= 3;
+        return armor_count <= 3 && weapon_count <= 3;
     }
 }
 
-public std::string character::Player::attributes()
+std::string character::Player::attributes()
 {
     std::vector<std::string> attributes;
     if (noisy)
     {
-	attributes.push_back("noisy");
+        attributes.push_back("noisy");
     }
     if (light)
     {
-	attributes.push_back("light");
+        attributes.push_back("light");
     }
     if (fast)
     {
-	attributes.push_back("fast");
+        attributes.push_back("fast");
     }
     return utils::join_string(attributes);
 }
 
-public void character::Player::move(GS gs, char direction)
+void character::Player::move(GS gs, char direction)
 {
-    
+    if (frozen <= 0)
+    {
+        std::tuple<int, int> delta;
+        switch (direction)
+        {
+        case 'j':
+            delta = consts::SOUTH;
+            break;
+        case 'k':
+            delta = consts::NORTH;
+            break;
+        case 'h':
+            delta = consts::WEST;
+            break;
+        case 'l':
+            delta = consts::EAST;
+            break;
+        case 'u':
+            delta = consts::NORTH_WEST;
+            break;
+        case 'b':
+            delta = consts::SOUTH_WEST;
+            break;
+        case 'i':
+            delta = consts::NORTH_EAST;
+            break;
+        case 'm':
+            delta = consts::SOUTH_EAST;
+            break;
+        default:
+            delta = {0, 0};
+        }
+
+        auto npos = loc + area::Point(delta);
+
+        if (loc != npos)
+        {
+            if (gs->map->walkable(npos) && map >= npos)
+            {
+                bool cancel = false;
+                auto me = gs->map[npos];
+                switch (me.sme)
+                {
+                case dungeons::StaticMapElement::GeneralObject:
+                    if (!me.m.empty())
+                    {
+                        std::tie(player_dead, monster_dead) = attack_other(me.m.back());
+                        gs->messages.insert(gs->messages.begin(), "[color=green]You attack the " + me.m.name);
+
+                        if (!monster_dead)
+                        {
+                            gs->messages.insert(gs->messages.begin(), "[color=red]The "+me.m.name+" attacks you.");
+                            gs->messages.insert(gs->messages.begin(), "[color=red]Its health is now "+std::string(me.m.health.value));
+                        }
+                        else
+                        {
+                            gs->messages.insert(gs->messages.begin(), "[color=green]You vanquish the "+me.m.name);
+                            me.m.drop_reward();
+                        }
+                    }
+                    if (!me.i.empty())
+                    {
+                        for (auto i : me.i)
+                        {
+                            if (i.broad_category == "light" ||
+                                i.broad_category == "food"  ||
+                                i.broad_category == "missle")
+                            {
+                                if (add_inventory_item(i))
+                                {
+                                    me.i.erase(std::find(me.i.begin(), me.i.end(), i));
+                                    gs->messages.insert(gs->messages.begin(), "You pick up a " + i.name + ".");
+                                }
+                                else
+                                {
+                                    gs->messages.insert(gs->messages.begin(), "Your inventory is full.");
+                                }
+                            }
+                            else
+                            {
+                                gs->messages.insert(gs->messages.begin(), "You find a " + i.name + ".");
+                            }
+                        }
+                    }
+                    cancel = true;
+                    break;
+                case dungeons::StaticMapElement::Wall:
+                    cancel = gs->map.area_at(npos).type == area::AreaType::Dirt;
+                    if (!cancel)
+                    {
+                        me.sme = dungeons::StaticMapElement::Floor;
+                    }
+                    break;
+                case dungeons::StaticMapElement::ClosedDoor:
+                    me = dungeons::StaticMapElement::OpenDoor;
+                    cancel = true;
+                    break;
+                }
+
+                if (!cancel)
+                {
+                    loc = npos;
+                    gs->map.calculate_fov(npos);
+                }
+            }
+        }
+    }
+    else
+    {
+        gs->messages.insert(gs->messages.begin(), "You're frozen.");
+    }
 }
