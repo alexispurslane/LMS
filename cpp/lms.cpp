@@ -59,7 +59,7 @@ int main()
     while (true)
     {
         // Update Screen
-        if (gs->player->health <= 0 && gs->screen != utils::ScreenState::Death)
+        if (gs->player.health <= 0 && gs->screen != utils::ScreenState::Death)
         {
             gs->screen = utils::ScreenState::Death;
         }
@@ -81,8 +81,8 @@ int main()
                 int mx = terminal_check(TK_MOUSE_X);
                 int my = terminal_check(TK_MOUSE_Y);
 
-                int map_x = std::max((double)0, gs->player->loc.x-floor(consts::WIDTH / 4));
-                int map_y = std::max((double)0, gs->player->loc.y-floor(consts::HEIGHT / 2));
+                int map_x = std::max((double)0, gs->player.loc.x-floor(consts::WIDTH / 4));
+                int map_y = std::max((double)0, gs->player.loc.y-floor(consts::HEIGHT / 2));
                 area::Point cell{mx+map_x, my+map_y};
 
                 auto e = gs->map[cell];
@@ -150,28 +150,29 @@ int main()
                 {
 
                     // Because...You can't define variables in a switch statement
-                    auto single_item = gs->player->inventory[gs->currentselection];
+                    auto item = &gs->player.inventory[gs->currentselection];
+                    auto single_item = gs->player.inventory[gs->currentselection];
 
                     switch (event)
                     {
                     case TK_UP:
                         gs->currentselection--;
-                        gs->currentselection %= gs->player->inventory.size();
+                        gs->currentselection %= gs->player.inventory.size();
                         break;
                     case TK_DOWN:
                         gs->currentselection++;
-                        gs->currentselection %= gs->player->inventory.size();
+                        gs->currentselection %= gs->player.inventory.size();
                         break;
                     case TK_D:
-                        item.count--;
+                        item->count--;
                         single_item.count = 1;
                         gs->map[gs->player.loc].i.push_back(std::make_shared<items::Item>(single_item));
                         break;
                     case TK_RETURN:
-                        gs->player->inventory[gs->currentselection].equip(gs->player);
+                        gs->player.inventory[gs->currentselection].equip(gs->player);
                         break;
                     case TK_ESCAPE:
-                        gs->player->inventory[gs->currentselection].dequip(gs->player);
+                        gs->player.inventory[gs->currentselection].dequip(gs->player);
                         break;
                     case TK_I:
                         gs->sidescreen = utils::SideScreenState::HUD;
@@ -212,7 +213,7 @@ int main()
                                   consts::PLAYER_HANDLE.end(),
                                   character) != consts::PLAYER_HANDLE.end())
                     {
-                        gs->player->handle_event(gs, character);
+                        gs->player.handle_event(gs, character);
                     }
                     else
                     {

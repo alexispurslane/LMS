@@ -131,12 +131,12 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
                 case dungeons::StaticMapElement::GeneralObject:
                     if (t.i != nullptr)
                     {
-                        x += t->i.front->tile_code;
+                        x += t->i.front->c;
                     }
                     if (t.m != nullptr)
                     {
                         x += t->m.front->color_fg;
-                        x += t->m.front->tile_code;
+                        x += t->m.front->c;
                     }
                 }
             }

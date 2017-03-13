@@ -47,8 +47,8 @@ namespace character
                 // Inventory
                 std::vector<items::Item> inventory;
                 std::set<items::Item> dequip_queue;
-                items::RangedWeapon ranged_weapon;
-                std::vector<items::Missle> missles;
+                items::Item ranged_weapon;
+                std::vector<items::Item> missles;
 
                 Player(races::Race r);
                 void handle_event(GS gs, char c);

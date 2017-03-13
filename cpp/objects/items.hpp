@@ -27,6 +27,7 @@ namespace items
         WBC broad_category;
         int weight;
         int probability;
+        int count = 1;
 
         // Weapon
         int handedness;
@@ -49,6 +50,8 @@ namespace items
 
         // Food
         int nutrition;
+        template<class T> void equip(T &player);
+        template<class T> void dequip(T &player);
     };
 
     extern std::map<std::string, Item> ITEMS;

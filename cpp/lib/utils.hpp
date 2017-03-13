@@ -64,5 +64,5 @@ namespace utils {
                                           const std::string& delimiter);
     template <class T>
     std::string join_string(const std::vector<T> v);
-    bool utils::is_number(const std::string& s);
+    bool is_number(const std::string& s);
 }
