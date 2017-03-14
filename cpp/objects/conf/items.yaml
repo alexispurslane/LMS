@@ -3,7 +3,7 @@ weapons:
 # Axe skill tree:
   
 - Dane Axe:
-    char: '>'
+    char: 0xE044
     weight: 23
     attack: 41
     probability: 5
@@ -11,7 +11,7 @@ weapons:
     category: ['axe']
 
 - Double-Bladed Axe:
-    char: '>'
+    char: 0xE043
     color: medium_blue
     weight: 20
     attack: 39
@@ -21,7 +21,7 @@ weapons:
 
 - Hand Axe:
     weight: 15
-    char: '>'
+    char: 0xE041
     handedness: 1
     attack: 19
     color: brown
@@ -29,7 +29,7 @@ weapons:
     probability: 12
       
 - Hatchet:
-    char: '>'
+    char: 0xE041
     weight: 10
     attack: 15
     color: grey
@@ -39,7 +39,7 @@ weapons:
 
 # Sword skill tree:
 - Claymoor:
-    char: '|'
+    char: 0xE045
     weight: 10
     attack: 21
     category: ['sword', 'axe']
@@ -47,7 +47,7 @@ weapons:
     handedness: 2
     
 - Long Sword:
-    char: '|'
+    char: 0xE045
     color: medium_blue
     weight: 6
     attack: 16
@@ -56,7 +56,7 @@ weapons:
     handedness: 1
 
 - Short Sword:
-    char: '('
+    char: 0xE03C
     color: brown
     attack: 12
     weight: 4
@@ -65,7 +65,7 @@ weapons:
     handedness: 1
 
 - Long Daggar:
-    char: '!'
+    char: 0xE042
     weight: 1
     color: grey
     attack: 6
@@ -76,14 +76,14 @@ weapons:
 armor:
 # Armor class
 - Knightly Armor:
-    char: '['
+    char: 0xE02F
     weight: 20
     defence: 25
     probability: 8
     category: ['heavy armor']
     
 - Lamellar Armor:
-    char: '['
+    char: 0xE02F
     color: red
     defence: 10
     weight: 10
@@ -91,7 +91,7 @@ armor:
     category: ['heavy armor']
     
 - Steel Mail:
-    char: '['
+    char: 0xE030
     weight: 0
     color: yellow
     defence: 11
@@ -99,21 +99,21 @@ armor:
     category: ['breastplate', 'heavy armor']
 
 - Leather Breastplate:
-    char: ']'
+    char: 0xE030
     weight: 5
     color: medium_blue
     probability: 13
     category: ['breastplate']
 
 - Gambeson:
-    char: ']'
+    char: 0xE030
     color: brown
     weight: 3
     probability: 18
     category: ['breastplate']
     
 - Linothorax:
-    char: '^'
+    char: 0xE030
     color: green
     weight: 0
     defence: 1
@@ -121,7 +121,7 @@ armor:
     probability: 19
     
 - Robe:
-    char: '^'
+    char: 0xE02E
     color: grey
     weight: 0
     defence: 1
@@ -130,20 +130,20 @@ armor:
   
 # Sheild class
 - Kite Sheild:
-    char: '}'
+    char: 0xE027
     weight: 6
     probability: 10
     category: ['sheild']
 
 - Wood Buckler:
-    char: '}'
+    char: 0xE031
     color: brown
     weight: 3
     probability: 15
     category: ['sheild']
 
 - Small Round Sheild:
-    char: 'o'
+    char: 0xE01C
     color: grey
     weight: 2
     probability: 20
@@ -151,48 +151,55 @@ armor:
 
 # Helmet class
 
-- Viking Helmb:
-    char: '*'
+- Elvin Helm:
+    char: 0xE02C
+    weight: 0
+    defence: 4
+    probability: 10
+    category: ['helmet']
+
+- Viking Helm:
+    char: 0xE02B
     weight: 3
     probability: 15
     category: ['helmet']
-    
+
 - Leather Cap:
-    char: '*'
+    char: 0xE029
     color: grey
     weight: 1
     probability: 20
-    category: ['helmet']
+    category: ['helmet', 'cloth']
 
 ranged weapons:
 - Yew Bow:
+    char: 0xE03E
     weight: 3
     probability: 5
     range: 13
     load_speed: 0
     category: ['bow']
-    char: ')'
     
 - Ash Bow:
+    char: 0xE03E
     color: medium_blue
     weight: 2
     probability: 8
     load_speed: 1
     category: ['bow']
     range: 10
-    char: ')'
 
 - Elm Bow:
+    char: 0xE03E
     color: brown
     weight: 1
     probability: 12
     category: ['bow']
     load_speed: 1
     range: 7
-    char: ')'
     
 - Crossbow:
-    char: '^'
+    char: 0xE03D
     weight: 5
     probability: 15
     range: 8
@@ -203,7 +210,7 @@ ranged weapons:
 
 missles:
 - Throwing Knife:
-    char: '!'
+    char: 0xE042
     color: white
     weight: 1
     hit: 8
@@ -212,25 +219,19 @@ missles:
 - Iron Bolt:
     weight: 1
     hit: 10
-    char: '_'
+    char: 0xE03F
     probability: 10
     
 - Wood Arrow:
     weight: 0
     hit: 5
     char: '-'
+    char: 0xE040
     probability: 15
 
 lights:
-- Fat Lamp:
-    char: '#'
-    weight: 2
-    radius: 13
-    lasts: 200
-    probability: 20
-
 - Torch:
-    char: ','
+    char: 0xE03B
     weight: 1
     radius: 8
     lasts: 500
@@ -238,16 +239,16 @@ lights:
 
 food:
 - Food Ration:
-    char: '%'
+    char: 0xE011
     nutrition: 12
     probability: 8
 
 - Bread:
-    char: '='
+    char: 0xE039
     nutrition: 15
     probability: 8
 
-- Hunk of Meat:
-    char: 'm'
+- Fish:
+    char: 0xE037
     nutrition: 20
     probability: 7

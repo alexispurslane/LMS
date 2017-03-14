@@ -129,7 +129,7 @@ namespace draw
 
         terminal_put(gs->player->loc->x + gs->offset->x,
                      gs->player->loc->y + gs->offset->y,
-                     0xE100 + gs->player->c);
+                     0xE000+gs->player->c);
     }
 
     /*

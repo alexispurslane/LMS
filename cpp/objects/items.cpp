@@ -201,7 +201,7 @@ int items::load_items()
         // All Items have these properties
         item.name = item_map["name"].str;
         item.categories = item_map["category"].strv;
-        item.c = item_map["char"].str.c_str()[0];
+        item.c = std::stoi(item_map["char"].str.c_str());
         item.color = item_map["color"].str;
         item.weight = item_map["weight"].i;
         item.probability = item_map["probability"].i;
@@ -215,7 +215,10 @@ int items::load_items()
             break;
 
         case IBC::Armor:
-            item.defence = item_map["defence"].i;
+            if (item_map.find("defence") != item_map.end())
+            {
+                item.defence = item_map["defence"].i;
+            }
             break;
 
         case IBC::RangedWeapon:

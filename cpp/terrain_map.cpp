@@ -111,14 +111,14 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
                     }
                     std::set<dungeons::MapElement> adj
                     {
-                        this[{x-1, y}], this[{x, y-1}], this[{x+1, y}], this[{x, y+1}],
-                            };
+                        this[{x-1, y}], this[{x, y-1}], this[{x+1, y}], this[{x, y+1}];
+                    };
 
                     if (std::find_if(adj.begin(), adj.end(),
                                      [](dungeons::MapElement x) { return x.sme == t.sme; })
                         == adj.end())
                     {
-                        x = 0xE020;
+                        x = 0xE01D;
                     }
                 case dungeons::StaticMapElement::UpStairs:
                     x += 13;
@@ -131,12 +131,15 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
                 case dungeons::StaticMapElement::GeneralObject:
                     if (t.i != nullptr)
                     {
-                        x += t->i.front->c;
+                        terminal_color(t->i.front->color_fg);
+                        x = t->i.front->c;
+                        terminal_color(color_from_name("white"));
                     }
                     if (t.m != nullptr)
                     {
-                        x += t->m.front->color_fg;
-                        x += t->m.front->c;
+                        terminal_color(t->m.front->color_fg);
+                        x = t->m.front->c;
+                        terminal_color(color_from_name("white"));
                     }
                 }
             }

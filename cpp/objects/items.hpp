@@ -22,7 +22,7 @@ namespace items
     {
         std::string name;
         std::vector<std::string> categories;
-        char c;
+        int c;
         color_t color;
         WBC broad_category;
         int weight;
