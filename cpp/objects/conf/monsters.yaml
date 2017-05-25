@@ -1,6 +1,6 @@
 monsters:
 - Fury:
-    char: f
+    tile: 0xE047
     color: yellow
     speed: 1
     health: 80
@@ -8,7 +8,7 @@ monsters:
     agressive: True
 
 - Wolf:
-    char: w
+    tile: 0xE039
     color: blue
     speed: 4
     health: 30
@@ -16,14 +16,14 @@ monsters:
     agressive: True
 
 - Dragon:
-    char: D
-    color: dark_red
+    tiles: [0xE060, 0xE061, 0xE06A, 0xE06B]
+    color: dark red
     health: 300
     speed: 15
     attack: 90
 
 - Goblin:
-    char: g
+    tile: 0xE051
     color: green
     speed: 3
     health: 26
@@ -31,15 +31,15 @@ monsters:
     agressive: True
 
 - Lesser Ice Giant:
-    char: G
-    color: dark_green
+    tile: 0xE055
+    color: dark green
     health: 50
     speed: 20
     attack: 35
     agressive: True
   
 - Slime:
-    char: s
+    tile: 0xE04E
     color: (27, 226, 21)
     health: 13
     speed: 8
@@ -47,15 +47,15 @@ monsters:
     action: breed
   
 - Dwarf:
-    char: i
-    color: light_blue
+    tile: 0xE056
+    color: light blue
     health: 13
     speed: 4
     attack: 17
     action: filtch
   
 - Snake:
-    char: S
+    tile: 0xE048
     color: green
     health: 12
     speed: 2
@@ -64,8 +64,8 @@ monsters:
     agressive: True
 
 - Adder:
-    char: A
-    color: dark_red
+    tiles: [0xE062, 0xE063, 0xE06C, 0xE06D]
+    color: dark red
     health: 25
     speed: 1
     attack: 22
@@ -74,14 +74,14 @@ monsters:
     agressive: True
 
 - Rat:
-    char: r
+    tile: 0xE04C
     color: brown
     health: 12
     speed: 4
     attack: 15
 
 - Wyvern:
-    char: W
+    tile: 0xE04D
     color: grey
     speed: 10
     health: 80
@@ -89,8 +89,22 @@ monsters:
     agressive: True
 
 - FlyingDragon:
-    char: F
-    color: dark_yellow
+    tiles: [0xE060, 0xE061, 0xE06A, 0xE06B]
+    color: dark yellow
     speed: 6
     health: 200
     attack: 80
+
+- Octopus:
+    tile: 0xE049
+    color: pink
+    speed: 6
+    attack: 15
+    health: 20
+
+- Giant Octopus:
+    tiles: [0xE066, 0xE067, 0xE070, 0xE071]
+    color: dark pink
+    speed: 8
+    attack: 17
+    health: 40

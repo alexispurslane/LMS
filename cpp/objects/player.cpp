@@ -31,8 +31,9 @@ character::Player::Player(races::Race r) : race(r), inventory(r.starting_invento
     inventory.insert(inventory.end(), food.begin(), food.end());
 }
 
-void character::Player::handle_event(GS gs, char c);
+int character::Player::handle_event(GS gs, char c);
 {
+    int time = 0;
     // Dequip used lights
     for (auto i : dequip_queue)
     {
@@ -40,6 +41,7 @@ void character::Player::handle_event(GS gs, char c);
         if (i.lasts <= 0)
         {
             i.dequip(this);
+            time++;
             gs->messages.push_back("[color=yellow]Your "+i.name+" flickers out.");
             dequip_queue.erase(std::find(dequip_queue.begin(),
                                          dequip_queue.end(), item));
@@ -52,6 +54,7 @@ void character::Player::handle_event(GS gs, char c);
         if (poisoned > 0)
         {
             poisoned--;
+            time++;
             health.value--;
         }
         if (frozen > 0)
@@ -89,6 +92,7 @@ void character::Player::handle_event(GS gs, char c);
                   d) != consts::PLAYER_MOVEMENT.end())
     {
         move(gs, c);
+        time += 5;
     }
     else
     {
@@ -101,6 +105,7 @@ void character::Player::handle_event(GS gs, char c);
             }
             break;
         case '<': // Go downstairs
+            time += 7;
             if (gs->map[loc] == dungeons::StaticMapElement::DownStairs)
             {
                 gs->map.generate_new_map();
@@ -108,6 +113,7 @@ void character::Player::handle_event(GS gs, char c);
             }
             break;
         case '>': // Go upstairs
+            time += 8;
             if (gs->map[loc] == dungeons::StaticMapElement::UpStairs)
             {
                 gs->map.restore_dungeon(gs->map.level-1);
@@ -115,16 +121,19 @@ void character::Player::handle_event(GS gs, char c);
             }
             break;
         case ',':
+            time += 5;
             if (!gs->map[loc].i.empty())
             {
                 inventory.push_back(gs->map[loc].i.back());
                 gs->map[loc].i.pop_back();
             }
         case '.': // Rest
+            time += 9;
             rest();
             break;
         }
     }
+    return time;
 }
 
 utils::BoundedValue<int> character::Player::skill_with_item(items::Item a)

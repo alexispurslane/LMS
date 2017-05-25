@@ -1,6 +1,6 @@
 #include "lib/utils.hpp"
-#include "BearLibTerminal.h"
 #include "objects/monsters.hpp"
+#include "BearLibTerminal.h"
 #include "lib/area.hpp"
 #include <memory>
 #include <cmath>
@@ -71,25 +71,26 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
         {
             if (std::find(fov.begin(), fov.end(), area::Point(x, y)) != v.end())
             {
-                char x = 0xE000;
+                std::vector<int> tiles;
+                char tile = 0xE000;
                 auto c = color_from_name("white");
                 auto t = dungeon->map[y][x];
 
                 switch (t.sme)
                 {
                 case dungeons::StaticMapElement::Water:
-                    x += 5;
+                    tile += 5;
                     c = color_from_name("sea");
                     break;
                 case dungeons::StaticMapElement::Fire:
-                    x += 5;
+                    tile += 5;
                     c = color_from_name("flame");
                     break;
                 case dungeons::StaticMapElement::OpenDoor:
                     c = color_from_name("#966F33");
                     break;
                 case dungeons::StaticMapElement::ClosedDoor:
-                    x += 14;
+                    tile += 14;
                     c = color_from_name("#966F33");
                     break;
                 case dungeons::StaticMapElement::Wall:
@@ -97,15 +98,15 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
                     switch (a.type)
                     {
                     case Marble:
-                        x += 1;
+                        tile += 1;
                         c = color_from_name("white");
                         break;
                     case Stone:
-                        x += 2;
+                        tile += 2;
                         c = color_from_name("darker white");
                         break;
                     case Dirt:
-                        x += 32;
+                        tile += 32;
                         c = color_from_name("darker #966F33");
                         break;
                     }
@@ -118,30 +119,43 @@ void terrain_map::TerrainMap::draw_map(std::shared_ptr<T> gs, uint frame) const
                                      [](dungeons::MapElement x) { return x.sme == t.sme; })
                         == adj.end())
                     {
-                        x = 0xE01D;
+                        tile = 0xE01D;
                     }
                 case dungeons::StaticMapElement::UpStairs:
-                    x += 13;
+                    tile += 13;
                     c = color_from_name("dark white");
                     break;
                 case dungeons::StaticMapElement::DownStairs:
-                    x += 12;
+                    tile += 12;
                     c = color_from_name("darkest white");
                     break;
                 case dungeons::StaticMapElement::GeneralObject:
                     if (t.i != nullptr)
                     {
-                        terminal_color(t->i.front->color_fg);
-                        x = t->i.front->c;
-                        terminal_color(color_from_name("white"));
+                        c = t->i.front->color;
+                        tile = t->i.front->c;
                     }
                     if (t.m != nullptr)
                     {
-                        terminal_color(t->m.front->color_fg);
-                        x = t->m.front->c;
-                        terminal_color(color_from_name("white"));
+                        c = t->i.front->color;
+                        tile = t->m.front->tile;
+                        tiles = t->m.front->tiles;
                     }
                 }
+
+                if (tiles.size() == 4)
+                {
+                    terminal_put(x, y,     tiles[0]);
+                    terminal_put(x+1, y,   tiles[1]);
+                    terminal_put(x, y+1,   tiles[2]);
+                    terminal_put(x+1, y+1, tiles[3]);
+                }
+                else
+                {
+                    terminal_put(x, y, tile);
+                }
+                terminal_color(c);
+                terminal_color(color_from_name("white"));
             }
         }
     }
@@ -183,10 +197,25 @@ area::Area terrain_map::TerrainMap::area_at(area::Point p) const
 
 bool terrain_map::TerrainMap::walkable(area::Point p) const
 {
-    return this[p].sme != dungeons::StaticMapElement::ClosedDoor &&
-        this[p].sme != dungeons::StaticMapElement::Wall &&
-        !(this[p].sme == dungeons::StaticMapElement::GeneralObject &&
-          this[p].m != nullptr);
+    bool simple_monster_check = this[p].m != nullptr;
+
+    bool found_overlapping_monster = false;
+    for (auto m : dungeon->monsters)
+    {
+        Point p1{m.loc.x+1, m.loc.y};
+        Point p2{m.loc.x, m.loc.y+1};
+        Point p3{m.loc.x+1, m.loc.y+1};
+        if (p == p1 || p == p2 || p == p3)
+        {
+            found_overlapping_monster = true;
+        }
+    }
+    bool complex_monster_check = simple_monster_check && found_overlapping_monster;
+
+    bool basic_walk = this[p].sme != dungeons::StaticMapElement::ClosedDoor &&
+        this[p].sme != dungeons::StaticMapElement::Wall && simple_monster_check;
+
+    return basic_walk && !complex_monster_check;
 }
 
 area::Area[] terrain_map::TerrainMap::generate_areas() const

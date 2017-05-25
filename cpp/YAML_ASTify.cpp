@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <yaml.h>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <map>
@@ -7,91 +8,35 @@
 #include <sstream>
 #include <iostream>
 
-template <class T>
-std::string join_string(const std::vector<T> v)
-{
-    std::string result = "";
-    for (T e : v)
-    {
-        result += std::string(e);
-
-        if (e != v.back())
-        {
-            result += ", ";
-        }
-    }
-
-    return result;
-}
-
 bool is_number(const std::string& s)
 {
     return !s.empty() && std::find_if(s.begin(),
                                       s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
 
-enum class ItemValType
-{
-    String, StringVector, Integer, Empty
-};
+typedef std::string Action;
+std::map<std::string, Action> ACTIONS;
 
-struct ItemVal
+class Monster
 {
-    ItemValType type;
-    std::string str;
-    std::vector<std::string> strv;
-    int i = 0;
-};
-
-enum class IBC
-{
-    Weapon,
-    Armor,
-    RangedWeapon,
-    Missle,
-    Light,
-    Food
-};
-
-struct Item
-{
+public:
     std::string name;
-    std::vector<std::string> categories;
-    char c;
+    std::vector<int> tiles;
+    int tile;
     std::string color;
-    IBC broad_category;
-    int weight;
-    int probability;
-
-    // Weapon
-    int handedness;
+    int speed;
+    int health;
     int attack;
-
-    // Armor
-    int defence;
-
-    // Ranged Weapon
-    int range;
-    int load_speed;
-
-    // Missle
-    int hit;
-    int accuracy;
-
-    // Light
-    int radius;
-    int lasts;
-
-    // Food
-    int nutrition;
+    bool aggressive;
+    Action action;
+    bool ranged;
 };
-std::map<std::string, Item> ITEMS;
 
-typedef std::map<std::string,  ItemVal> ItemMap;
+std::map<std::string, Monster> MONSTERS;
 
 int main(void)
 {
-    FILE *fh = fopen("/Users/christopherdumas/AlchemySphere/cpp/objects/conf/items.yaml", "r");
+    FILE *fh = fopen("/Users/christopherdumas/AlchemySphere/cpp/objects/conf/monsters.yaml", "r");
     yaml_parser_t parser;
     yaml_event_t  event;   /* New variable */
 
@@ -108,28 +53,35 @@ int main(void)
     /* Set input file */
     yaml_parser_set_input_file(&parser, fh);
 
-    /* START new code */
+    /* START\n new code */
+    enum class MonsterValType
+    {
+        Str, Bool, Int, IntVector, Empty
+    };
+
+    struct MonsterVal
+    {
+        MonsterValType type;
+        std::string str;
+        std::vector<int> iv;
+        int i = 0;
+        bool b = false;
+    };
+
+    typedef std::map<std::string,  MonsterVal> MonsterMap;
+
     int mapping_level = 0;
+    enum MappingLevels { TypeMapping = 1, Mapping = 2, PropertyMapping = 3 };
+
     int sequence_level = 0;
-    enum MappingLevels
-    {
-        TypeMapping = 1,
-        Mapping = 2,
-        PropertyMapping = 3
-    };
+    enum SequenceLevels { TypeOfMonster = 1, Tiles = 2 };
 
-    enum SequenceLevels
-    {
-        TypeOfItem = 1,
-        Categories = 2
-    };
-
-    std::vector<ItemMap> items;
-    ItemMap item;
+    std::vector<MonsterMap> monsters;
+    MonsterMap monster;
     std::string key = "";
 
-    ItemVal val;
-    val.type = ItemValType::Empty;
+    MonsterVal val;
+    val.type = MonsterValType::Empty;
 
     do
     {
@@ -142,23 +94,21 @@ int main(void)
         switch(event.type)
         {
         case YAML_SEQUENCE_START_EVENT:
-            if (sequence_level == Categories)
-            {
-                if (key == "category")
-                {
-                    val.type = ItemValType::StringVector;
-                    val.strv = std::vector<std::string>();
-                }
-            }
             sequence_level++;
+            if (sequence_level == Tiles && key == "tiles")
+            {
+                monster.erase("tile");
+                key = "tiles";
+                val.type = MonsterValType::IntVector;
+                val.iv = std::vector<int>();
+            }
             break;
 
         case YAML_SEQUENCE_END_EVENT:
-            if (sequence_level == Categories)
+            if (sequence_level == Tiles)
             {
-                item[key] = val;
-                val.type = ItemValType::Empty;
-                val.strv = std::vector<std::string>();
+                monster[key] = val;
+                val.type = MonsterValType::Empty;
                 key = "";
             }
             sequence_level--;
@@ -173,10 +123,10 @@ int main(void)
             switch (mapping_level)
             {
             case Mapping:
-                // Item::name (in this case in pre-postprocessing map)
+                // Monster::name (in this case in pre-postprocessing map)
                 // is always a string (hopefully)
-                items.push_back(item);
-                item = std::map<std::string, ItemVal>();
+                monsters.push_back(monster);
+                monster = MonsterMap();
                 break;
             }
             break;
@@ -184,9 +134,12 @@ int main(void)
             /* Data */
         case YAML_SCALAR_EVENT:
             std::string strval(reinterpret_cast<char*>(event.data.scalar.value));
-            if (sequence_level == Categories)
+            if (sequence_level == Tiles)
             {
-                val.strv.push_back(strval);
+                std::stringstream convert(strval);
+                unsigned int value;
+                convert >> std::hex >> value;
+                val.iv.push_back(value);
             }
             else if (mapping_level == PropertyMapping)
             {
@@ -194,45 +147,56 @@ int main(void)
                 {
                     key = strval;
                 }
-                else if (val.type == ItemValType::Empty)
+                else if (val.type == MonsterValType::Empty)
                 {
                     if (is_number(strval))
                     {
                         std::stringstream convert(strval);
                         convert >> val.i;
-                        val.type = ItemValType::Integer;
+                        val.type = MonsterValType::Int;
+                    }
+                    else if (strval == "True")
+                    {
+                        val.type = MonsterValType::Bool;
+                        val.b = true;
+                    }
+                    else if (strval == "False")
+                    {
+                        val.type = MonsterValType::Bool;
+                        val.b = false;
                     }
                     else
                     {
                         val.str = strval;
-                        val.type = ItemValType::String;
+                        val.type = MonsterValType::Str;
                     }
                 }
 
-                if (val.type != ItemValType::Empty && key != "")
+                if (val.type != MonsterValType::Empty && key != "")
                 {
-                    item[key] = val;
+                    monster[key] = val;
                     key = "";
-                    val.type = ItemValType::Empty;
+                    val.type = MonsterValType::Empty;
                 }
             }
             else if (mapping_level == TypeMapping)
             {
-                val.type = ItemValType::String;
+                val.type = MonsterValType::Str;
                 val.str = strval;
-                item["broad_category"] = val;
-                val.type = ItemValType::Empty;
+                monster["broad_category"] = val;
+                val.type = MonsterValType::Empty;
             }
             else if (mapping_level == Mapping)
             {
-                std::transform(strval.begin(), strval.end(), strval.begin(), [](char ch) {
-                        return ch == ' ' ? '_' : toupper(ch);
-                    });
+                std::transform(strval.begin(), strval.end(), strval.begin(),
+                               [](char ch) {
+                                   return ch == ' ' ? '_' : toupper(ch);
+                               });
 
-                val.type = ItemValType::String;
+                val.type = MonsterValType::Str;
                 val.str = strval;
-                item["name"] = val;
-                val.type = ItemValType::Empty;
+                monster["name"] = val;
+                val.type = MonsterValType::Empty;
             }
             break;
         }
@@ -243,79 +207,48 @@ int main(void)
     }
     while(event.type != YAML_STREAM_END_EVENT);
 
-    for (auto item_map : items)
+    for (auto mmap : monsters)
     {
-        Item item;
-
-        IBC ibc = IBC::Light; // Random, doesn't matter.
-        if (item_map["broad_category"].str == "weapon")
+        Monster mon;
+        mon.name = mmap["name"].str;
+        if (mmap.find("tiles") != mmap.end())
         {
-            ibc = IBC::Weapon;
+            mon.tiles = mmap["tiles"].iv;
         }
-        else if (item_map["broad_category"].str == "armor")
+        else
         {
-            ibc = IBC::Armor;
+            mon.tiles = {mmap["tile"].i};
         }
-        else if (item_map["broad_category"].str == "ranged weapon")
+        mon.color = /*color_from_name*/(mmap["color"].str/*.c_str()*/);
+        mon.speed = mmap["speed"].i;
+        mon.health = mmap["health"].i;
+        mon.attack = mmap["attack"].i;
+        if (mmap.find("agressive") != mmap.end() && mmap["aggressive"].b)
         {
-            ibc = IBC::RangedWeapon;
+            mon.aggressive = true;
         }
-        else if (item_map["broad_category"].str == "missle")
+        else
         {
-            ibc = IBC::Missle;
+            mon.aggressive = false;
         }
-        else if (item_map["broad_category"].str == "light")
+        if (mmap.find("ranged") != mmap.end() && mmap["ranged"].b)
         {
-            ibc = IBC::Light;
+            mon.ranged = true;
         }
-
-        // All Items have these properties
-        item.name = item_map["name"].str;
-        item.categories = item_map["category"].strv;
-        item.c = item_map["char"].str.c_str()[0];
-        item.color = item_map["color"].str;
-        item.weight = item_map["weight"].i;
-        item.probability = item_map["probability"].i;
-        item.broad_category = ibc;
-
-        switch (ibc)
+        else
         {
-        case IBC::Weapon:
-            item.handedness = item_map["handedness"].i;
-            item.attack = item_map["attack"].i;
-            break;
-
-        case IBC::Armor:
-            item.defence = item_map["defence"].i;
-            break;
-
-        case IBC::RangedWeapon:
-            item.range = item_map["range"].i;
-            item.load_speed = item_map["load_speed"].i;
-            break;
-
-        case IBC::Missle:
-            item.hit = item_map["hit"].i;
-            item.accuracy = item_map["accuracy"].i;
-            break;
-
-        case IBC::Light:
-            item.radius = item_map["radius"].i;
-            item.lasts = item_map["lasts"].i;
-            break;
-
-        case IBC::Food:
-            item.nutrition = item_map["nutrition"].i;
-            break;
+            mon.ranged = false;
         }
-        ITEMS[item_map["name"].str] = item;
+        /*mon.action = ACTIONS[mmap["action"].str];*/
+        MONSTERS[mon.name] = mon;
     }
 
     yaml_event_delete(&event);
-    /* END new code */
+    /* END\n new code */
 
     /* Cleanup */
     yaml_parser_delete(&parser);
     fclose(fh);
+
     return 0;
 }

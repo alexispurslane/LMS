@@ -1,4 +1,5 @@
 #include "items.hpp"
+#include "../lib/utils.hpp"
 #include <yaml.h>
 #include <stdio.h>
 #include <stdexcept>
@@ -18,7 +19,7 @@ struct ItemVal
 
 typedef std::map<std::string,  ItemVal> ItemMap;
 
-int items::load_items()
+void items::load()
 {
     FILE *fh = fopen("/Users/christopherdumas/AlchemySphere/cpp/objects/conf/items.yaml", "r");
     yaml_parser_t parser;
@@ -125,7 +126,7 @@ int items::load_items()
                 }
                 else if (val.type == ItemValType::Empty)
                 {
-                    if (is_number(strval))
+                    if (utils::is_number(strval))
                     {
                         std::stringstream convert(strval);
                         convert >> val.i;
@@ -176,71 +177,71 @@ int items::load_items()
     {
         Item item;
 
-        IBC ibc = IBC::Light; // Random, doesn't matter.
+        WBC ibc = WBC::Light; // Random, doesn't matter.
         if (item_map["broad_category"].str == "weapon")
         {
-            ibc = IBC::Weapon;
+            ibc = WBC::Weapon;
         }
         else if (item_map["broad_category"].str == "armor")
         {
-            ibc = IBC::Armor;
+            ibc = WBC::Armor;
         }
         else if (item_map["broad_category"].str == "ranged weapon")
         {
-            ibc = IBC::RangedWeapon;
+            ibc = WBC::RangedWeapon;
         }
         else if (item_map["broad_category"].str == "missle")
         {
-            ibc = IBC::Missle;
+            ibc = WBC::Missle;
         }
         else if (item_map["broad_category"].str == "light")
         {
-            ibc = IBC::Light;
+            ibc = WBC::Light;
         }
 
         // All Items have these properties
         item.name = item_map["name"].str;
         item.categories = item_map["category"].strv;
         item.c = std::stoi(item_map["char"].str.c_str());
-        item.color = item_map["color"].str;
+        item.color = color_from_name(item_map["color"].str);
         item.weight = item_map["weight"].i;
         item.probability = item_map["probability"].i;
         item.broad_category = ibc;
 
         switch (ibc)
         {
-        case IBC::Weapon:
+        case WBC::Weapon:
             item.handedness = item_map["handedness"].i;
             item.attack = item_map["attack"].i;
             break;
 
-        case IBC::Armor:
+        case WBC::Armor:
             if (item_map.find("defence") != item_map.end())
             {
                 item.defence = item_map["defence"].i;
             }
             break;
 
-        case IBC::RangedWeapon:
+        case WBC::RangedWeapon:
             item.range = item_map["range"].i;
             item.load_speed = item_map["load_speed"].i;
             break;
 
-        case IBC::Missle:
+        case WBC::Missle:
             item.hit = item_map["hit"].i;
             item.accuracy = item_map["accuracy"].i;
             break;
 
-        case IBC::Light:
+        case WBC::Light:
             item.radius = item_map["radius"].i;
             item.lasts = item_map["lasts"].i;
             break;
 
-        case IBC::Food:
+        case WBC::Food:
             item.nutrition = item_map["nutrition"].i;
             break;
         }
-        ITEMS[item_map["name"].str] = item;
+        ITEMS[item_map["name"].str] = std::move(item);
     }
 
     yaml_event_delete(&event);

@@ -28,7 +28,7 @@ namespace character
                 uint poisoned = 0;
                 uint frozen = 0;
                 int hunger = 0;
-                int tile_code = 0xE059;
+                int tile = 0xE059;
 
                 // Stats
                 std::map<std::string, utils::BoundedValue<uint> > skill_tree{};
@@ -51,7 +51,7 @@ namespace character
                 std::vector<items::Item> missles;
 
                 Player(races::Race r);
-                void handle_event(GS gs, char c);
+                int handle_event(GS gs, char c);
                 utils::BoundedValue<int> skill_with_item(items::Item a);
                 bool can_use(items::Item a);
                 bool has(items::Item x);

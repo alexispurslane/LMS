@@ -7,7 +7,6 @@
 #pragma once
 namespace items
 {
-    void load_items();
     enum class WBC
     {
         Weapon,
@@ -70,4 +69,5 @@ namespace items
     };
 
     typedef std::map<std::string,  ItemVal> ItemMap;
+    void load();
 }

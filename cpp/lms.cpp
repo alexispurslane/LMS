@@ -44,7 +44,8 @@ int main()
     gs->sidescreen = utils::SideScreenState::HUD;
     gs->map        = {consts::WIDTH, consts::HEIGHT};
     gs->player     = {races::WARRIOR};
-
+    items::load();
+    monsters::load();
 
     std::ifstream infile(".gamescores");
     std::string line;
@@ -134,6 +135,8 @@ int main()
                         id = "a moldy, lichen covered stone wall";
                         break;
                     }
+                default:
+                    id = "unknown";
                     break;
                 }
 
@@ -208,39 +211,44 @@ int main()
                 }
                 else if (gs->screen == utils::ScreenState::Game)
                 {
-                    char character = terminal_check(TK_CHAR);
-                    if (std::find(consts::PLAYER_HANDLE.begin(),
-                                  consts::PLAYER_HANDLE.end(),
-                                  character) != consts::PLAYER_HANDLE.end())
+                    int allotted = 10;
+                    while (allotted > 0)
                     {
-                        gs->player.handle_event(gs, character);
-                    }
-                    else
-                    {
-                        switch (character)
+                        char character = terminal_check(TK_CHAR);
+                        if (std::find(consts::PLAYER_HANDLE.begin(),
+                                      consts::PLAYER_HANDLE.end(),
+                                      character) != consts::PLAYER_HANDLE.end())
                         {
-                        case 'i':
-                            if (gs->sidescreen == utils::SideScreenState::Inventory)
+                            allotted -= gs->player.handle_event(gs, character);
+                        }
+                        else
+                        {
+                            allotted -= 10;
+                            switch (character)
                             {
-                                gs->sidescreen = utils::SideScreenState::HUD;
+                            case 'i':
+                                if (gs->sidescreen == utils::SideScreenState::Inventory)
+                                {
+                                    gs->sidescreen = utils::SideScreenState::HUD;
+                                }
+                                else
+                                {
+                                    gs->sidescreen = utils::SideScreenState::Inventory;
+                                }
+                                break;
+                            case 'm':
+                                if (gs->sidescreen == utils::SideScreenState::Skills)
+                                {
+                                    gs->sidescreen = utils::SideScreenState::HUD;
+                                }
+                                else
+                                {
+                                    gs->sidescreen = utils::SideScreenState::Skills;
+                                }
+                                break;
+                            default:
+                                break;
                             }
-                            else
-                            {
-                                gs->sidescreen = utils::SideScreenState::Inventory;
-                            }
-                            break;
-                        case 'm':
-                            if (gs->sidescreen == utils::SideScreenState::Skills)
-                            {
-                                gs->sidescreen = utils::SideScreenState::HUD;
-                            }
-                            else
-                            {
-                                gs->sidescreen = utils::SideScreenState::Skills;
-                            }
-                            break;
-                        default:
-                            break;
                         }
                     }
                 }
