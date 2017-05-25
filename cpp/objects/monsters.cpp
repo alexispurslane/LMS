@@ -190,7 +190,7 @@ void monsters::load()
         {
             mon.tiles = {mmap["tile"].i};
         }
-        mon.color = /*color_from_name*/(mmap["color"].str/*.c_str()*/);
+        mon.color = color_from_name(mmap["color"].str.c_str());
         mon.speed = mmap["speed"].i;
         mon.health = mmap["health"].i;
         mon.attack = mmap["attack"].i;
@@ -210,7 +210,7 @@ void monsters::load()
         {
             mon.ranged = false;
         }
-        /*mon.action = ACTIONS[mmap["action"].str];*/
+        mon.action = ACTIONS[mmap["action"].str];
         MONSTERS[mon.name] = mon;
     }
 
