@@ -1,8 +1,47 @@
+#include <algorithm>
 #include "monsters.hpp"
+
+std::vector<area::Point> adj =
+{
+    {0,1},
+    {0,-1},
+    {1,0},
+    {-1,0},
+    {-1,-1},
+    {1,1},
+    {-1,1},
+    {1,-1}
+};
 
 void monsters::Monster::run_ai(GS gs)
 {
+    std::vector<int> ratings;
+    std::transform(
+        adj.begin(), adj.end(),
+        ratings.begin(),
+        (const area::Point p) const
+        {
+            return (p + loc).dist_from_point(gs->player.loc);
+        });
+    int idx = std::distance(ratings.begin(),
+                            std::min_element(ratings.begin(),
+                                             ratings.end()));
+    area::Point min = adj[idx];
+    loc += min;
+}
 
+monsters::Monster::Monster(const Monster &m, area::Point l = {0,0})
+{
+    name = m.name;
+    tiles = m.name;
+    color = m.name;
+    speed = m.name;
+    health = m.name;
+    attack = m.name;
+    aggressive = m.name;
+    action = m.name;
+    ranged = m.name;
+    loc = l;
 }
 
 void monsters::load()
@@ -211,6 +250,7 @@ void monsters::load()
             mon.ranged = false;
         }
         mon.action = ACTIONS[mmap["action"].str];
+        mon.loc = {0,0};
         MONSTERS[mon.name] = mon;
     }
 

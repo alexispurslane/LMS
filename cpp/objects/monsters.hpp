@@ -35,6 +35,7 @@ namespace monsters
         Action action;
         bool ranged;
         void run_ai(GS gs);
+        area::Point loc;
     };
 
     extern std::map<std::string, Monster> MONSTERS;

@@ -15,6 +15,10 @@ namespace area
         Point(int sx, int sy) : x(sx), y(sy) {};
         Point(std::tuple<int, int> t) : x(std::get<0>(t)), y(std::get<1>(t)) {};
         double dist_from_center() const { return sqrt(x*x + y*y); };
+        double dist_from_point(Point p) const
+        {
+            return sqrt((p.x*p.x-x*x) + (p.y*p.y-y*y));
+        };
         Point operator+(Point o) const { return {x+o.y, y+o.y}; }
         Point operator-(Point o) const { return {x-o.x, y-o.y}; }
         Point operator*(Point o) const { return {x*o.x, y*o.y}; }
